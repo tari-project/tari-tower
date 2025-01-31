@@ -1,6 +1,6 @@
 {
 	"name": "@tari-project/tari-tower",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"private": false,
 	"description": "the tower animation used in Tari Universe",
 	"homepage": "https://github.com/tari-project/tari-tower#readme",
@@ -24,7 +24,7 @@
 			"default": "./dist/main.js"
 		}
 	},
-	"main": "lib/main.ts",
+	"main": "dist/main.js",
 	"files": [
 		"/dist"
 	],
