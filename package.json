@@ -1,0 +1,65 @@
+{
+	"name": "@tari-project/tari-tower",
+	"version": "0.0.1",
+	"private": false,
+	"description": "the tower animation used in Tari Universe",
+	"homepage": "https://github.com/tari-project/tari-tower#readme",
+	"bugs": {
+		"url": "https://github.com/tari-project/tari-tower/issues"
+	},
+	"author": "",
+	"license": "ISC",
+	"type": "module",
+	"exports": {
+		".": {
+			"/BASE.buf": "./dist/assets/models/BASE.buf",
+			"/BOX.buf": "./dist/assets/models/BOX.buf",
+			"/COIN.buf": "./dist/assets/models/COIN.buf",
+			"/COIN_PLACEMENT.buf": "./dist/assets/models/COIN_PLACEMENT.buf",
+			"/LOSE_ANIMATION.buf": "./dist/assets/models/LOSE_ANIMATION.buf",
+			"/gobo.jpg": "./dist/assets/textures/gobo.jpg",
+			"/LDR_RGB1_0.png": "./dist/assets/textures/LDR_RGB1_0.png",
+			"/matcap_gold.jpg": "./dist/assets/textures/matcap_gold.jpg",
+			"types": "./dist/main.d.ts",
+			"default": "./dist/main.js"
+		}
+	},
+	"main": "lib/main.ts",
+	"files": [
+		"/dist"
+	],
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc --p ./tsconfig.lib.json && vite build",
+		"build:watch": "tsc --p ./tsconfig.lib.json && vite build -w",
+		"preview": "vite preview",
+		"lint": "eslint lib"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.19.0",
+		"@nabla/vite-plugin-eslint": "^2.0.5",
+		"@types/eslint__js": "^8.42.3",
+		"@types/node": "^22.12.0",
+		"@types/three": "^0.172.0",
+		"@typescript-eslint/parser": "^8.22.0",
+		"eslint": "^9.19.0",
+		"eslint-config-prettier": "^9.1.0",
+		"glob": "^11.0.1",
+		"globals": "^15.14.0",
+		"lil-gui": "^0.20.0",
+		"min-signal": "^1.0.2",
+		"prettier": "3.3.3",
+		"typescript": "^5.7.3",
+		"typescript-eslint": "^8.22.0",
+		"vite": "^6.0.11",
+		"vite-plugin-dts": "^4.5.0",
+		"vite-tsconfig-paths": "^5.1.4"
+	},
+	"peerDependencies": {
+		"min-signal": "^1.0.2",
+		"three": "^0.172.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
