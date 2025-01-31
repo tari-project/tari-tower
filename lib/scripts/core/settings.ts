@@ -1,4 +1,4 @@
-export const ASSETS_PATH = '/assets';
+export const ASSETS_PATH = '';
 const DPR = Math.min(2, window.devicePixelRatio || 1);
 const USE_PIXEL_LIMIT = true;
 const MAX_PIXEL_COUNT = 2560 * 1440;

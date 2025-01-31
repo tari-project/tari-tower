@@ -20,7 +20,8 @@
 		"strict": true,
 		"noFallthroughCasesInSwitch": true,
 		"noImplicitAny": false,
-		"types": ["vite/client"]
+		"types": ["vite/client"],
+		"baseUrl": "."
 	},
 	"include": ["src"],
 	"references": [{ "path": "./tsconfig.node.json" }]

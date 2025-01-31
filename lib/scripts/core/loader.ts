@@ -1,19 +1,41 @@
 import * as THREE from 'three';
 import { properties } from './properties';
 
+import BASE from '/assets/BASE.buf?inline';
+import BOX from '/assets/BOX.buf?inline';
+import COIN from '/assets/COIN.buf?inline';
+import COIN_PLACEMENT from '/assets/COIN_PLACEMENT.buf?inline';
+import LOSE_ANIMATION from '/assets/LOSE_ANIMATION.buf?inline';
+
+import gobo from '/assets/gobo.jpg?url';
+import LDR_RGB1_0 from '/assets/LDR_RGB1_0.png?url';
+import matcap_gold from '/assets/matcap_gold.jpg?url';
+
 interface LoaderItems {
 	list: (() => void | Promise<void>)[];
 	loadedCount: number;
 	onLoadCallback: (() => void) | null;
 }
 
+const assets = {
+	'models/BASE.buf': BASE,
+	'models/BOX.buf': BOX,
+	'models/COIN.buf': COIN,
+	'models/COIN_PLACEMENT.buf': COIN_PLACEMENT,
+	'models/LOSE_ANIMATION.buf': LOSE_ANIMATION,
+	'textures/gobo.jpg': gobo,
+	'textures/LDR_RGB1_0.png': LDR_RGB1_0,
+	'textures/matcap_gold.jpg': matcap_gold,
+};
 const Loader = () => {
 	let list: LoaderItems['list'] = [];
 	let loadedCount: LoaderItems['loadedCount'] = 0;
 	let onLoadCallback: LoaderItems['onLoadCallback'] = null;
 
-	function loadBuf(url, cb) {
-		console.debug(`url= ${url}`);
+	function loadBuf(filename, cb) {
+		console.debug(filename);
+		const url = assets[filename];
+		console.debug(url);
 		list.push(async () => {
 			try {
 				const response = await fetch(url);
@@ -78,7 +100,10 @@ const Loader = () => {
 		return outArr;
 	}
 
-	function loadTexture(url, cb) {
+	function loadTexture(filename, cb) {
+		console.debug(`filename= ${filename}`);
+		const url = assets[filename];
+		console.debug(url);
 		list.push(() => {
 			new THREE.TextureLoader().load(
 				url,

@@ -35,8 +35,8 @@ const coinsSharedUniforms = {
 
 const Coins = () => {
 	async function preload() {
-		const modelPath = ASSETS_PATH + '/models';
-		const texturePath = ASSETS_PATH + '/textures';
+		const modelPath = ASSETS_PATH + 'models';
+		const texturePath = ASSETS_PATH + 'textures';
 		loader.loadTexture(`${texturePath}/matcap_gold.jpg`, (texture) => {
 			matcapTexture = texture;
 			matcapTexture.needsUpdate = true;

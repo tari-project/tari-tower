@@ -80,8 +80,8 @@ const Hero = () => {
 		heroState._blockList = arr.map((_) => new HeroBlockCoordinates());
 		heroState._blockRenderList = [...heroState._blockList];
 
-		const modelPath = ASSETS_PATH + '/models';
-		const texturePath = ASSETS_PATH + '/textures';
+		const modelPath = ASSETS_PATH + 'models';
+		const texturePath = ASSETS_PATH + 'textures';
 
 		loader.loadBuf(`${modelPath}/BASE.buf`, (geometry) => {
 			_onBaseBlocksLoaded(geometry);

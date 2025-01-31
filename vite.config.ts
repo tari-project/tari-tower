@@ -1,42 +1,30 @@
 import { defineConfig } from 'vite';
 import eslint from '@nabla/vite-plugin-eslint';
-
+import commonjs from '@rollup/plugin-commonjs';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import dts from 'vite-plugin-dts';
-import libAssetsPlugin from '@laynezh/vite-plugin-lib-assets';
-import { resolve } from 'path';
 
 export default defineConfig({
-	plugins: [
-		dts({ include: ['lib', 'assets'] }),
-		tsconfigPaths(),
-		eslint({ eslintOptions: { cache: false, fix: true } }),
-		libAssetsPlugin({
-			outputPath: (url) => {
-				return url.endsWith('.buf') ? 'assets/models' : 'assets/textures';
-			},
-			include: ['**/*.buf', '**/*.jpg', '**/*.png'],
-			name: '[name].[contenthash:8].[ext]',
-		}),
-	],
-
+	assetsInclude: ['**/*.buf', '**/*.jpg', '**/*.png'],
+	plugins: [commonjs(), dts({ include: ['lib'] }), tsconfigPaths(), eslint({ eslintOptions: { cache: false, fix: true } })],
 	build: {
-		lib: {
-			entry: resolve(__dirname, 'lib/main.ts'),
-			formats: ['es'],
-		},
 		sourcemap: true,
+		emitAssets: true,
 		rollupOptions: {
+			input: 'lib/main.ts',
 			external: ['three', 'min-signal'],
-			input: { main: resolve(__dirname, 'lib/main.ts') },
 			output: {
+				format: 'es',
+				name: 'main',
 				entryFileNames: '[name].js',
-				assetFileNames: 'assets/[name][ext]',
+				assetFileNames: 'assets/[name][extname]',
 				globals: {
 					'three': 'Three',
 					'min-signal': 'MinSignal',
 				},
 			},
+			makeAbsoluteExternalsRelative: true,
+			preserveEntrySignatures: 'exports-only',
 		},
 	},
 });

@@ -1,6 +1,6 @@
 {
 	"name": "@tari-project/tari-tower",
-	"version": "0.0.5",
+	"version": "0.0.6",
 	"private": false,
 	"description": "the tower animation used in Tari Universe",
 	"homepage": "https://github.com/tari-project/tari-tower#readme",
@@ -12,14 +12,14 @@
 	"type": "module",
 	"exports": {
 		".": {
-			"assets/models/BASE.buf": "./public/assets/models/BASE.buf",
-			"assets/models/BOX.buf": "./public/assets/models/BOX.buf",
-			"assets/models/COIN.buf": "./public/assets/models/COIN.buf",
-			"assets/models/COIN_PLACEMENT.buf": "./public/assets/models/COIN_PLACEMENT.buf",
-			"assets/models/LOSE_ANIMATION.buf": "./public/assets/models/LOSE_ANIMATION.buf",
-			"assets/textures/gobo.jpg": "./public/assets/textures/gobo.jpg",
-			"assets/textures/LDR_RGB1_0.png": "./public/assets/textures/LDR_RGB1_0.png",
-			"assets/textures/matcap_gold.jpg": "./public/assets/textures/matcap_gold.jpg",
+			"assets/BASE.buf": "./public/assets/BASE.buf",
+			"assets/BOX.buf": "./public/assets/BOX.buf",
+			"assets/COIN.buf": "./public/assets/COIN.buf",
+			"assets/COIN_PLACEMENT.buf": "./public/assets/COIN_PLACEMENT.buf",
+			"assets/LOSE_ANIMATION.buf": "./public/assets/LOSE_ANIMATION.buf",
+			"assets/gobo.jpg": "./public/assets/gobo.jpg",
+			"assets/LDR_RGB1_0.png": "./public/assets/LDR_RGB1_0.png",
+			"assets/matcap_gold.jpg": "./public/assets/matcap_gold.jpg",
 			"assets": "./dist/assets/",
 			"types": "./dist/main.d.ts",
 			"default": "./dist/main.js"
@@ -39,8 +39,8 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.19.0",
-		"@laynezh/vite-plugin-lib-assets": "^1.0.0",
 		"@nabla/vite-plugin-eslint": "^2.0.5",
+		"@rollup/plugin-commonjs": "^28.0.2",
 		"@types/eslint__js": "^8.42.3",
 		"@types/node": "^22.12.0",
 		"@types/three": "^0.172.0",
