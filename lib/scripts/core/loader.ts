@@ -16,7 +16,6 @@ const Loader = () => {
 		list.push(async () => {
 			try {
 				const response = await fetch(url);
-
 				const buffer = await response.arrayBuffer();
 				const schematicJsonSize = new Uint32Array(buffer, 0, 1)[0];
 				const schematic = JSON.parse(new TextDecoder().decode(new Uint8Array(buffer, 4, schematicJsonSize)));
@@ -78,8 +77,6 @@ const Loader = () => {
 	}
 
 	function loadTexture(url, cb) {
-		console.debug(url);
-
 		list.push(() => {
 			new THREE.TextureLoader().load(
 				url,
