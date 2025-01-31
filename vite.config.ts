@@ -19,8 +19,8 @@ export default defineConfig({
 		},
 	},
 	plugins: [dts({ include: ['lib'] }), tsconfigPaths(), eslint({ eslintOptions: { cache: false, fix: true } })],
-	assetsInclude: ['**/*.buf', '**/*.glsl', '**/*.frag', '**/*.vert', '**/*.jpg', '**/*.png'],
 	build: {
+		copyPublicDir: false,
 		lib: {
 			entry: resolve(__dirname, 'lib/main.ts'),
 			formats: ['es'],
@@ -30,7 +30,6 @@ export default defineConfig({
 			input: { main: resolve(__dirname, 'lib/main.ts') },
 			output: {
 				entryFileNames: '[name].js',
-				assetFileNames: 'assets/[dirname]/[name][ext]',
 				globals: {
 					'three': 'Three',
 					'min-signal': 'MinSignal',

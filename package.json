@@ -12,21 +12,12 @@
 	"type": "module",
 	"exports": {
 		".": {
-			"/BASE.buf": "./assets/models/BASE.buf",
-			"/BOX.buf": "./assets/models/BOX.buf",
-			"/COIN.buf": "./assets/models/COIN.buf",
-			"/COIN_PLACEMENT.buf": "./assets/models/COIN_PLACEMENT.buf",
-			"/LOSE_ANIMATION.buf": "./assets/models/LOSE_ANIMATION.buf",
-			"/gobo.jpg": "./assets/textures/gobo.jpg",
-			"/LDR_RGB1_0.png": "./assets/textures/LDR_RGB1_0.png",
-			"/matcap_gold.jpg": "./assets/textures/matcap_gold.jpg",
 			"default": "./dist/main.js"
 		}
 	},
 	"main": "dist/main.js",
 	"files": [
-		"/dist",
-		"/assets"
+		"/dist"
 	],
 	"scripts": {
 		"dev": "vite",
