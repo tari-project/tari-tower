@@ -1,21 +1,20 @@
 import { defineConfig } from 'vite';
 import eslint from '@nabla/vite-plugin-eslint';
-import commonjs from '@rollup/plugin-commonjs';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import dts from 'vite-plugin-dts';
 
 export default defineConfig({
-	assetsInclude: ['**/*.buf', '**/*.jpg', '**/*.png'],
-	plugins: [commonjs(), dts({ include: ['lib'] }), tsconfigPaths(), eslint({ eslintOptions: { cache: false, fix: true } })],
+	plugins: [dts({ include: ['lib'], rollupTypes: true, tsconfigPath: './tsconfig.app.json' }), tsconfigPaths(), eslint({ eslintOptions: { cache: false, fix: true } })],
 	build: {
-		sourcemap: true,
-		emitAssets: true,
+		lib: {
+			entry: 'lib/index.ts',
+			name: '@tari-project/tari-tower',
+			formats: ['es'],
+		},
 		rollupOptions: {
-			input: 'lib/main.ts',
+			input: 'lib/index.ts',
 			external: ['three', 'min-signal'],
 			output: {
-				format: 'es',
-				name: 'main',
 				entryFileNames: '[name].js',
 				assetFileNames: 'assets/[name][extname]',
 				globals: {
