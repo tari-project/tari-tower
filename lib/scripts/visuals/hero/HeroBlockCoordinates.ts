@@ -1,4 +1,4 @@
-import math from '@utils/math';
+import math from '../../utils/math';
 import * as THREE from 'three';
 import { Quaternion, Vector2, Vector3 } from 'three';
 

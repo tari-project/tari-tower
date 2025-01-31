@@ -12,6 +12,15 @@
 	"type": "module",
 	"exports": {
 		".": {
+			"/BASE.buf": "./dist/assets/models/BASE.buf",
+			"/BOX.buf": "./dist/assets/models/BOX.buf",
+			"/COIN.buf": "./dist/assets/models/COIN.buf",
+			"/COIN_PLACEMENT.buf": "./dist/assets/models/COIN_PLACEMENT.buf",
+			"/LOSE_ANIMATION.buf": "./dist/assets/models/LOSE_ANIMATION.buf",
+			"/gobo.jpg": "./dist/assets/textures/gobo.jpg",
+			"/LDR_RGB1_0.png": "./dist/assets/textures/LDR_RGB1_0.png",
+			"/matcap_gold.jpg": "./dist/assets/textures/matcap_gold.jpg",
+			"types": "./dist/main.d.ts",
 			"default": "./dist/main.js"
 		}
 	},
@@ -28,6 +37,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.19.0",
+		"@laynezh/vite-plugin-lib-assets": "^1.0.0",
 		"@nabla/vite-plugin-eslint": "^2.0.5",
 		"@types/eslint__js": "^8.42.3",
 		"@types/node": "^22.12.0",

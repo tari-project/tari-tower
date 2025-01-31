@@ -1,20 +1,20 @@
 import * as THREE from 'three';
-import { OrbitControls } from '@controls/OrbitControls';
-import { properties, resetProperties } from '@core/properties.ts';
-import { heroBlocks, heroContainer } from '@visuals/hero/hero.ts';
-import { coinContainer, coins } from '@visuals/coins/coins.ts';
-import blueNoise from '@utils/blueNoise/blueNoise.ts';
-import game from '@logic/systemManager.ts';
-import settings from '@core/settings.ts';
-import loader from '@core/loader.ts';
+import { OrbitControls } from './controls/OrbitControls';
+import { properties, resetProperties } from './core/properties';
+import { heroBlocks, heroContainer } from './visuals/hero/hero';
+import { coinContainer, coins } from './visuals/coins/coins';
+import blueNoise from './utils/blueNoise/blueNoise';
+import game from './logic/systemManager';
+import settings from './core/settings';
+import loader from './core/loader';
 
-import Background from '@visuals/bg/bg.ts';
-import { result, status } from '@logic/stateManager.ts';
-import { setAnimationState } from '@/main.ts';
-import { stopAnimationDuration } from '@logic/stopAnimationManager.ts';
-import { AnimationResult } from '@/types';
-import { errorAnimationDuration } from '@logic/errorAnimationManager.ts';
-import { successAnimationDuration } from '@logic/successAnimationManager.ts';
+import Background from './visuals/bg/bg';
+import { result, status } from './logic/stateManager';
+import { setAnimationState } from '../main';
+import { stopAnimationDuration } from './logic/stopAnimationManager';
+import { AnimationResult } from '../types';
+import { errorAnimationDuration } from './logic/errorAnimationManager';
+import { successAnimationDuration } from './logic/successAnimationManager';
 
 THREE.ColorManagement.enabled = false;
 const background = Background();

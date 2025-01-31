@@ -1,29 +1,29 @@
 import * as THREE from 'three';
 
-import loader from '@core/loader';
-import { properties } from '@core/properties';
-import math from '@utils/math';
-import ease, { customEasing } from '@utils/ease';
-import blueNoise from '@utils/blueNoise/blueNoise';
-import { blocks, firstStartAnimationRatio, lastSpawnedBlock, previousSuccessBlocksAnimationRatio } from '@logic/systemManager';
-import { result } from '@logic/stateManager';
-import { HALF_SIZE, SIZE, TOTAL_TILES, SIZE_WITH_PADDING, TOTAL_TILES_WITH_PADDING, tiles, board } from '@logic/board';
+import loader from '../../core/loader';
+import { properties } from '../../core/properties';
+import math from '../../utils/math';
+import ease, { customEasing } from '../../utils/ease';
+import blueNoise from '../../utils/blueNoise/blueNoise';
+import { blocks, firstStartAnimationRatio, lastSpawnedBlock, previousSuccessBlocksAnimationRatio } from '../../logic/systemManager';
+import { result } from '../../logic/stateManager';
+import { HALF_SIZE, SIZE, TOTAL_TILES, SIZE_WITH_PADDING, TOTAL_TILES_WITH_PADDING, tiles, board } from '../../logic/board';
 
 import vert from './hero.vert?raw';
 import frag from './hero.frag?raw';
 import fragDepth from './heroDepth.frag?raw';
 
-import { floatingCubesDisplacement, floatingCubesRatio, successPushDownRatio, successRatio, successColorTowerRatio, towerRotationRatio } from '@logic/successAnimationManager';
-import { stopPushDownRatio, stopSpawnRatio } from '@logic/stopAnimationManager';
-import { failFloatingCubesRatio, failPushDownRatio, failShakeRatio, failSpawnRatio } from '@logic/errorAnimationManager';
-import HeroBlockCoordinates from '@visuals/hero/HeroBlockCoordinates.ts';
-import { lightCameraHelperSignal, lightCameraUpdateSignal } from '@logic/signals.ts';
+import { floatingCubesDisplacement, floatingCubesRatio, successPushDownRatio, successRatio, successColorTowerRatio, towerRotationRatio } from '../../logic/successAnimationManager';
+import { stopPushDownRatio, stopSpawnRatio } from '../../logic/stopAnimationManager';
+import { failFloatingCubesRatio, failPushDownRatio, failShakeRatio, failSpawnRatio } from '../../logic/errorAnimationManager';
+import HeroBlockCoordinates from './HeroBlockCoordinates.ts';
+import { lightCameraHelperSignal, lightCameraUpdateSignal } from '../../logic/signals.ts';
 
 import { InstancedBufferAttribute } from 'three';
 import { SharedUniforms } from '../../../types/properties.ts';
 import { HeroType } from '../../../types/hero.ts';
 import { AnimationResult } from '../../../types';
-import { ASSETS_PATH } from '@core/settings.ts';
+import { ASSETS_PATH } from '../../core/settings.ts';
 
 const TOTAL_BLOCKS = 2 * TOTAL_TILES;
 const _v2_0 = new THREE.Vector2();

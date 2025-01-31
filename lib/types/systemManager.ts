@@ -1,4 +1,4 @@
-import Block from '@logic/Block.ts';
+import Block from '../scripts/logic/Block.ts';
 
 export interface SystemManagerState {
 	firstStartAnimationRatio: number;

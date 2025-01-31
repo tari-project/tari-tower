@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { properties } from '@core/properties';
-import blueNoise from '@utils/blueNoise/blueNoise';
+import { properties } from '../../core/properties';
+import blueNoise from '../../utils/blueNoise/blueNoise';
 
 import vert from './bg.vert?raw';
 import frag from './bg.frag?raw';

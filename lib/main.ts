@@ -5,7 +5,6 @@ import { result, stateManager, status, statusIndex } from './scripts/logic/state
 function setAnimationState(id: string, isReplay = false) {
 	stateManager.set(id, isReplay);
 }
-
 interface Property {
 	property: string;
 	value: unknown;

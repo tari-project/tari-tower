@@ -3,24 +3,20 @@ import eslint from '@nabla/vite-plugin-eslint';
 
 import tsconfigPaths from 'vite-tsconfig-paths';
 import dts from 'vite-plugin-dts';
+import libAssetsPlugin from '@laynezh/vite-plugin-lib-assets';
 import { resolve } from 'path';
 
 export default defineConfig({
-	resolve: {
-		alias: {
-			'@controls/*': resolve(__dirname, './lib/scripts/controls/*'),
-			'@core/*': resolve(__dirname, './lib/scripts/core/*'),
-			'@logic/*': resolve(__dirname, './lib/scripts/logic/*'),
-			'@utils/*': resolve(__dirname, './lib/scripts/utils/*'),
-			'@visuals/*': resolve(__dirname, './lib/scripts/visuals/*'),
-			'@/scripts': resolve(__dirname, './lib/scripts/*'),
-			'@/structs': resolve(__dirname, './lib/scripts/*'),
-			'@/*': resolve(__dirname, './lib/*'),
-		},
-	},
-	plugins: [dts({ include: ['lib'] }), tsconfigPaths(), eslint({ eslintOptions: { cache: false, fix: true } })],
+	plugins: [
+		dts({ include: ['lib', 'assets'] }),
+		tsconfigPaths(),
+		eslint({ eslintOptions: { cache: false, fix: true } }),
+		libAssetsPlugin({
+			include: ['**/*.buf', '**/*.glsl', '**/*.frag', '**/*.vert', '**/*.jpg', '**/*.png'],
+		}),
+	],
+	assetsInclude: ['**/*.buf', '**/*.glsl', '**/*.frag', '**/*.vert', '**/*.jpg', '**/*.png'],
 	build: {
-		copyPublicDir: false,
 		lib: {
 			entry: resolve(__dirname, 'lib/main.ts'),
 			formats: ['es'],
@@ -30,6 +26,7 @@ export default defineConfig({
 			input: { main: resolve(__dirname, 'lib/main.ts') },
 			output: {
 				entryFileNames: '[name].js',
+				assetFileNames: 'assets/[name][ext]',
 				globals: {
 					'three': 'Three',
 					'min-signal': 'MinSignal',

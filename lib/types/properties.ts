@@ -1,6 +1,6 @@
 import { WebGLRenderer, Vector2, OrthographicCamera, ColorRepresentation, ShaderMaterialParameters, Object3D } from 'three';
-import Block from '@logic/Block.ts';
-import { OrbitControls } from '@controls/OrbitControls';
+import Block from '../scripts/logic/Block.ts';
+import { OrbitControls } from '../scripts/controls/OrbitControls';
 
 export interface PropertiesType {
 	canvasId?: string;

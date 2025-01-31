@@ -13,9 +13,11 @@ const Loader = () => {
 	let onLoadCallback: LoaderItems['onLoadCallback'] = null;
 
 	function loadBuf(url, cb) {
+		console.debug(`url= ${url}`);
 		list.push(async () => {
 			try {
 				const response = await fetch(url);
+				console.debug(response);
 				const buffer = await response.arrayBuffer();
 				const schematicJsonSize = new Uint32Array(buffer, 0, 1)[0];
 				const schematic = JSON.parse(new TextDecoder().decode(new Uint8Array(buffer, 4, schematicJsonSize)));

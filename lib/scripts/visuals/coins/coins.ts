@@ -1,16 +1,16 @@
 import * as THREE from 'three';
 
-import loader from '@core/loader';
-import { properties } from '@core/properties';
-import blueNoise from '@utils/blueNoise/blueNoise';
-import { heroSharedUniforms } from '@visuals/hero/hero';
+import loader from '../../core/loader';
+import { properties } from '../../core/properties';
+import blueNoise from '../../utils/blueNoise/blueNoise';
+import { heroSharedUniforms } from '../hero/hero';
 
 import vert from './coins.vert?raw';
 import frag from './coins.frag?raw';
 import fragDepth from './coinsDepth.frag?raw';
-import { floatingCoinsRatio, vortexCoinsRatio } from '@logic/successAnimationManager';
+import { floatingCoinsRatio, vortexCoinsRatio } from '../../logic/successAnimationManager';
 import { BufferGeometry, InstancedBufferGeometry, Mesh, ShaderMaterial } from 'three';
-import { ASSETS_PATH } from '@core/settings.ts';
+import { ASSETS_PATH } from '../../core/settings.ts';
 
 const coinContainer = new THREE.Object3D();
 let coinMesh: Mesh | null = null;

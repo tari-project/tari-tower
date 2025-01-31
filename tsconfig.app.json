@@ -20,17 +20,6 @@
 		"strict": true,
 		"noFallthroughCasesInSwitch": true,
 		"noImplicitAny": false,
-		"baseUrl": ".",
-		"paths": {
-			"@controls/*": ["./lib/scripts/controls/*"],
-			"@core/*": ["./lib/scripts/core/*"],
-			"@logic/*": ["./lib/scripts/logic/*"],
-			"@utils/*": ["./lib/scripts/utils/*"],
-			"@visuals/*": ["./lib/scripts/visuals/*"],
-			"@/scripts": ["./lib/scripts/*"],
-			"@/structs": ["./lib/types/*"],
-			"@/*": ["./lib/*"]
-		},
 		"types": ["vite/client"]
 	},
 	"include": ["src"],
