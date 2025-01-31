@@ -24,6 +24,7 @@ dist-ssr
 
 /src/
 /lib/
+/public/
 index.html
 .npmrc
 vite.config.ts
