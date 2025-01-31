@@ -1,6 +1,6 @@
-import math from '@utils/math';
+import math from '../utils/math';
 
-import { errorAnimationEndedSignal, stateSignal } from '@logic/signals.ts';
+import { errorAnimationEndedSignal, stateSignal } from './signals.ts';
 import { AnimationResult, AnimationStatus } from '../../types/stateManager';
 
 let isActive = false;

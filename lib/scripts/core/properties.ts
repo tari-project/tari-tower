@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import settings from './settings';
 
-import { TOTAL_TILES } from '@logic/board';
+import { TOTAL_TILES } from '../logic/board';
 import { PropertiesType } from '../../types/properties';
 
 const resolution = new THREE.Vector2();

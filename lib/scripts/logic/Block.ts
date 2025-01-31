@@ -1,6 +1,6 @@
-import { properties } from '@core/properties';
-import math from '@utils/math';
-import { customEasing } from '@utils/ease';
+import { properties } from '../core/properties';
+import math from '../utils/math';
+import { customEasing } from '../utils/ease';
 import { isFree, isResult, isResultAnimation } from './stateManager';
 import { BlockType } from '../../types/block';
 

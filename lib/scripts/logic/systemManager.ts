@@ -1,6 +1,6 @@
-import math from '@utils/math';
-import { properties } from '@core/properties';
-import { heroBlocks as blocksVisual } from '@visuals/hero/hero';
+import math from '../utils/math';
+import { properties } from '../core/properties';
+import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
 
 import {
 	hasNotStarted,
@@ -23,8 +23,8 @@ import Block from './Block';
 
 import { stopAnimationManager } from './stopAnimationManager';
 import { errorAnimationManager } from './errorAnimationManager';
-import { successAnimationManager } from '@logic/successAnimationManager.ts';
-import { completeAnimationEndedSignal, endCycleSignal, errorAnimationEndedSignal, spawnSignal, stopAnimationEndedSignal } from '@logic/signals.ts';
+import { successAnimationManager } from '../logic/successAnimationManager.ts';
+import { completeAnimationEndedSignal, endCycleSignal, errorAnimationEndedSignal, spawnSignal, stopAnimationEndedSignal } from '../logic/signals.ts';
 import { SystemManagerState } from '../../types/systemManager';
 
 let firstStartAnimationRatio: SystemManagerState['firstStartAnimationRatio'] = 0;
