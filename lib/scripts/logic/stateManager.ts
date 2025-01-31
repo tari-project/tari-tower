@@ -1,9 +1,9 @@
 import { properties } from '../core/properties';
 import settings from '../core/settings';
-import { heroBlocks as blocksVisual } from '../visuals/hero/hero.ts';
+import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
 
-import { blocks } from './systemManager.ts';
-import { gameEndedSignal, stateSignal } from './signals.ts';
+import { blocks } from './systemManager';
+import { gameEndedSignal, stateSignal } from './signals';
 import { AnimationResult, AnimationStatus, StatusManagerState, SuccessLevel } from '../../types/stateManager';
 
 export const PREVENT_CYCLE_STATES = [AnimationStatus.NOT_STARTED, AnimationStatus.RESTART_ANIMATION, AnimationStatus.RESTART, AnimationStatus.STARTED];

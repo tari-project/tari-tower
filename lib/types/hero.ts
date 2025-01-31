@@ -1,6 +1,6 @@
 import { Mesh, CameraHelper, DataTexture, DirectionalLight, InstancedBufferGeometry, ShaderMaterial } from 'three';
 import { SharedUniforms } from './properties';
-import HeroBlockCoordinates from '@visuals/hero/HeroBlockCoordinates.ts';
+import HeroBlockCoordinates from '../scripts/visuals/hero/HeroBlockCoordinates';
 
 export interface HeroType {
 	_baseMesh?: Mesh & { material: ShaderMaterial };

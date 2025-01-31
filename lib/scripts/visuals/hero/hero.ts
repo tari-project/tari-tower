@@ -16,14 +16,14 @@ import fragDepth from './heroDepth.frag?raw';
 import { floatingCubesDisplacement, floatingCubesRatio, successPushDownRatio, successRatio, successColorTowerRatio, towerRotationRatio } from '../../logic/successAnimationManager';
 import { stopPushDownRatio, stopSpawnRatio } from '../../logic/stopAnimationManager';
 import { failFloatingCubesRatio, failPushDownRatio, failShakeRatio, failSpawnRatio } from '../../logic/errorAnimationManager';
-import HeroBlockCoordinates from './HeroBlockCoordinates.ts';
-import { lightCameraHelperSignal, lightCameraUpdateSignal } from '../../logic/signals.ts';
+import HeroBlockCoordinates from './HeroBlockCoordinates';
+import { lightCameraHelperSignal, lightCameraUpdateSignal } from '../../logic/signals';
 
 import { InstancedBufferAttribute } from 'three';
-import { SharedUniforms } from '../../../types/properties.ts';
-import { HeroType } from '../../../types/hero.ts';
+import { SharedUniforms } from '../../../types/properties';
+import { HeroType } from '../../../types/hero';
 import { AnimationResult } from '../../../types';
-import { ASSETS_PATH } from '../../core/settings.ts';
+import { ASSETS_PATH } from '../../core/settings';
 
 const TOTAL_BLOCKS = 2 * TOTAL_TILES;
 const _v2_0 = new THREE.Vector2();

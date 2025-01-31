@@ -10,7 +10,7 @@ import frag from './coins.frag?raw';
 import fragDepth from './coinsDepth.frag?raw';
 import { floatingCoinsRatio, vortexCoinsRatio } from '../../logic/successAnimationManager';
 import { BufferGeometry, InstancedBufferGeometry, Mesh, ShaderMaterial } from 'three';
-import { ASSETS_PATH } from '../../core/settings.ts';
+import { ASSETS_PATH } from '../../core/settings';
 
 const coinContainer = new THREE.Object3D();
 let coinMesh: Mesh | null = null;

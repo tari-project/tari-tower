@@ -23,8 +23,8 @@ import Block from './Block';
 
 import { stopAnimationManager } from './stopAnimationManager';
 import { errorAnimationManager } from './errorAnimationManager';
-import { successAnimationManager } from '../logic/successAnimationManager.ts';
-import { completeAnimationEndedSignal, endCycleSignal, errorAnimationEndedSignal, spawnSignal, stopAnimationEndedSignal } from '../logic/signals.ts';
+import { successAnimationManager } from '../logic/successAnimationManager';
+import { completeAnimationEndedSignal, endCycleSignal, errorAnimationEndedSignal, spawnSignal, stopAnimationEndedSignal } from '../logic/signals';
 import { SystemManagerState } from '../../types/systemManager';
 
 let firstStartAnimationRatio: SystemManagerState['firstStartAnimationRatio'] = 0;

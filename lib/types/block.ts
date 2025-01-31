@@ -1,4 +1,4 @@
-import Tile from '@logic/Tile.ts';
+import Tile from '../scripts/logic/Tile';
 
 interface Vector {
 	x: number;

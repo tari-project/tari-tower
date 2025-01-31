@@ -3,7 +3,7 @@ import loader from '../../core/loader';
 
 import getBlueNoiseShader from './getBlueNoise.glsl?raw';
 import { SharedUniforms } from '../../../types/properties';
-import { ASSETS_PATH } from '../../core/settings.ts';
+import { ASSETS_PATH } from '../../core/settings';
 
 const BlueNoise = () => {
 	const bn_sharedUniforms: SharedUniforms = {

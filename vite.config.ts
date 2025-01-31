@@ -12,15 +12,20 @@ export default defineConfig({
 		tsconfigPaths(),
 		eslint({ eslintOptions: { cache: false, fix: true } }),
 		libAssetsPlugin({
-			include: ['**/*.buf', '**/*.glsl', '**/*.frag', '**/*.vert', '**/*.jpg', '**/*.png'],
+			outputPath: (url) => {
+				return url.endsWith('.buf') ? 'assets/models' : 'assets/textures';
+			},
+			include: ['**/*.buf', '**/*.jpg', '**/*.png'],
+			name: '[name].[contenthash:8].[ext]',
 		}),
 	],
-	assetsInclude: ['**/*.buf', '**/*.glsl', '**/*.frag', '**/*.vert', '**/*.jpg', '**/*.png'],
+
 	build: {
 		lib: {
 			entry: resolve(__dirname, 'lib/main.ts'),
 			formats: ['es'],
 		},
+		sourcemap: true,
 		rollupOptions: {
 			external: ['three', 'min-signal'],
 			input: { main: resolve(__dirname, 'lib/main.ts') },

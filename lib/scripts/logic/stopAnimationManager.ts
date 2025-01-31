@@ -1,5 +1,5 @@
 import math from '../utils/math';
-import { stateSignal, stopAnimationEndedSignal } from './signals.ts';
+import { stateSignal, stopAnimationEndedSignal } from './signals';
 import { AnimationResult, AnimationStatus } from '../../types/stateManager';
 
 let isActive = false;

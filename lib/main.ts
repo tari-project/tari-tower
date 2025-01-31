@@ -1,6 +1,6 @@
-import { loadTowerAnimation, removeTowerAnimation } from './scripts/index.ts';
-import { properties } from './scripts/core/properties.ts';
-import { result, stateManager, status, statusIndex } from './scripts/logic/stateManager.ts';
+import { loadTowerAnimation, removeTowerAnimation } from './scripts/index';
+import { properties } from './scripts/core/properties';
+import { result, stateManager, status, statusIndex } from './scripts/logic/stateManager';
 
 function setAnimationState(id: string, isReplay = false) {
 	stateManager.set(id, isReplay);

@@ -1,5 +1,5 @@
 import { WebGLRenderer, Vector2, OrthographicCamera, ColorRepresentation, ShaderMaterialParameters, Object3D } from 'three';
-import Block from '../scripts/logic/Block.ts';
+import Block from '../scripts/logic/Block';
 import { OrbitControls } from '../scripts/controls/OrbitControls';
 
 export interface PropertiesType {
