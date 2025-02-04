@@ -23,14 +23,19 @@ export declare let animationStatus: StatusManagerState['status'];
 
 export declare let animationStatusIndex: StatusManagerState['statusIndex'];
 
-export declare function loadTowerAnimation(canvasId: string, offset?: number): Promise<void>;
+export declare function loadTowerAnimation({ canvasId, offset }: {
+    canvasId: string;
+    offset?: number;
+}): Promise<void>;
 
 declare interface Property {
     property: string;
     value: unknown;
 }
 
-export declare function removeTowerAnimation(canvasId: string): Promise<void>;
+export declare function removeTowerAnimation({ canvasId }: {
+    canvasId: string;
+}): Promise<void>;
 
 export declare function setAnimationProperties(newProps: Property[]): void;
 

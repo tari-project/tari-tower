@@ -1,6 +1,5 @@
 import { Vector2, ColorRepresentation, ShaderMaterialParameters, Object3D } from 'three';
 import Block from '../scripts/logic/Block';
-import { OrbitControls } from '../scripts/controls/OrbitControls';
 
 export interface PropertiesType {
 	canvasId?: string;
@@ -18,7 +17,6 @@ export interface PropertiesType {
 	postprocessing?: boolean;
 	resolution: Vector2;
 	viewportResolution: Vector2;
-	orbitControls?: OrbitControls;
 	canvas?: HTMLElement | null;
 	orbitTarget?: HTMLElement | null;
 	isPaused?: boolean;

@@ -24,10 +24,11 @@ let isSuccessResult: StatusManagerState['isSuccessResult'] = false;
 let isFailResult: StatusManagerState['isFailResult'] = false;
 let isStopped: StatusManagerState['isStopped'] = false;
 let result: StatusManagerState['result'] = AnimationResult.NONE;
-const statusUpdateQueue: StatusManagerState['statusUpdateQueue'] = [];
 let completeAnimationLevel: StatusManagerState['completeAnimationLevel'] = SuccessLevel.ONE;
 
 const StateManager = () => {
+	const statusUpdateQueue: StatusManagerState['statusUpdateQueue'] = [];
+
 	function updateAfterCycle() {
 		if (properties.errorBlock) {
 			if (properties.errorBlock.isErrorBlockFalling || properties.errorBlock.errorLifeCycle < properties.errorBlockMaxLifeCycle) {
@@ -59,7 +60,7 @@ const StateManager = () => {
 	}
 
 	function _canUpdateStatus(newStatus, hasResult = false, isReplay = false) {
-		if (!properties.showVisual || !properties.canvas) {
+		if (!properties.showVisual) {
 			return false;
 		}
 
@@ -105,6 +106,7 @@ const StateManager = () => {
 	}
 
 	function set(id: string, isReplay = false) {
+		console.debug(id);
 		const actions = {
 			start: () => setStart(),
 			free: () => setFree(),
@@ -172,6 +174,7 @@ const StateManager = () => {
 	}
 
 	function setStop() {
+		console.debug('efdhgsh');
 		_queueStatusUpdate({ status: AnimationStatus.RESULT, result: AnimationResult.STOP });
 	}
 
@@ -231,20 +234,4 @@ const StateManager = () => {
 };
 
 const stateManager = StateManager();
-
-export {
-	stateManager,
-	statusIndex,
-	status,
-	hasNotStarted,
-	isFree,
-	isResult,
-	isResultAnimation,
-	isRestart,
-	isReplayResult,
-	isSuccessResult,
-	isFailResult,
-	isStopped,
-	result,
-	statusUpdateQueue,
-};
+export { stateManager, statusIndex, status, hasNotStarted, isFree, isResult, isResultAnimation, isRestart, isReplayResult, isSuccessResult, isFailResult, isStopped, result };

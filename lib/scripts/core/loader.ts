@@ -17,17 +17,17 @@ interface LoaderItems {
 	onLoadCallback: (() => void) | null;
 }
 
-const assets = {
-	'models/BASE.buf': BASE,
-	'models/BOX.buf': BOX,
-	'models/COIN.buf': COIN,
-	'models/COIN_PLACEMENT.buf': COIN_PLACEMENT,
-	'models/LOSE_ANIMATION.buf': LOSE_ANIMATION,
-	'textures/gobo.jpg': gobo,
-	'textures/LDR_RGB1_0.png': LDR_RGB1_0,
-	'textures/matcap_gold.jpg': matcap_gold,
-};
 const Loader = () => {
+	const assets = {
+		'models/BASE.buf': BASE,
+		'models/BOX.buf': BOX,
+		'models/COIN.buf': COIN,
+		'models/COIN_PLACEMENT.buf': COIN_PLACEMENT,
+		'models/LOSE_ANIMATION.buf': LOSE_ANIMATION,
+		'textures/gobo.jpg': gobo,
+		'textures/LDR_RGB1_0.png': LDR_RGB1_0,
+		'textures/matcap_gold.jpg': matcap_gold,
+	};
 	let list: LoaderItems['list'] = [];
 	let loadedCount: LoaderItems['loadedCount'] = 0;
 	let onLoadCallback: LoaderItems['onLoadCallback'] = null;

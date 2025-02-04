@@ -37,7 +37,7 @@ function initCallback() {
 	animate();
 }
 
-export async function loadTowerAnimation(canvasId: string, offset = 0) {
+export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: string; offset?: number }) {
 	_offset = offset;
 	try {
 		await tower.preload({ canvasId, initCallback });
@@ -46,43 +46,50 @@ export async function loadTowerAnimation(canvasId: string, offset = 0) {
 	}
 }
 
-function removeCanvas(canvasId) {
+function removeCanvas({ canvasId }: { canvasId: string }) {
 	const canvas = document.getElementById(canvasId);
+	if (!canvas) {
+		return;
+	}
+	canvas.remove();
 
-	canvas?.remove();
-
-	tower.renderer?.domElement?.remove();
-	tower.renderer?.state?.reset();
-	tower.renderer?.resetState();
+	tower.renderer.state.reset();
+	tower.renderer.resetState();
+	tower.renderer.dispose();
 	properties.orbitTarget = undefined;
-	tower.renderer?.dispose();
 
 	resetProperties();
 }
 
-export async function removeTowerAnimation(canvasId: string) {
+export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 	const canvas = document.getElementById(canvasId);
 	if (!canvas) return;
 
 	const resultDelays = {
-		[AnimationResult.FAILED]: errorAnimationDuration,
-		[AnimationResult.COMPLETED]: successAnimationDuration,
-		[AnimationResult.REPLAY]: successAnimationDuration,
-		[AnimationResult.STOP]: stopAnimationDuration,
+		[AnimationResult.FAILED]: errorAnimationDuration * 1000,
+		[AnimationResult.COMPLETED]: successAnimationDuration * 1000,
+		[AnimationResult.REPLAY]: successAnimationDuration * 1000,
+		[AnimationResult.STOP]: stopAnimationDuration * 1000,
 	};
 	const alreadyStopped = status === 'not-started';
-	const useResultDelay = result !== null;
+	const useResultDelay = result !== null && result !== 'none';
 
-	const baseDelay = 1000 * 3.5;
-	const resultDelay = (resultDelays[result] || 1) * 1000 + baseDelay;
-	const baseStopDelay = stopAnimationDuration * 1000 * 2;
+	const baseDelay = 1000 * 1.5;
+	const resultDelay = resultDelays[result] || 1000;
+	const safeTimeoutDelay = useResultDelay ? baseDelay + resultDelay : baseDelay;
 
-	const removeDelay = useResultDelay ? resultDelay : baseDelay;
-	const stopDelay = useResultDelay ? baseStopDelay + resultDelay : baseStopDelay;
+	const resultWithStopDelay = safeTimeoutDelay + stopAnimationDuration * baseDelay;
+	const removeDelay = alreadyStopped ? 0 : resultWithStopDelay;
 
 	if (!alreadyStopped) {
-		setTimeout(() => setAnimationState('stop'), stopDelay);
+		const stopTimeout = setTimeout(() => {
+			setAnimationState('stop');
+			clearTimeout(stopTimeout);
+		}, safeTimeoutDelay);
 	}
 
-	setTimeout(() => removeCanvas(canvasId), alreadyStopped ? removeDelay : removeDelay + stopDelay);
+	const removeTimeout = setTimeout(() => {
+		removeCanvas({ canvasId });
+		clearTimeout(removeTimeout);
+	}, removeDelay);
 }

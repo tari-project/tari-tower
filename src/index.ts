@@ -1,15 +1,15 @@
 import GUI from 'lil-gui';
 
-import { loadTowerAnimation, removeTowerAnimation, setAnimationState } from '@tari-project/tari-tower';
-// import { loadTowerAnimation, removeTowerAnimation, setAnimationState } from '../lib';
+// import { loadTowerAnimation, removeTowerAnimation, setAnimationState } from '@tari-project/tari-tower';
+import { loadTowerAnimation, removeTowerAnimation, setAnimationState } from '../lib';
 
 if (import.meta.env.MODE === 'development') {
 	const gui = new GUI();
 	gui.add(document, 'title');
 
 	const actions = {
-		removeCanvas: () => removeTowerAnimation('canvas-id'),
-		initCanvas: () => loadTowerAnimation('canvas-id', 0),
+		removeCanvas: () => removeTowerAnimation({ canvasId: 'canvas-id' }),
+		initCanvas: () => loadTowerAnimation({ canvasId: 'canvas-id', offset: 0 }),
 		showVisual: () => setAnimationState('showVisual'),
 		start: () => setAnimationState('start'),
 		stopVis: () => setAnimationState('stop'),
@@ -29,7 +29,14 @@ if (import.meta.env.MODE === 'development') {
 	gui.add(actions, 'removeCanvas');
 	gui.add(actions, 'initCanvas');
 
-	document.addEventListener('DOMContentLoaded', () => {
-		loadTowerAnimation('canvas-id', 0);
-	});
+	function handleLoad() {
+		loadTowerAnimation({ canvasId: 'canvas-id', offset: 0 });
+	}
+
+	document.addEventListener('DOMContentLoaded', handleLoad);
+
+	const timeOutId = setTimeout(() => {
+		document.removeEventListener('DOMContentLoaded', handleLoad);
+		clearTimeout(timeOutId);
+	}, 500);
 }

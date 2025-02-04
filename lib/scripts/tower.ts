@@ -12,14 +12,8 @@ import { OrthographicCamera } from 'three';
 
 THREE.ColorManagement.enabled = false;
 
-let _viewportWidth = window.innerWidth;
-let _viewportHeight = window.innerHeight;
-let cameraOffsetX = 0;
-const cameraOffsetY = 0;
 export const heroBlocks = Hero();
 export const renderer = new THREE.WebGLRenderer(WEBGL_OPTS);
-const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 60);
-let orbitCamera: OrthographicCamera;
 
 const TariTower = () => {
 	const background = Background();
@@ -28,7 +22,15 @@ const TariTower = () => {
 	const game = SystemManager();
 
 	let canvas: HTMLCanvasElement;
+	let orbitControls: OrbitControls;
 	let _canvasId: string | undefined = undefined;
+	let _viewportWidth = window.innerWidth;
+	let _viewportHeight = window.innerHeight;
+	let cameraOffsetX = 0;
+	const cameraOffsetY = 0;
+
+	const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 60);
+	let orbitCamera: OrthographicCamera;
 
 	async function _handleRenderer() {
 		if (_canvasId && renderer) {
@@ -98,7 +100,7 @@ const TariTower = () => {
 		properties.scene.add(camera);
 		camera.position.fromArray(settings.DEFAULT_POSITION);
 		orbitCamera = camera.clone();
-		const orbitControls = (properties.orbitControls = new OrbitControls(orbitCamera, canvas));
+		orbitControls = new OrbitControls(orbitCamera, canvas);
 		orbitControls.target0.fromArray(settings.DEFAULT_LOOKAT_POSITION);
 		orbitControls.reset();
 	}
@@ -145,7 +147,7 @@ const TariTower = () => {
 		camera.bottom = -_viewportHeight / 2 - (cameraOffsetY * _viewportHeight) / cameraZoom / 2;
 
 		camera.updateProjectionMatrix();
-		properties.orbitControls?.update();
+		orbitControls?.update();
 		orbitCamera?.updateMatrix();
 
 		orbitCamera?.matrix.decompose(camera.position, camera.quaternion, camera.scale);
