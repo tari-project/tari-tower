@@ -26,7 +26,9 @@ const TariTower = () => {
 	let _viewportHeight;
 
 	async function _handleRenderer() {
-		if (_canvasId) {
+		console.debug(_canvasId);
+		console.debug(renderer.domElement);
+		if (_canvasId && renderer) {
 			renderer.domElement.id = _canvasId;
 			canvas = renderer.domElement;
 			document.body.appendChild(renderer.domElement);
@@ -72,9 +74,6 @@ const TariTower = () => {
 	}
 
 	async function _preload() {
-		const existingCanvas = renderer.domElement || (_canvasId && document.getElementById(_canvasId));
-		if (existingCanvas) return;
-
 		await heroBlocks.preload();
 		await coins.preload();
 		await blueNoise.preInit();
@@ -87,13 +86,16 @@ const TariTower = () => {
 		properties.scene.add(camera);
 		camera.position.fromArray(settings.DEFAULT_POSITION);
 		orbitCamera = camera.clone();
+		console.debug(canvas);
 		properties.orbitControls = new OrbitControls(orbitCamera, canvas);
 		properties.orbitControls.target0.fromArray(settings.DEFAULT_LOOKAT_POSITION);
 	}
 	async function init({ canvasId }: { canvasId: string }) {
 		_canvasId = canvasId;
-		await _preload();
-		await _initScene();
+		console.debug(canvasId);
+		await _preload().then(async () => {
+			await _initScene();
+		});
 
 		// first the logic
 		await game.init();
