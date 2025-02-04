@@ -1,4 +1,4 @@
-import { WebGLRenderer, Vector2, OrthographicCamera, ColorRepresentation, ShaderMaterialParameters, Object3D } from 'three';
+import { Vector2, OrthographicCamera, ColorRepresentation, ShaderMaterialParameters, Object3D } from 'three';
 import Block from '../scripts/logic/Block';
 import { OrbitControls } from '../scripts/controls/OrbitControls';
 
@@ -13,10 +13,9 @@ export interface PropertiesType {
 	camera?: OrthographicCamera;
 	orbitCamera?: OrthographicCamera;
 	cameraZoom: number;
+	scene: Object3D;
 	cameraOffsetX: number;
 	cameraOffsetY: number;
-	renderer?: WebGLRenderer;
-	scene?: Object3D;
 	postprocessing?: boolean;
 	resolution: Vector2;
 	viewportResolution: Vector2;

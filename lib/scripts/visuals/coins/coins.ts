@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 import loader from '../../core/loader';
 import { properties } from '../../core/properties';
-import blueNoise from '../../utils/blueNoise/blueNoise';
+import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
 import { heroSharedUniforms } from '../hero/hero';
 
 import vert from './coins.vert?raw';
@@ -94,7 +94,7 @@ const Coins = () => {
 				...heroSharedUniforms,
 				...properties.sharedUniforms,
 				...coinsSharedUniforms,
-				...blueNoise.bn_sharedUniforms,
+				...bn_sharedUniforms,
 				...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
 				u_matcapTexture: { value: matcapTexture },
 			},
@@ -142,6 +142,4 @@ const Coins = () => {
 	};
 };
 
-const coins = Coins();
-
-export { coins, coinContainer };
+export { Coins, coinContainer };

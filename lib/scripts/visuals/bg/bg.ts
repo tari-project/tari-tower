@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { properties } from '../../core/properties';
-import blueNoise from '../../utils/blueNoise/blueNoise';
+import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
 
 import vert from './bg.vert?raw';
 import frag from './bg.frag?raw';
@@ -20,7 +20,7 @@ const Background = () => {
 					u_bgColor1: properties.sharedUniforms?.u_bgColor1,
 					u_bgColor2: properties.sharedUniforms?.u_bgColor2,
 				},
-				blueNoise.bn_sharedUniforms,
+				bn_sharedUniforms,
 			),
 			vertexShader: vert,
 			fragmentShader: frag,

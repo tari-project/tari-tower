@@ -8,7 +8,10 @@ if (import.meta.env.MODE === 'development') {
 
 	const actions = {
 		removeCanvas: () => removeTowerAnimation('canvas-id'),
-		initCanvas: () => loadTowerAnimation('canvas-id'),
+		initCanvas: () =>
+			loadTowerAnimation('canvas-id', 0, true).then(() => {
+				setAnimationState('showVisual');
+			}),
 		showVisual: () => setAnimationState('showVisual'),
 		start: () => setAnimationState('start'),
 		stopVis: () => setAnimationState('stop'),

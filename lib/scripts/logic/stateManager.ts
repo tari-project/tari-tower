@@ -1,6 +1,6 @@
 import { properties } from '../core/properties';
 import settings from '../core/settings';
-import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
+import { heroBlocks as blocksVisual } from '../tower';
 
 import { blocks } from './systemManager';
 import { gameEndedSignal, stateSignal } from './signals';

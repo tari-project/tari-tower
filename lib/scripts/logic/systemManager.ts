@@ -1,7 +1,6 @@
 import math from '../utils/math';
 import { properties } from '../core/properties';
-import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
-
+import { heroBlocks as blocksVisual } from '../tower.ts';
 import {
 	hasNotStarted,
 	isFailResult,
@@ -222,7 +221,7 @@ const SystemManager = () => {
 		}
 	}
 
-	function init() {
+	async function init() {
 		stateManager.init();
 		successAnimationManager.init();
 		stopAnimationManager.init();
@@ -250,6 +249,5 @@ const SystemManager = () => {
 		reset,
 	};
 };
-const game = SystemManager();
-export default game;
+export default SystemManager;
 export { firstStartAnimationRatio, blocks, lastSpawnedBlock, previousSuccessBlocksAnimationRatio };

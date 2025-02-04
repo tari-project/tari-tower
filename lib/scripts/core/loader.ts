@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { properties } from './properties';
 
 import BASE from 'public/assets/BASE.buf?url&inline';
 import BOX from 'public/assets/BOX.buf?url&inline';
@@ -10,6 +9,7 @@ import LOSE_ANIMATION from 'public/assets/LOSE_ANIMATION.buf?url&inline';
 import gobo from 'public/assets/gobo.jpg';
 import LDR_RGB1_0 from 'public/assets/LDR_RGB1_0.png';
 import matcap_gold from 'public/assets/matcap_gold.jpg';
+import { renderer } from '../tower.ts';
 
 interface LoaderItems {
 	list: (() => void | Promise<void>)[];
@@ -37,7 +37,6 @@ const Loader = () => {
 		list.push(async () => {
 			try {
 				const response = await fetch(url);
-				console.debug(response);
 				const buffer = await response.arrayBuffer();
 				const schematicJsonSize = new Uint32Array(buffer, 0, 1)[0];
 				const schematic = JSON.parse(new TextDecoder().decode(new Uint8Array(buffer, 4, schematicJsonSize)));
@@ -107,7 +106,7 @@ const Loader = () => {
 					texture.minFilter = THREE.LinearMipMapLinearFilter;
 					texture.magFilter = THREE.LinearFilter;
 					texture.generateMipmaps = true;
-					texture.anisotropy = properties.renderer?.capabilities.getMaxAnisotropy() || 1;
+					texture.anisotropy = renderer.capabilities.getMaxAnisotropy() || 1;
 					texture.flipY = true;
 					if (cb) cb(texture);
 					_onLoad();

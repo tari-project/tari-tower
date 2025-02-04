@@ -4,7 +4,7 @@ import loader from '../../core/loader';
 import { properties } from '../../core/properties';
 import math from '../../utils/math';
 import ease, { customEasing } from '../../utils/ease';
-import blueNoise from '../../utils/blueNoise/blueNoise';
+import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
 import { blocks, firstStartAnimationRatio, lastSpawnedBlock, previousSuccessBlocksAnimationRatio } from '../../logic/systemManager';
 import { result } from '../../logic/stateManager';
 import { HALF_SIZE, SIZE, TOTAL_TILES, SIZE_WITH_PADDING, TOTAL_TILES_WITH_PADDING, tiles, board } from '../../logic/board';
@@ -166,7 +166,7 @@ const Hero = () => {
 				...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
 				...properties.sharedUniforms,
 				...heroSharedUniforms,
-				...blueNoise.bn_sharedUniforms,
+				...bn_sharedUniforms,
 			},
 			vertexShader: vert,
 			fragmentShader: frag,
@@ -587,5 +587,4 @@ const Hero = () => {
 	};
 };
 
-const heroBlocks = Hero();
-export { heroBlocks, heroContainer, heroSharedUniforms };
+export { Hero, heroContainer, heroSharedUniforms };
