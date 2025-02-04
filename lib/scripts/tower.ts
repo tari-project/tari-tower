@@ -6,28 +6,28 @@ import { coinContainer, Coins } from './visuals/coins/coins.ts';
 import BlueNoise from './utils/blueNoise/blueNoise.ts';
 import { OrbitControls } from './controls/OrbitControls';
 import SystemManager from './logic/systemManager.ts';
-import Background from './visuals/bg/bg.ts';
+import { Background, bgContainer } from './visuals/bg/bg.ts';
+import loader from './core/loader.ts';
 THREE.ColorManagement.enabled = false;
 
 export const heroBlocks = Hero();
 export const renderer = new THREE.WebGLRenderer(WEBGL_OPTS);
 const TariTower = () => {
-	const coins = Coins();
-	const blueNoise = BlueNoise();
-	const game = SystemManager();
 	const background = Background();
+	const blueNoise = BlueNoise();
+	const coins = Coins();
+	const game = SystemManager();
 
 	const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 60);
 	let canvas: HTMLCanvasElement;
 	let _canvasId: string | undefined = undefined;
 	let cameraOffsetX = 0;
+	const allLoaded = false;
 	let orbitCamera;
 	let _viewportWidth;
 	let _viewportHeight;
 
 	async function _handleRenderer() {
-		console.debug(_canvasId);
-		console.debug(renderer.domElement);
 		if (_canvasId && renderer) {
 			renderer.domElement.id = _canvasId;
 			canvas = renderer.domElement;
@@ -73,12 +73,18 @@ const TariTower = () => {
 		_handleResize(window.innerWidth, window.innerHeight);
 	}
 
-	async function _preload() {
-		await heroBlocks.preload();
-		await coins.preload();
-		await blueNoise.preInit();
+	async function _preload(initCallback) {
+		try {
+			await heroBlocks.preload();
+			await coins.preload();
+			await blueNoise.preInit();
 
-		await _handleRenderer();
+			await _handleRenderer();
+
+			loader.start(initCallback);
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	async function _initScene() {
@@ -86,30 +92,30 @@ const TariTower = () => {
 		properties.scene.add(camera);
 		camera.position.fromArray(settings.DEFAULT_POSITION);
 		orbitCamera = camera.clone();
-		console.debug(canvas);
 		properties.orbitControls = new OrbitControls(orbitCamera, canvas);
 		properties.orbitControls.target0.fromArray(settings.DEFAULT_LOOKAT_POSITION);
 	}
-	async function init({ canvasId }: { canvasId: string }) {
+	async function init({ canvasId, initCallback }: { canvasId: string; initCallback: () => void }) {
 		_canvasId = canvasId;
-		console.debug(canvasId);
-		await _preload().then(async () => {
+
+		_preload(initCallback).then(async () => {
 			await _initScene();
+			// first the logic
+			await game.init();
+
+			// then the visuals
+			background.init();
+			heroBlocks.init();
+			coins.init();
+
+			properties.scene.add(coinContainer);
+			properties.scene.add(bgContainer);
+			properties.scene.add(heroContainer);
 		});
-
-		// first the logic
-		await game.init();
-		// then the visuals
-		heroBlocks.init();
-		coins.init();
-		background.init();
-
-		properties.scene.add(coinContainer);
-		properties.scene.add(background.container);
-		properties.scene.add(heroContainer);
 	}
 
 	function render(dt: number) {
+		if (!allLoaded) return;
 		if (!canvas) {
 			dt *= 0;
 		}

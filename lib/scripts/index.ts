@@ -1,5 +1,4 @@
 import { properties, resetProperties } from './core/properties';
-import loader from './core/loader';
 
 import { result, status } from './logic/stateManager';
 import { setAnimationState } from '../main';
@@ -15,6 +14,7 @@ let time = 0;
 let lastRender = 0;
 const targetFPS = 60;
 const frameInterval = 1 / targetFPS;
+let _offset = 0;
 
 function animate() {
 	const newTime = performance.now() / 1000;
@@ -27,17 +27,22 @@ function animate() {
 	tower.renderer.setAnimationLoop(animate);
 }
 
-function initCallback(offset?: number) {
+function initCallback() {
+	console.debug('wen callback');
 	time = performance.now() / 1000;
 	lastRender = time;
-	window.addEventListener('resize', () => tower.onResize(offset));
-	tower.onResize(offset);
+	window.addEventListener('resize', () => tower.onResize(_offset));
+	tower.onResize(_offset);
 	animate();
 }
 
-export async function loadTowerAnimation(canvasId: string, offset?: number) {
-	await tower.init({ canvasId });
-	loader.start(() => initCallback(offset));
+export async function loadTowerAnimation(canvasId: string, offset = 0) {
+	_offset = offset;
+	try {
+		await tower.init({ canvasId, initCallback });
+	} catch (e) {
+		console.error('loadTowerAnimation', e);
+	}
 }
 
 function removeCanvas(canvasId) {

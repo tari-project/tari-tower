@@ -65,7 +65,7 @@ const Coins = () => {
 	}
 
 	function _setupGeometry() {
-		refGeometry.computeVertexNormals();
+		refGeometry?.computeVertexNormals();
 		const geometry = new THREE.InstancedBufferGeometry();
 		geometry.index = refGeometry.index;
 		Object.entries(refGeometry.attributes).forEach(([id, attr]) => geometry.setAttribute(id, attr));
