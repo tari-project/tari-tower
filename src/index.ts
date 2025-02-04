@@ -1,7 +1,7 @@
 import GUI from 'lil-gui';
 
-// import { loadTowerAnimation, removeTowerAnimation, setAnimationState } from '@tari-project/tari-tower';
-import { loadTowerAnimation, removeTowerAnimation, setAnimationState } from '../lib';
+import { loadTowerAnimation, removeTowerAnimation, setAnimationState } from '@tari-project/tari-tower';
+// import { loadTowerAnimation, removeTowerAnimation, setAnimationState } from '../lib';
 
 if (import.meta.env.MODE === 'development') {
 	const gui = new GUI();
@@ -15,7 +15,7 @@ if (import.meta.env.MODE === 'development') {
 		stopVis: () => setAnimationState('stop'),
 		success: () => setAnimationState('success'),
 		success2: () => setAnimationState('success2'),
-		success3: () => setAnimationState('success3', true),
+		success3: () => setAnimationState('success3', { isReplay: true }),
 		fail: () => setAnimationState('fail'),
 	};
 

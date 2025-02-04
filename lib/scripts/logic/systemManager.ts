@@ -23,7 +23,16 @@ import Block from './Block';
 import { stopAnimationManager } from './stopAnimationManager';
 import { errorAnimationManager } from './errorAnimationManager';
 import { successAnimationManager } from '../logic/successAnimationManager';
-import { completeAnimationEndedSignal, endCycleSignal, errorAnimationEndedSignal, spawnSignal, stopAnimationEndedSignal } from '../logic/signals';
+import {
+	canvasSignal,
+	completeAnimationEndedSignal,
+	endCycleSignal,
+	errorAnimationEndedSignal,
+	gameEndedSignal,
+	spawnSignal,
+	stateSignal,
+	stopAnimationEndedSignal,
+} from '../logic/signals';
 import { SystemManagerState } from '../../types/systemManager';
 
 let firstStartAnimationRatio: SystemManagerState['firstStartAnimationRatio'] = 0;
@@ -32,7 +41,7 @@ let lastSpawnedBlock: SystemManagerState['lastSpawnedBlock'] = null;
 let cycleIndex: SystemManagerState['cycleIndex'] = 0;
 let animationSpeedRatio: SystemManagerState['animationSpeedRatio'] = 0;
 let previousSuccessBlocksAnimationRatio: SystemManagerState['previousSuccessBlocksAnimationRatio'] = 0;
-
+let canvasInit = false;
 const SystemManager = () => {
 	function _spawnBlock() {
 		if (_shouldPreventSpawn()) return;
@@ -128,7 +137,7 @@ const SystemManager = () => {
 		});
 	}
 
-	function reset() {
+	function reset(isEnd = false) {
 		blocks.forEach((block) => block.reset());
 		blocksVisual.reset();
 		board.reset();
@@ -141,16 +150,25 @@ const SystemManager = () => {
 
 		const needsRestart = resetCycleResults.includes(result);
 		stateManager.reset();
-		_startNewCycle();
+		if (!isEnd) {
+			_startNewCycle();
 
-		if (needsRestart) {
-			stateManager.setStart();
+			if (needsRestart) {
+				stateManager.setStart();
+			}
+		}
+
+		if (isEnd) {
+			canvasSignal.dispatch(stateManager.status, stateManager.result, isEnd);
 		}
 
 		completeAnimationEndedSignal.remove(() => {
 			stateManager.setRestart();
 			_startNewCycle();
 			previousSuccessBlocksAnimationRatio = 1;
+		});
+		canvasSignal.remove(() => {
+			canvasInit = true;
 		});
 		stopAnimationEndedSignal.remove(() => {
 			stateManager.setRestart();
@@ -159,6 +177,9 @@ const SystemManager = () => {
 		errorAnimationEndedSignal.remove(() => {
 			stateManager.setRestart();
 			_startNewCycle();
+		});
+		gameEndedSignal.remove(() => {
+			reset(true);
 		});
 	}
 
@@ -228,6 +249,10 @@ const SystemManager = () => {
 		errorAnimationManager.init();
 		board.init();
 
+		canvasSignal.add(() => {
+			canvasInit = true;
+		});
+
 		completeAnimationEndedSignal.add(() => {
 			stateManager.setRestart();
 			_startNewCycle();
@@ -240,6 +265,9 @@ const SystemManager = () => {
 		errorAnimationEndedSignal.add(() => {
 			stateManager.setRestart();
 			_startNewCycle();
+		});
+		gameEndedSignal.add(() => {
+			reset(true);
 		});
 	}
 

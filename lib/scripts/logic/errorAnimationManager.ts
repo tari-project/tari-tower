@@ -1,6 +1,6 @@
 import math from '../utils/math';
 
-import { errorAnimationEndedSignal, stateSignal } from './signals';
+import { canvasSignal, errorAnimationEndedSignal, gameEndedSignal, stateSignal } from './signals';
 import { AnimationResult, AnimationStatus } from '../../types/stateManager';
 
 let isActive = false;
@@ -39,6 +39,7 @@ const ErrorAnimationManager = () => {
 		failPushDownRatio = math.fit(failRatio, 0.6, 0.8, 0, 1);
 		if (failRatio >= 1) {
 			errorAnimationEndedSignal.dispatch();
+
 			resetRatios();
 		}
 	}

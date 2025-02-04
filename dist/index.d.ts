@@ -39,7 +39,10 @@ export declare function removeTowerAnimation({ canvasId }: {
 
 export declare function setAnimationProperties(newProps: Property[]): void;
 
-export declare function setAnimationState(id: string, isReplay?: boolean): void;
+export declare function setAnimationState(id: string, options?: {
+    isReplay?: boolean;
+    isRemove?: boolean;
+}): void;
 
 declare interface StatusManagerState {
     status: AnimationStatus;

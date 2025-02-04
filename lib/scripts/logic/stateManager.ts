@@ -3,7 +3,7 @@ import settings from '../core/settings';
 import { heroBlocks as blocksVisual } from '../tower';
 
 import { blocks } from './systemManager';
-import { gameEndedSignal, stateSignal } from './signals';
+import { canvasSignal, gameEndedSignal, stateSignal, stopAnimationEndedSignal } from './signals';
 import { AnimationResult, AnimationStatus, StatusManagerState, SuccessLevel } from '../../types/stateManager';
 
 export const PREVENT_CYCLE_STATES = [AnimationStatus.NOT_STARTED, AnimationStatus.RESTART_ANIMATION, AnimationStatus.RESTART, AnimationStatus.STARTED];
@@ -76,6 +76,7 @@ const StateManager = () => {
 			if (!hasResult) {
 				updateFlags();
 				stateSignal.dispatch(status, result);
+				canvasSignal.dispatch(status, result, isReplay);
 			}
 			return true;
 		}
@@ -86,12 +87,15 @@ const StateManager = () => {
 		status: newStatus,
 		result: newResult,
 		animationStyle,
+		isRemove = false,
 	}: {
 		status: AnimationStatus;
 		result: AnimationResult;
 		animationStyle: SuccessLevel | null;
+		isRemove?: boolean;
 	}) {
-		if (_canUpdateStatus(newStatus, true, newResult === AnimationResult.REPLAY)) {
+		const isReplay = newResult === AnimationResult.REPLAY;
+		if (_canUpdateStatus(newStatus, true, isReplay)) {
 			if (properties.errorBlock && !properties.errorBlock.isErrorBlockFalling) {
 				properties.errorBlock.preventErrorBlockFallAnimation();
 				properties.errorBlock = null;
@@ -102,17 +106,20 @@ const StateManager = () => {
 
 			updateFlags();
 			stateSignal.dispatch(status, result, completeAnimationLevel);
+			canvasSignal.dispatch(status, result, isRemove || isReplay);
 		}
 	}
 
-	function set(id: string, isReplay = false) {
-		console.debug(id);
+	function set(id: string, options?: { isReplay?: boolean; isRemove?: boolean }) {
+		const { isRemove, isReplay } = options || {};
+		console.debug(`isRemove= ${isRemove}`);
+		console.debug(`isReplay= ${isReplay}`);
 		const actions = {
 			start: () => setStart(),
 			free: () => setFree(),
 			pause: () => setPause(),
 			resume: () => setResume(),
-			stop: () => setStop(),
+			stop: () => setStop(isRemove),
 			fail: () => setFail(),
 			resultAnimation: () => setResultAnimation(),
 			restartAnimation: () => setRestartAnimation(),
@@ -120,12 +127,13 @@ const StateManager = () => {
 			showVisual: () => showVisual(),
 		};
 		const successActions = {
-			success: (isReplay?: boolean) => setComplete(isReplay),
-			success2: (isReplay?: boolean) => setComplete2(isReplay),
-			success3: (isReplay?: boolean) => setComplete3(isReplay),
+			success: () => setComplete(isReplay),
+			success2: () => setComplete2(isReplay),
+			success3: () => setComplete3(isReplay),
 		};
 		actions[id]?.();
-		successActions[id]?.(isReplay);
+
+		successActions[id]?.();
 	}
 
 	function showVisual() {
@@ -136,10 +144,12 @@ const StateManager = () => {
 		status,
 		result = null,
 		animationStyle = null,
+		isRemove = false,
 	}: {
 		status: AnimationStatus;
 		result?: AnimationResult | null;
 		animationStyle?: SuccessLevel | null;
+		isRemove?: boolean;
 	}) {
 		if (properties.errorBlock && properties.errorBlock?.errorFallAnimationTime < 1) {
 			const logicBlock = blocks?.find((block) => block?.id === properties.errorBlock?.id);
@@ -173,9 +183,8 @@ const StateManager = () => {
 		properties.isPaused = false;
 	}
 
-	function setStop() {
-		console.debug('efdhgsh');
-		_queueStatusUpdate({ status: AnimationStatus.RESULT, result: AnimationResult.STOP });
+	function setStop(isRemove = false) {
+		_queueStatusUpdate({ status: AnimationStatus.RESULT, result: AnimationResult.STOP, isRemove });
 	}
 
 	function setComplete(isReplay = false) {
@@ -209,7 +218,7 @@ const StateManager = () => {
 	function setRestart() {
 		statusUpdateQueue.push(() => {
 			if (_canUpdateStatus(AnimationStatus.RESTART)) {
-				gameEndedSignal.dispatch();
+				stopAnimationEndedSignal.dispatch();
 			}
 		});
 	}
@@ -230,6 +239,8 @@ const StateManager = () => {
 		setStart,
 		setRestartAnimation,
 		setRestart,
+		status,
+		result,
 	};
 };
 

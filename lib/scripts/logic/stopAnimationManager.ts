@@ -1,5 +1,5 @@
 import math from '../utils/math';
-import { stateSignal, stopAnimationEndedSignal } from './signals';
+import { gameEndedSignal, stateSignal, stopAnimationEndedSignal } from './signals';
 import { AnimationResult, AnimationStatus } from '../../types/stateManager';
 
 let isActive = false;
@@ -33,6 +33,7 @@ const StopAnimationManager = () => {
 
 		if (stopRatio >= 1) {
 			stopAnimationEndedSignal.dispatch();
+			gameEndedSignal.dispatch();
 			resetRatios();
 		}
 	}

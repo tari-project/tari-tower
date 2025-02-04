@@ -2,8 +2,9 @@ import { loadTowerAnimation, removeTowerAnimation } from './scripts/index';
 import { properties } from './scripts/core/properties';
 import { result, stateManager, status, statusIndex } from './scripts/logic/stateManager';
 
-export function setAnimationState(id: string, isReplay = false) {
-	stateManager.set(id, isReplay);
+export function setAnimationState(id: string, options?: { isReplay?: boolean; isRemove?: boolean }) {
+	const { isReplay, isRemove } = options || {};
+	stateManager.set(id, { isRemove, isReplay });
 }
 interface Property {
 	property: string;

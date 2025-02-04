@@ -1,12 +1,13 @@
 import { properties, resetProperties } from './core/properties';
 
-import { result, status } from './logic/stateManager';
 import { setAnimationState } from '../main';
 import { stopAnimationDuration } from './logic/stopAnimationManager';
 import { AnimationResult } from '../types';
 import { errorAnimationDuration } from './logic/errorAnimationManager';
 import { successAnimationDuration } from './logic/successAnimationManager';
 import TariTower from './tower.ts';
+import { canvasSignal, stateSignal } from './logic/signals.ts';
+import { status as currentStatus } from './logic/stateManager.ts';
 
 const tower = TariTower();
 
@@ -39,6 +40,7 @@ function initCallback() {
 
 export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: string; offset?: number }) {
 	_offset = offset;
+	if (document.getElementById(canvasId)) return;
 	try {
 		await tower.preload({ canvasId, initCallback });
 	} catch (e) {
@@ -71,25 +73,29 @@ export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 		[AnimationResult.REPLAY]: successAnimationDuration * 1000,
 		[AnimationResult.STOP]: stopAnimationDuration * 1000,
 	};
-	const alreadyStopped = status === 'not-started';
-	const useResultDelay = result !== null && result !== 'none';
-
-	const baseDelay = 1000 * 1.5;
-	const resultDelay = resultDelays[result] || 1000;
-	const safeTimeoutDelay = useResultDelay ? baseDelay + resultDelay : baseDelay;
-
-	const resultWithStopDelay = safeTimeoutDelay + stopAnimationDuration * baseDelay;
-	const removeDelay = alreadyStopped ? 0 : resultWithStopDelay;
-
+	const alreadyStopped = currentStatus === 'not-started';
+	console.debug('alreadyStopped', alreadyStopped);
 	if (!alreadyStopped) {
-		const stopTimeout = setTimeout(() => {
-			setAnimationState('stop');
-			clearTimeout(stopTimeout);
-		}, safeTimeoutDelay);
-	}
-
-	const removeTimeout = setTimeout(() => {
+		setAnimationState('stop', { isRemove: true });
+	} else {
 		removeCanvas({ canvasId });
-		clearTimeout(removeTimeout);
-	}, removeDelay);
+	}
+	canvasSignal.add((status, result, isEnd) => {
+		console.debug('rm:', status, result, isEnd);
+		const useResultDelay = result !== null && result !== 'none';
+
+		const baseDelay = 1000 * 1.5;
+		const resultDelay = resultDelays[result] || 1000;
+		const safeTimeoutDelay = useResultDelay ? baseDelay + resultDelay : baseDelay;
+
+		const resultWithStopDelay = safeTimeoutDelay + stopAnimationDuration * baseDelay;
+		const removeDelay = alreadyStopped ? 0 : resultWithStopDelay;
+
+		if (isEnd) {
+			const removeTimeout = setTimeout(() => {
+				removeCanvas({ canvasId });
+				clearTimeout(removeTimeout);
+			}, removeDelay);
+		}
+	});
 }
