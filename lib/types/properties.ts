@@ -10,8 +10,7 @@ export interface PropertiesType {
 	height: number;
 	viewportWidth: number;
 	viewportHeight: number;
-	camera?: OrthographicCamera;
-	orbitCamera?: OrthographicCamera;
+
 	cameraZoom: number;
 	scene: Object3D;
 	cameraOffsetX: number;

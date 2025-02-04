@@ -36,8 +36,6 @@ const propertiesInitialState: PropertiesType = {
 	height: 0,
 	viewportWidth: 0,
 	viewportHeight: 0,
-	camera: undefined,
-	orbitCamera: undefined,
 	cameraZoom: 1,
 	cameraOffsetX: 0,
 	cameraOffsetY: 0,

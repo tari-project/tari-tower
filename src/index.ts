@@ -28,4 +28,8 @@ if (import.meta.env.MODE === 'development') {
 	gui.add(actions, 'fail');
 	gui.add(actions, 'removeCanvas');
 	gui.add(actions, 'initCanvas');
+
+	document.addEventListener('DOMContentLoaded', () => {
+		loadTowerAnimation('canvas-id', 0);
+	});
 }

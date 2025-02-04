@@ -12,30 +12,33 @@ import { floatingCoinsRatio, vortexCoinsRatio } from '../../logic/successAnimati
 import { BufferGeometry, InstancedBufferGeometry, Mesh, ShaderMaterial } from 'three';
 import { ASSETS_PATH } from '../../core/settings';
 const coinContainer = new THREE.Object3D();
-let coinMesh: Mesh | null = null;
-let coinGeometry: InstancedBufferGeometry | null = null;
-let coinMaterial: ShaderMaterial | null = null;
-let positionsArray = null;
-let orientArray = null;
-let curveuArray = null;
-let aoNArray = null;
-let aoPArray = null;
-let coinsCount = 0;
-let animationRatio = 0;
-const isFloating = true;
-let matcapTexture;
-let refGeometry: BufferGeometry;
-let randsArray;
-const coinsSharedUniforms = {
-	u_time: { value: 0 },
-	u_ratio: { value: 0 },
-	u_isFloating: { value: 1 },
-};
 
 const Coins = () => {
+	let refGeometry: BufferGeometry;
+	let coinMesh: Mesh | null = null;
+	let coinGeometry: InstancedBufferGeometry | null = null;
+	let coinMaterial: ShaderMaterial | null = null;
+	let positionsArray = null;
+	let orientArray = null;
+	let curveuArray = null;
+	let aoNArray = null;
+	let aoPArray = null;
+	let coinsCount = 0;
+	let animationRatio = 0;
+	const isFloating = true;
+	let matcapTexture;
+
+	let randsArray;
+	const coinsSharedUniforms = {
+		u_time: { value: 0 },
+		u_ratio: { value: 0 },
+		u_isFloating: { value: 1 },
+	};
+
 	async function preload() {
 		const modelPath = ASSETS_PATH + 'models';
 		const texturePath = ASSETS_PATH + 'textures';
+
 		loader.loadTexture(`${texturePath}/matcap_gold.jpg`, (texture) => {
 			matcapTexture = texture;
 			matcapTexture.needsUpdate = true;
@@ -65,7 +68,7 @@ const Coins = () => {
 	}
 
 	function _setupGeometry() {
-		refGeometry?.computeVertexNormals();
+		refGeometry.computeVertexNormals();
 		const geometry = new THREE.InstancedBufferGeometry();
 		geometry.index = refGeometry.index;
 		Object.entries(refGeometry.attributes).forEach(([id, attr]) => geometry.setAttribute(id, attr));

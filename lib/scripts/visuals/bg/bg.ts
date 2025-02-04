@@ -13,7 +13,6 @@ const Background = () => {
 	const particles: Mesh & { material: ShaderMaterial } = new THREE.Mesh();
 
 	function init() {
-		console.debug('wen init');
 		const material = new THREE.ShaderMaterial({
 			uniforms: Object.assign(
 				{
@@ -75,12 +74,9 @@ const Background = () => {
 		particles.geometry = geometry;
 		particles.frustumCulled = false;
 		container.add(particles);
-		console.debug('WEN LOAD');
 	}
 
-	function update(dt: number) {
-		if (!dt) return;
-		console.debug('WEN');
+	function update(_dt: number) {
 		particles.material.uniforms.u_size.value = properties.particlesSize;
 		particles.material.uniforms.u_color.value.set(properties.particlesColor);
 		particles.material.uniforms.u_opacity.value = properties.particlesOpacity;

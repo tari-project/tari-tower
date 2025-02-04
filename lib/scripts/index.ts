@@ -28,7 +28,8 @@ function animate() {
 }
 
 function initCallback() {
-	console.debug('wen callback');
+	tower.init();
+
 	time = performance.now() / 1000;
 	lastRender = time;
 	window.addEventListener('resize', () => tower.onResize(_offset));
@@ -39,7 +40,7 @@ function initCallback() {
 export async function loadTowerAnimation(canvasId: string, offset = 0) {
 	_offset = offset;
 	try {
-		await tower.init({ canvasId, initCallback });
+		await tower.preload({ canvasId, initCallback });
 	} catch (e) {
 		console.error('loadTowerAnimation', e);
 	}

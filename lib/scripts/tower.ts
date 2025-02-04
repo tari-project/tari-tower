@@ -8,24 +8,27 @@ import { OrbitControls } from './controls/OrbitControls';
 import SystemManager from './logic/systemManager.ts';
 import { Background, bgContainer } from './visuals/bg/bg.ts';
 import loader from './core/loader.ts';
+import { OrthographicCamera, PerspectiveCamera } from 'three';
+
 THREE.ColorManagement.enabled = false;
 
+let _viewportWidth = window.innerWidth;
+let _viewportHeight = window.innerHeight;
+let cameraOffsetX = 0;
+const cameraOffsetY = 0;
 export const heroBlocks = Hero();
 export const renderer = new THREE.WebGLRenderer(WEBGL_OPTS);
+const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 60);
+let orbitCamera: OrthographicCamera;
+
 const TariTower = () => {
 	const background = Background();
 	const blueNoise = BlueNoise();
 	const coins = Coins();
 	const game = SystemManager();
 
-	const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 60);
 	let canvas: HTMLCanvasElement;
 	let _canvasId: string | undefined = undefined;
-	let cameraOffsetX = 0;
-	const allLoaded = false;
-	let orbitCamera;
-	let _viewportWidth;
-	let _viewportHeight;
 
 	async function _handleRenderer() {
 		if (_canvasId && renderer) {
@@ -50,22 +53,30 @@ const TariTower = () => {
 	function _handleResize(viewportWidth: number, viewportHeight: number) {
 		_viewportWidth = viewportWidth;
 		_viewportHeight = viewportHeight;
+
+		properties.viewportResolution.set(viewportWidth, window.innerHeight);
+
 		let dprWidth = viewportWidth * settings.DPR;
 		let dprHeight = viewportHeight * settings.DPR;
 
+		const aspect = dprWidth / dprHeight;
+
 		if (dprHeight * dprWidth > settings.MAX_PIXEL_COUNT) {
-			const aspect = dprWidth / dprHeight;
 			dprHeight = Math.sqrt(settings.MAX_PIXEL_COUNT / aspect);
 			dprWidth = Math.ceil(dprHeight * aspect);
 			dprHeight = Math.ceil(dprHeight);
 		}
 
+		properties.width = dprWidth;
+		properties.height = dprHeight;
 		properties.resolution.set(dprWidth, dprHeight);
+
 		camera.updateProjectionMatrix();
+
 		renderer.setSize(dprWidth, dprHeight);
 
-		canvas.style.width = dprWidth + 'px';
-		canvas.style.height = dprHeight + 'px';
+		canvas.style.width = viewportWidth + 'px';
+		canvas.style.height = viewportHeight + 'px';
 	}
 
 	function onResize(offset = 0) {
@@ -73,49 +84,46 @@ const TariTower = () => {
 		_handleResize(window.innerWidth, window.innerHeight);
 	}
 
-	async function _preload(initCallback) {
+	async function preload({ canvasId, initCallback }: { canvasId: string; initCallback: () => void }) {
+		_canvasId = canvasId;
+		await _handleRenderer();
+		await heroBlocks.preload();
+		await blueNoise.preInit();
+		await coins.preload();
+
+		loader.start(initCallback);
+	}
+
+	async function _initScene() {
+		properties.scene.add(camera);
+		camera.position.fromArray(settings.DEFAULT_POSITION);
+		orbitCamera = camera.clone();
+		const orbitControls = (properties.orbitControls = new OrbitControls(orbitCamera, canvas));
+		orbitControls.target0.fromArray(settings.DEFAULT_LOOKAT_POSITION);
+		orbitControls.reset();
+	}
+	async function init() {
+		await _initScene();
+
 		try {
-			await heroBlocks.preload();
-			await coins.preload();
-			await blueNoise.preInit();
+			// first the logic
+			await game.init();
 
-			await _handleRenderer();
+			console.debug('HELLOo?o');
+			// then the visuals
+			heroBlocks.init();
+			coins.init();
+			background.init();
 
-			loader.start(initCallback);
+			properties.scene.add(coinContainer);
+			properties.scene.add(bgContainer);
+			properties.scene.add(heroContainer);
 		} catch (error) {
 			console.error(error);
 		}
 	}
 
-	async function _initScene() {
-		properties.scene = new THREE.Scene();
-		properties.scene.add(camera);
-		camera.position.fromArray(settings.DEFAULT_POSITION);
-		orbitCamera = camera.clone();
-		properties.orbitControls = new OrbitControls(orbitCamera, canvas);
-		properties.orbitControls.target0.fromArray(settings.DEFAULT_LOOKAT_POSITION);
-	}
-	async function init({ canvasId, initCallback }: { canvasId: string; initCallback: () => void }) {
-		_canvasId = canvasId;
-
-		_preload(initCallback).then(async () => {
-			await _initScene();
-			// first the logic
-			await game.init();
-
-			// then the visuals
-			background.init();
-			heroBlocks.init();
-			coins.init();
-
-			properties.scene.add(coinContainer);
-			properties.scene.add(bgContainer);
-			properties.scene.add(heroContainer);
-		});
-	}
-
 	function render(dt: number) {
-		if (!allLoaded) return;
 		if (!canvas) {
 			dt *= 0;
 		}
@@ -130,14 +138,14 @@ const TariTower = () => {
 		}
 
 		const cameraZoom = (properties.cameraZoom * _viewportHeight) / 10;
-		const cameraOffsetY = properties.cameraOffsetY;
+
 		camera.zoom = cameraZoom;
 		camera.left = -_viewportWidth / 2 - (cameraOffsetX * _viewportWidth) / cameraZoom / 2;
 		camera.right = _viewportWidth / 2 - (cameraOffsetX * _viewportWidth) / cameraZoom / 2;
 		camera.top = _viewportHeight / 2 - (cameraOffsetY * _viewportHeight) / cameraZoom / 2;
 		camera.bottom = -_viewportHeight / 2 - (cameraOffsetY * _viewportHeight) / cameraZoom / 2;
-		camera.updateProjectionMatrix();
 
+		camera.updateProjectionMatrix();
 		properties.orbitControls?.update();
 		orbitCamera?.updateMatrix();
 
@@ -154,6 +162,7 @@ const TariTower = () => {
 	}
 
 	return {
+		preload,
 		renderer,
 		init,
 		coins,

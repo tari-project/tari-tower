@@ -125,7 +125,7 @@ const Loader = () => {
 
 	function _onLoad() {
 		loadedCount++;
-		console.debug(`loadedCount= ${loadedCount}`);
+
 		if (loadedCount === list.length) {
 			list = [];
 			onLoadCallback?.();
