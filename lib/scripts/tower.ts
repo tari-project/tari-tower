@@ -8,7 +8,7 @@ import { OrbitControls } from './controls/OrbitControls';
 import SystemManager from './logic/systemManager.ts';
 import { Background, bgContainer } from './visuals/bg/bg.ts';
 import loader from './core/loader.ts';
-import { OrthographicCamera, PerspectiveCamera } from 'three';
+import { OrthographicCamera } from 'three';
 
 THREE.ColorManagement.enabled = false;
 
@@ -109,7 +109,6 @@ const TariTower = () => {
 			// first the logic
 			await game.init();
 
-			console.debug('HELLOo?o');
 			// then the visuals
 			heroBlocks.init();
 			coins.init();

@@ -2198,7 +2198,7 @@ const KP = () => {
   async function H() {
     await x();
     try {
-      await A.init(), console.debug("HELLOo?o"), KA.init(), z.init(), B.init(), Q.scene.add(H8), Q.scene.add(Nw), Q.scene.add(xA);
+      await A.init(), KA.init(), z.init(), B.init(), Q.scene.add(H8), Q.scene.add(Nw), Q.scene.add(xA);
     } catch (I) {
       console.error(I);
     }

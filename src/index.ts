@@ -1,7 +1,7 @@
 import GUI from 'lil-gui';
 
-// import { loadTowerAnimation, removeTowerAnimation, setAnimationState } from '@tari-project/tari-tower';
-import { loadTowerAnimation, removeTowerAnimation, setAnimationState } from '../lib';
+import { loadTowerAnimation, removeTowerAnimation, setAnimationState } from '@tari-project/tari-tower';
+// import { loadTowerAnimation, removeTowerAnimation, setAnimationState } from '../lib';
 
 if (import.meta.env.MODE === 'development') {
 	const gui = new GUI();
