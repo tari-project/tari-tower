@@ -6,8 +6,8 @@ import { AnimationResult } from '../types';
 import { errorAnimationDuration } from './logic/errorAnimationManager';
 import { successAnimationDuration } from './logic/successAnimationManager';
 import TariTower from './tower.ts';
-import { canvasSignal, stateSignal } from './logic/signals.ts';
-import { status as currentStatus } from './logic/stateManager.ts';
+import { canvasSignal, gameEndedSignal, stateSignal } from './logic/signals.ts';
+import { status as currentStatus, result as currentResult } from './logic/stateManager.ts';
 
 const tower = TariTower();
 
@@ -74,14 +74,14 @@ export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 		[AnimationResult.STOP]: stopAnimationDuration * 1000,
 	};
 	const alreadyStopped = currentStatus === 'not-started';
-	console.debug('alreadyStopped', alreadyStopped);
+	const isReplay = currentResult === 'replay';
 	if (!alreadyStopped) {
-		setAnimationState('stop', { isRemove: true });
+		setAnimationState('stop', { isRemove: true, isReplay });
 	} else {
 		removeCanvas({ canvasId });
 	}
 	canvasSignal.add((status, result, isEnd) => {
-		console.debug('rm:', status, result, isEnd);
+		console.debug('RM:', status, result, isEnd);
 		const useResultDelay = result !== null && result !== 'none';
 
 		const baseDelay = 1000 * 1.5;

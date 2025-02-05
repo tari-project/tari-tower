@@ -25,6 +25,7 @@ let isFailResult: StatusManagerState['isFailResult'] = false;
 let isStopped: StatusManagerState['isStopped'] = false;
 let result: StatusManagerState['result'] = AnimationResult.NONE;
 let completeAnimationLevel: StatusManagerState['completeAnimationLevel'] = SuccessLevel.ONE;
+let removeCanvas = false;
 
 const StateManager = () => {
 	const statusUpdateQueue: StatusManagerState['statusUpdateQueue'] = [];
@@ -46,7 +47,7 @@ const StateManager = () => {
 		callback?.();
 	}
 
-	function updateFlags() {
+	function updateFlags(isRemove = false) {
 		hasNotStarted = status === AnimationStatus.NOT_STARTED;
 		isStart = status === AnimationStatus.STARTED;
 		isFree = status === AnimationStatus.FREE;
@@ -57,6 +58,7 @@ const StateManager = () => {
 		isSuccessResult = (isResult || isResultAnimation) && result === AnimationResult.COMPLETED;
 		isFailResult = (isResult || isResultAnimation) && result === AnimationResult.FAILED;
 		isStopped = (isResult || isResultAnimation) && result === AnimationResult.STOP;
+		removeCanvas = isRemove;
 	}
 
 	function _canUpdateStatus(newStatus, hasResult = false, isReplay = false) {
@@ -76,7 +78,6 @@ const StateManager = () => {
 			if (!hasResult) {
 				updateFlags();
 				stateSignal.dispatch(status, result);
-				canvasSignal.dispatch(status, result, isReplay);
 			}
 			return true;
 		}
@@ -104,16 +105,13 @@ const StateManager = () => {
 			result = newResult;
 			completeAnimationLevel = animationStyle;
 
-			updateFlags();
+			updateFlags(isRemove);
 			stateSignal.dispatch(status, result, completeAnimationLevel);
-			canvasSignal.dispatch(status, result, isRemove || isReplay);
 		}
 	}
 
 	function set(id: string, options?: { isReplay?: boolean; isRemove?: boolean }) {
 		const { isRemove, isReplay } = options || {};
-		console.debug(`isRemove= ${isRemove}`);
-		console.debug(`isReplay= ${isReplay}`);
 		const actions = {
 			start: () => setStart(),
 			free: () => setFree(),
@@ -159,8 +157,7 @@ const StateManager = () => {
 			}
 			properties.errorBlock = null;
 		}
-
-		statusUpdateQueue.push(() => (result ? _updateStatusAndResult({ status, result, animationStyle }) : _canUpdateStatus(status)));
+		statusUpdateQueue.push(() => (result ? _updateStatusAndResult({ status, result, animationStyle, isRemove }) : _canUpdateStatus(status)));
 	}
 
 	function reset() {
@@ -199,7 +196,6 @@ const StateManager = () => {
 
 	function setComplete3(isReplay = false) {
 		const result = isReplay && hasNotStarted ? AnimationResult.REPLAY : AnimationResult.COMPLETED;
-
 		_queueStatusUpdate({ status: AnimationStatus.RESULT, result, animationStyle: SuccessLevel.THREE });
 	}
 
@@ -216,6 +212,10 @@ const StateManager = () => {
 	}
 
 	function setRestart() {
+		console.debug(`removeCanvas= ${removeCanvas}`);
+		if (removeCanvas) {
+			gameEndedSignal.dispatch(true);
+		}
 		statusUpdateQueue.push(() => {
 			if (_canUpdateStatus(AnimationStatus.RESTART)) {
 				stopAnimationEndedSignal.dispatch();

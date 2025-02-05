@@ -41,7 +41,7 @@ let lastSpawnedBlock: SystemManagerState['lastSpawnedBlock'] = null;
 let cycleIndex: SystemManagerState['cycleIndex'] = 0;
 let animationSpeedRatio: SystemManagerState['animationSpeedRatio'] = 0;
 let previousSuccessBlocksAnimationRatio: SystemManagerState['previousSuccessBlocksAnimationRatio'] = 0;
-let canvasInit = false;
+const canvasInit = false;
 const SystemManager = () => {
 	function _spawnBlock() {
 		if (_shouldPreventSpawn()) return;
@@ -159,6 +159,7 @@ const SystemManager = () => {
 		}
 
 		if (isEnd) {
+			console.debug(`isEnd= ${isEnd}`);
 			canvasSignal.dispatch(stateManager.status, stateManager.result, isEnd);
 		}
 
@@ -166,9 +167,6 @@ const SystemManager = () => {
 			stateManager.setRestart();
 			_startNewCycle();
 			previousSuccessBlocksAnimationRatio = 1;
-		});
-		canvasSignal.remove(() => {
-			canvasInit = true;
 		});
 		stopAnimationEndedSignal.remove(() => {
 			stateManager.setRestart();
@@ -178,8 +176,8 @@ const SystemManager = () => {
 			stateManager.setRestart();
 			_startNewCycle();
 		});
-		gameEndedSignal.remove(() => {
-			reset(true);
+		gameEndedSignal.remove((isEnd) => {
+			reset(isEnd);
 		});
 	}
 
@@ -249,10 +247,6 @@ const SystemManager = () => {
 		errorAnimationManager.init();
 		board.init();
 
-		canvasSignal.add(() => {
-			canvasInit = true;
-		});
-
 		completeAnimationEndedSignal.add(() => {
 			stateManager.setRestart();
 			_startNewCycle();
@@ -266,8 +260,8 @@ const SystemManager = () => {
 			stateManager.setRestart();
 			_startNewCycle();
 		});
-		gameEndedSignal.add(() => {
-			reset(true);
+		gameEndedSignal.add((isEnd) => {
+			reset(isEnd);
 		});
 	}
 
