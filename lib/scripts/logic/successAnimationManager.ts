@@ -1,6 +1,6 @@
 import math from '../utils/math';
 
-import { completeAnimationEndedSignal, gameEndedSignal, stateSignal } from './signals';
+import { completeAnimationEndedSignal, stateSignal } from './signals';
 import { AnimationResult, AnimationStatus, SuccessLevel } from '../../types/stateManager';
 
 let currentAnimationStyle: SuccessLevel | null;

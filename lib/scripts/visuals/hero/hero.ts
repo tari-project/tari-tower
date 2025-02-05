@@ -5,7 +5,7 @@ import { properties } from '../../core/properties';
 import math from '../../utils/math';
 import ease, { customEasing } from '../../utils/ease';
 import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
-import { blocks, firstStartAnimationRatio, lastSpawnedBlock, previousSuccessBlocksAnimationRatio } from '../../logic/systemManager';
+import systemManager from '../../logic/systemManager';
 import { result } from '../../logic/stateManager';
 import { HALF_SIZE, SIZE, TOTAL_TILES, SIZE_WITH_PADDING, TOTAL_TILES_WITH_PADDING, tiles, board } from '../../logic/board';
 
@@ -24,6 +24,7 @@ import { SharedUniforms } from '../../../types/properties';
 import { HeroType } from '../../../types/hero';
 import { AnimationResult } from '../../../types';
 import { ASSETS_PATH } from '../../core/settings';
+import Block from '../../logic/Block.ts';
 
 const TOTAL_BLOCKS = 2 * TOTAL_TILES;
 const _v2_0 = new THREE.Vector2();
@@ -74,6 +75,8 @@ const heroState: HeroType = {
 	heroSharedUniforms,
 };
 
+const blocks = systemManager.blocks;
+const lastSpawnedBlock = (systemManager.lastSpawnedBlock as unknown as Block) || undefined;
 const Hero = () => {
 	async function preload() {
 		const arr = Array.from({ length: TOTAL_BLOCKS });
@@ -333,7 +336,7 @@ const Hero = () => {
 
 			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.set(DEFAULT_COLOR);
 
-			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(_c.set(properties.successColor), previousSuccessBlocksAnimationRatio);
+			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(_c.set(properties.successColor), systemManager.previousSuccessBlocksAnimationRatio);
 			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.convertSRGBToLinear();
 		}
 	}
@@ -553,7 +556,7 @@ const Hero = () => {
 
 		const pushDownRatio = Math.min(1, stopPushDownRatio + failPushDownRatio + successPushDownRatio);
 		const easedRestartAnimationRatio = ease.backOut(pushDownRatio, 3);
-		const easedFirstStartAnimationRatio = 1 - customEasing(firstStartAnimationRatio);
+		const easedFirstStartAnimationRatio = 1 - customEasing(systemManager.firstStartAnimationRatio);
 		heroContainer.position.y = -easedRestartAnimationRatio - 2 * easedFirstStartAnimationRatio;
 		heroContainer.rotation.y = 0.5 * Math.PI * easedFirstStartAnimationRatio;
 		heroContainer.rotation.y += 2 * Math.PI * ease.quartInOut(towerRotationRatio);

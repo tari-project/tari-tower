@@ -3,8 +3,8 @@ import { properties } from './scripts/core/properties';
 import { result, stateManager, status, statusIndex } from './scripts/logic/stateManager';
 
 export function setAnimationState(id: string, options?: { isReplay?: boolean; isRemove?: boolean }) {
-	const { isReplay, isRemove } = options || {};
-	stateManager.set(id, { isRemove, isReplay });
+	const isReplay = options?.isReplay;
+	stateManager.set(id, { isReplay });
 }
 interface Property {
 	property: string;

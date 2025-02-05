@@ -1,6 +1,6 @@
 import math from '../utils/math';
 
-import { canvasSignal, errorAnimationEndedSignal, gameEndedSignal, stateSignal } from './signals';
+import { errorAnimationEndedSignal, stateSignal } from './signals';
 import { AnimationResult, AnimationStatus } from '../../types/stateManager';
 
 let isActive = false;
