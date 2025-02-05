@@ -271,11 +271,11 @@ const Hero = () => {
 	function reset(resetHero = false) {
 		heroState.successColorRatio = 0;
 		heroState._blockList.forEach((block) => block.reset());
-		console.debug(resetHero);
+
 		if (resetHero) {
+			heroContainer.position.y = -2.5;
 			heroState._baseMesh = undefined;
 			heroState.heroSharedUniforms = heroSharedUniforms;
-			heroContainer.position.y = -2.5;
 		}
 	}
 
@@ -592,5 +592,5 @@ const Hero = () => {
 		update,
 	};
 };
-
-export { Hero, heroContainer, heroSharedUniforms };
+const heroBlocks = Hero();
+export { heroBlocks, heroContainer, heroSharedUniforms };

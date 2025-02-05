@@ -1,6 +1,6 @@
 import math from '../utils/math';
 import { properties } from '../core/properties';
-import { heroBlocks as blocksVisual } from '../tower.ts';
+import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
 import {
 	hasNotStarted,
 	isFailResult,
@@ -132,18 +132,15 @@ const SystemManager = () => {
 		const { isDestroy, resetHero } = opts || {};
 		if (isDestroy) {
 			firstStartAnimationRatio = 0;
-			canvasSignal.dispatch(true);
+			canvasSignal.dispatch();
 		}
-
 		blocks.forEach((block) => block.reset());
 		blocksVisual.reset(resetHero);
 		board.reset();
-		previousSuccessBlocksAnimationRatio = 0;
 
 		blocks = [];
 		lastSpawnedBlock = null;
 		cycleIndex = 0;
-
 		animationSpeedRatio = 0;
 
 		const needsRestart = resetCycleResults.includes(result);
@@ -167,7 +164,7 @@ const SystemManager = () => {
 			stateManager.setRestart();
 			_startNewCycle();
 		});
-		gameEndedSignal.remove((isEnd: boolean) => {
+		gameEndedSignal.remove(() => {
 			reset({ isDestroy: true });
 		});
 	}
@@ -252,8 +249,8 @@ const SystemManager = () => {
 			stateManager.setRestart();
 			_startNewCycle();
 		});
-		gameEndedSignal.add((isEnd = false) => {
-			reset({ isDestroy: isEnd });
+		gameEndedSignal.add(() => {
+			reset({ isDestroy: true });
 		});
 	}
 

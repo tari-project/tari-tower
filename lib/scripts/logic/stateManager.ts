@@ -1,6 +1,6 @@
 import { properties } from '../core/properties';
 import settings from '../core/settings';
-import { heroBlocks as blocksVisual } from '../tower';
+import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
 
 import { blocks } from './systemManager';
 import { gameEndedSignal, stateSignal, stopAnimationEndedSignal } from './signals';
@@ -26,9 +26,8 @@ let isStopped: StatusManagerState['isStopped'] = false;
 let result: StatusManagerState['result'] = AnimationResult.NONE;
 let completeAnimationLevel: StatusManagerState['completeAnimationLevel'] = SuccessLevel.ONE;
 
+let removeCanvas = false;
 const StateManager = () => {
-	let removeCanvas = false;
-
 	const statusUpdateQueue: StatusManagerState['statusUpdateQueue'] = [];
 
 	function updateAfterCycle() {
@@ -159,8 +158,8 @@ const StateManager = () => {
 	}
 
 	function reset() {
-		removeCanvas = false;
 		_queueStatusUpdate({ status: AnimationStatus.NOT_STARTED, result: AnimationResult.NONE });
+		removeCanvas = false;
 	}
 
 	function setStart() {
@@ -209,20 +208,19 @@ const StateManager = () => {
 	function setRestartAnimation() {
 		_queueStatusUpdate({ status: AnimationStatus.RESTART_ANIMATION });
 	}
-	function setRemove(isRemove = false) {
-		removeCanvas = isRemove;
+	function setRemove() {
+		removeCanvas = true;
 	}
 	function setRestart() {
+		console.debug(`removeCanvas= ${removeCanvas}`);
 		if (removeCanvas) {
-			gameEndedSignal.dispatch(true);
-			reset();
+			gameEndedSignal.dispatch();
 		} else {
-			setStart();
-			// statusUpdateQueue.push(() => {
-			// 	if (_canUpdateStatus(AnimationStatus.RESTART)) {
-			// 		stopAnimationEndedSignal.dispatch();
-			// 	}
-			// });
+			statusUpdateQueue.push(() => {
+				if (_canUpdateStatus(AnimationStatus.RESTART)) {
+					stopAnimationEndedSignal.dispatch();
+				}
+			});
 		}
 	}
 

@@ -10,7 +10,7 @@ let lastRender = 0;
 const targetFPS = 60;
 const frameInterval = 1 / targetFPS;
 let _offset = 0;
-
+let frame: number;
 function animate() {
 	const newTime = performance.now() / 1000;
 	const dt = newTime - time;
@@ -19,7 +19,8 @@ function animate() {
 		tower.render(dt);
 		time = newTime;
 	}
-	tower.renderer.setAnimationLoop(animate);
+	cancelAnimationFrame(frame);
+	frame = requestAnimationFrame(animate);
 }
 
 function initCallback() {
@@ -33,8 +34,8 @@ function initCallback() {
 }
 
 export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: string; offset?: number }) {
-	_offset = offset;
 	if (document.getElementById(canvasId)) return;
+	_offset = offset;
 	try {
 		await tower.preload({ canvasId, initCallback });
 	} catch (e) {
@@ -43,14 +44,13 @@ export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: s
 }
 
 export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
-	const canvas = document.getElementById(canvasId);
-	if (!canvas) return;
+	if (!document.getElementById(canvasId)) return;
 
 	const alreadyStopped = currentStatus === 'not-started';
 	if (!alreadyStopped) {
-		stateManager.setRemove(true);
+		stateManager.setRemove();
 		setAnimationState('stop');
 	} else {
-		gameEndedSignal.dispatch(true);
+		gameEndedSignal.dispatch();
 	}
 }

@@ -1,7 +1,7 @@
 import GUI from 'lil-gui';
 
-// import { loadTowerAnimation, removeTowerAnimation, setAnimationState } from '@tari-project/tari-tower';
-import { loadTowerAnimation, removeTowerAnimation, setAnimationState } from '../lib';
+import { loadTowerAnimation, removeTowerAnimation, setAnimationState } from '@tari-project/tari-tower';
+// import { loadTowerAnimation, removeTowerAnimation, setAnimationState } from '../lib';
 
 if (import.meta.env.MODE === 'development') {
 	const gui = new GUI();
@@ -29,14 +29,14 @@ if (import.meta.env.MODE === 'development') {
 	gui.add(actions, 'removeCanvas');
 	gui.add(actions, 'initCanvas');
 
-	function handleLoad() {
-		loadTowerAnimation({ canvasId: 'canvas-id', offset: 0 });
-	}
-
-	document.addEventListener('DOMContentLoaded', handleLoad);
-
-	const timeOutId = setTimeout(() => {
-		document.removeEventListener('DOMContentLoaded', handleLoad);
-		clearTimeout(timeOutId);
-	}, 500);
+	// function handleLoad() {
+	// 	loadTowerAnimation({ canvasId: 'canvas-id', offset: 0 });
+	// }
+	//
+	// document.addEventListener('DOMContentLoaded', handleLoad);
+	//
+	// const timeOutId = setTimeout(() => {
+	// 	document.removeEventListener('DOMContentLoaded', handleLoad);
+	// 	clearTimeout(timeOutId);
+	// }, 500);
 }
