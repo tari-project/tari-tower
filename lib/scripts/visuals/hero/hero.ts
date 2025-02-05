@@ -5,7 +5,7 @@ import { properties } from '../../core/properties';
 import math from '../../utils/math';
 import ease, { customEasing } from '../../utils/ease';
 import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
-import systemManager from '../../logic/systemManager';
+import { blocks, firstStartAnimationRatio, lastSpawnedBlock, previousSuccessBlocksAnimationRatio } from '../../logic/systemManager';
 import { result } from '../../logic/stateManager';
 import { HALF_SIZE, SIZE, TOTAL_TILES, SIZE_WITH_PADDING, TOTAL_TILES_WITH_PADDING, tiles, board } from '../../logic/board';
 
@@ -24,7 +24,6 @@ import { SharedUniforms } from '../../../types/properties';
 import { HeroType } from '../../../types/hero';
 import { AnimationResult } from '../../../types';
 import { ASSETS_PATH } from '../../core/settings';
-import Block from '../../logic/Block.ts';
 
 const TOTAL_BLOCKS = 2 * TOTAL_TILES;
 const _v2_0 = new THREE.Vector2();
@@ -75,8 +74,6 @@ const heroState: HeroType = {
 	heroSharedUniforms,
 };
 
-const blocks = systemManager.blocks;
-const lastSpawnedBlock = (systemManager.lastSpawnedBlock as unknown as Block) || undefined;
 const Hero = () => {
 	async function preload() {
 		const arr = Array.from({ length: TOTAL_BLOCKS });
@@ -112,7 +109,7 @@ const Hero = () => {
 			...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
 			...properties.sharedUniforms,
 			...heroSharedUniforms,
-			// ...blueNoise.sharedUniforms,
+			...bn_sharedUniforms,
 			u_color: { value: new THREE.Color(properties.neutralColor) },
 			u_blocksColor: { value: new THREE.Color() },
 			u_yDisplacement: { value: 0 },
@@ -271,9 +268,15 @@ const Hero = () => {
 		});
 	}
 
-	function reset() {
+	function reset(resetHero = false) {
 		heroState.successColorRatio = 0;
 		heroState._blockList.forEach((block) => block.reset());
+		console.debug(resetHero);
+		if (resetHero) {
+			heroState._baseMesh = undefined;
+			heroState.heroSharedUniforms = heroSharedUniforms;
+			heroContainer.position.y = -2.5;
+		}
 	}
 
 	function resetBlockFromLogicBlock(logicBlock) {
@@ -336,7 +339,7 @@ const Hero = () => {
 
 			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.set(DEFAULT_COLOR);
 
-			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(_c.set(properties.successColor), systemManager.previousSuccessBlocksAnimationRatio);
+			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(_c.set(properties.successColor), previousSuccessBlocksAnimationRatio);
 			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.convertSRGBToLinear();
 		}
 	}
@@ -556,7 +559,7 @@ const Hero = () => {
 
 		const pushDownRatio = Math.min(1, stopPushDownRatio + failPushDownRatio + successPushDownRatio);
 		const easedRestartAnimationRatio = ease.backOut(pushDownRatio, 3);
-		const easedFirstStartAnimationRatio = 1 - customEasing(systemManager.firstStartAnimationRatio);
+		const easedFirstStartAnimationRatio = 1 - customEasing(firstStartAnimationRatio);
 		heroContainer.position.y = -easedRestartAnimationRatio - 2 * easedFirstStartAnimationRatio;
 		heroContainer.rotation.y = 0.5 * Math.PI * easedFirstStartAnimationRatio;
 		heroContainer.rotation.y += 2 * Math.PI * ease.quartInOut(towerRotationRatio);

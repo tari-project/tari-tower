@@ -67,7 +67,6 @@ const propertiesInitialState: PropertiesType = {
 let properties = propertiesInitialState;
 
 export function resetProperties() {
-	console.debug('hello?');
 	properties = propertiesInitialState;
 }
 

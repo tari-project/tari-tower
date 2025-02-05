@@ -1,25 +1,26 @@
 import * as THREE from 'three';
 import settings, { WEBGL_OPTS } from './core/settings.ts';
-import { properties } from './core/properties.ts';
+import { properties, resetProperties } from './core/properties.ts';
 import { Hero, heroContainer } from './visuals/hero/hero.ts';
 import { coinContainer, Coins } from './visuals/coins/coins.ts';
 import BlueNoise from './utils/blueNoise/blueNoise.ts';
 import { OrbitControls } from './controls/OrbitControls';
-
+import SystemManager from './logic/systemManager.ts';
 import { Background, bgContainer } from './visuals/bg/bg.ts';
 import loader from './core/loader.ts';
 import { OrthographicCamera } from 'three';
-import systemManager from './logic/systemManager.ts';
+import { canvasSignal } from './logic/signals.ts';
 
 THREE.ColorManagement.enabled = false;
 
 export const heroBlocks = Hero();
-export const renderer = new THREE.WebGLRenderer(WEBGL_OPTS);
 
 const TariTower = () => {
+	const renderer = new THREE.WebGLRenderer(WEBGL_OPTS);
 	const background = Background();
 	const blueNoise = BlueNoise();
 	const coins = Coins();
+	const game = SystemManager();
 
 	let canvas: HTMLCanvasElement;
 	let orbitControls: OrbitControls;
@@ -105,11 +106,17 @@ const TariTower = () => {
 		orbitControls.reset();
 	}
 	async function init() {
+		canvasSignal.add((isEnd) => {
+			console.debug(`isEnd FROM ADDd= ${isEnd}`);
+			if (isEnd) {
+				destroy();
+			}
+		});
 		await _initScene();
 
 		try {
 			// first the logic
-			await systemManager.init();
+			await game.init();
 
 			// then the visuals
 			heroBlocks.init();
@@ -154,14 +161,28 @@ const TariTower = () => {
 		camera.matrix.compose(camera.position, camera.quaternion, camera.scale);
 
 		blueNoise.update(dt);
-		systemManager.update(dt);
+		game.update(dt);
 		heroBlocks.update(dt);
 		coins.update(dt);
 		background.update(dt);
 
 		renderer.render(properties.scene, camera);
 	}
+	function destroy() {
+		game.reset({ resetHero: true });
+		canvas.remove();
+		renderer.state.reset();
+		renderer.resetState();
+		renderer.dispose();
+		properties.orbitTarget = undefined;
 
+		resetProperties();
+
+		canvasSignal.remove((isEnd) => {
+			console.debug(`isEnd from RM= ${isEnd}`);
+			destroy();
+		});
+	}
 	return {
 		preload,
 		renderer,

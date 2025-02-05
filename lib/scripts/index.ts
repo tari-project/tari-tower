@@ -1,13 +1,7 @@
-import { properties, resetProperties } from './core/properties';
-
 import { setAnimationState } from '../main';
-import { stopAnimationDuration } from './logic/stopAnimationManager';
-import { AnimationResult } from '../types';
-import { errorAnimationDuration } from './logic/errorAnimationManager';
-import { successAnimationDuration } from './logic/successAnimationManager';
 import TariTower from './tower.ts';
-import { canvasSignal } from './logic/signals.ts';
 import { status as currentStatus, stateManager } from './logic/stateManager.ts';
+import { gameEndedSignal } from './logic/signals.ts';
 
 const tower = TariTower();
 
@@ -42,54 +36,9 @@ export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: s
 	_offset = offset;
 	if (document.getElementById(canvasId)) return;
 	try {
-		console.debug('hellooo load');
 		await tower.preload({ canvasId, initCallback });
 	} catch (e) {
 		console.error('loadTowerAnimation', e);
-	}
-}
-
-function removeCanvas({ canvasId }: { canvasId: string }) {
-	const canvas = document.getElementById(canvasId);
-	if (!canvas) {
-		return;
-	}
-	canvas.remove();
-
-	tower.renderer.state.reset();
-	tower.renderer.resetState();
-	tower.renderer.dispose();
-	properties.orbitTarget = undefined;
-
-	resetProperties();
-
-	canvasSignal.remove((status, result, isEnd) => {
-		handleRemoveTimeouts(status, result, isEnd, canvasId);
-	});
-}
-
-function handleRemoveTimeouts(status, result, isEnd, canvasId) {
-	console.debug(status, result, isEnd, canvasId);
-	const resultDelays = {
-		[AnimationResult.FAILED]: errorAnimationDuration * 1000,
-		[AnimationResult.COMPLETED]: successAnimationDuration * 1000,
-		[AnimationResult.REPLAY]: successAnimationDuration * 1000,
-		[AnimationResult.STOP]: stopAnimationDuration * 1000,
-	};
-
-	const useResultDelay = result !== null && result !== 'none';
-
-	const baseDelay = 1000 * 1.5;
-	const resultDelay = resultDelays[result] || 1000;
-	const safeTimeoutDelay = useResultDelay ? baseDelay + resultDelay : baseDelay;
-
-	const resultWithStopDelay = safeTimeoutDelay + stopAnimationDuration * baseDelay;
-
-	if (isEnd) {
-		const removeTimeout = setTimeout(() => {
-			removeCanvas({ canvasId });
-			clearTimeout(removeTimeout);
-		}, resultWithStopDelay);
 	}
 }
 
@@ -102,11 +51,6 @@ export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 		stateManager.setRemove(true);
 		setAnimationState('stop');
 	} else {
-		removeCanvas({ canvasId });
-		return;
+		gameEndedSignal.dispatch(true);
 	}
-
-	canvasSignal.add((status, result, isEnd) => {
-		handleRemoveTimeouts(status, result, isEnd, canvasId);
-	});
 }

@@ -2,7 +2,7 @@ import { properties } from '../core/properties';
 import settings from '../core/settings';
 import { heroBlocks as blocksVisual } from '../tower';
 
-import systemManager from './systemManager';
+import { blocks } from './systemManager';
 import { gameEndedSignal, stateSignal, stopAnimationEndedSignal } from './signals';
 import { AnimationResult, AnimationStatus, StatusManagerState, SuccessLevel } from '../../types/stateManager';
 
@@ -148,7 +148,7 @@ const StateManager = () => {
 		isRemove?: boolean;
 	}) {
 		if (properties.errorBlock && properties.errorBlock?.errorFallAnimationTime < 1) {
-			const logicBlock = systemManager.blocks?.find((block) => block?.id === properties.errorBlock?.id);
+			const logicBlock = blocks?.find((block) => block?.id === properties.errorBlock?.id);
 			if (logicBlock) {
 				logicBlock.isErrorBlock = false;
 				blocksVisual.resetBlockFromLogicBlock(logicBlock);
@@ -215,12 +215,14 @@ const StateManager = () => {
 	function setRestart() {
 		if (removeCanvas) {
 			gameEndedSignal.dispatch(true);
+			reset();
 		} else {
-			statusUpdateQueue.push(() => {
-				if (_canUpdateStatus(AnimationStatus.RESTART)) {
-					stopAnimationEndedSignal.dispatch();
-				}
-			});
+			setStart();
+			// statusUpdateQueue.push(() => {
+			// 	if (_canUpdateStatus(AnimationStatus.RESTART)) {
+			// 		stopAnimationEndedSignal.dispatch();
+			// 	}
+			// });
 		}
 	}
 
