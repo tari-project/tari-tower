@@ -1,9 +1,6 @@
 import { properties } from '../core/properties';
 import settings from '../core/settings';
-import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
-
-import { blocks } from './systemManager';
-import { gameEndedSignal, stateSignal, stopAnimationEndedSignal } from './signals';
+import { gameEndedSignal, restartSignal, stateSignal, stopAnimationEndedSignal } from './signals';
 import { AnimationResult, AnimationStatus, StatusManagerState, SuccessLevel } from '../../types/stateManager';
 
 export const PREVENT_CYCLE_STATES = [AnimationStatus.NOT_STARTED, AnimationStatus.RESTART_ANIMATION, AnimationStatus.RESTART, AnimationStatus.STARTED];
@@ -24,22 +21,27 @@ let isSuccessResult: StatusManagerState['isSuccessResult'] = false;
 let isFailResult: StatusManagerState['isFailResult'] = false;
 let isStopped: StatusManagerState['isStopped'] = false;
 let result: StatusManagerState['result'] = AnimationResult.NONE;
-let completeAnimationLevel: StatusManagerState['completeAnimationLevel'] = SuccessLevel.ONE;
-
 let removeCanvas = false;
-const StateManager = () => {
-	const statusUpdateQueue: StatusManagerState['statusUpdateQueue'] = [];
 
+const statusUpdateQueue: StatusManagerState['statusUpdateQueue'] = [];
+
+interface QueueArgs {
+	status: AnimationStatus;
+
+	result?: AnimationResult | null;
+	animationStyle?: SuccessLevel | null;
+}
+const StateManager = () => {
 	function updateAfterCycle() {
 		if (properties.errorBlock) {
 			if (properties.errorBlock.isErrorBlockFalling || properties.errorBlock.errorLifeCycle < properties.errorBlockMaxLifeCycle) {
 				return;
 			}
 		}
+
 		if (isStart) {
 			setFree();
-		}
-		if (isResult) {
+		} else if (isResult) {
 			setResultAnimation();
 		}
 
@@ -49,7 +51,7 @@ const StateManager = () => {
 
 	function updateFlags() {
 		hasNotStarted = status === AnimationStatus.NOT_STARTED;
-		isStart = status === AnimationStatus.STARTED;
+		isStart = status === AnimationStatus.STARTED && !removeCanvas;
 		isFree = status === AnimationStatus.FREE;
 		isResult = status === AnimationStatus.RESULT;
 		isResultAnimation = status === AnimationStatus.RESULT_ANIMATION;
@@ -64,7 +66,6 @@ const StateManager = () => {
 		if (!properties.showVisual) {
 			return false;
 		}
-
 		if (isReplay && statusIndex === 0) {
 			statusIndex = 2;
 		}
@@ -74,6 +75,7 @@ const StateManager = () => {
 		if (nextStatusIndexMatches) {
 			statusIndex = newStateIndex;
 			status = statusOrder[statusIndex];
+
 			if (!hasResult) {
 				updateFlags();
 				stateSignal.dispatch(status, result);
@@ -83,33 +85,23 @@ const StateManager = () => {
 		return false;
 	}
 
-	function _updateStatusAndResult({
-		status: newStatus,
-		result: newResult,
-		animationStyle,
-	}: {
-		status: AnimationStatus;
-		result: AnimationResult;
-		animationStyle: SuccessLevel | null;
-	}) {
-		const isReplay = newResult === AnimationResult.REPLAY;
-
-		if (_canUpdateStatus(newStatus, true, isReplay)) {
+	function _updateStatusAndResult({ status: newStatus, result: newResult, animationStyle }: QueueArgs) {
+		if (_canUpdateStatus(newStatus, true, newResult === AnimationResult.REPLAY)) {
 			if (properties.errorBlock && !properties.errorBlock.isErrorBlockFalling) {
 				properties.errorBlock.preventErrorBlockFallAnimation();
 				properties.errorBlock = null;
 			}
-
-			result = newResult;
-			completeAnimationLevel = animationStyle;
+			if (newResult) {
+				result = newResult;
+			}
 
 			updateFlags();
-			stateSignal.dispatch(status, result, completeAnimationLevel);
+			stateSignal.dispatch(status, result, animationStyle);
 		}
 	}
 
 	function set(id: string, options?: { isReplay?: boolean; isRemove?: boolean }) {
-		const { isReplay } = options || {};
+		const isReplay = options?.isReplay;
 		const actions = {
 			start: () => setStart(),
 			free: () => setFree(),
@@ -121,45 +113,23 @@ const StateManager = () => {
 			restartAnimation: () => setRestartAnimation(),
 			restart: () => setRestart(),
 			showVisual: () => showVisual(),
-		};
-		const successActions = {
 			success: () => setComplete(isReplay),
 			success2: () => setComplete2(isReplay),
 			success3: () => setComplete3(isReplay),
 		};
 		actions[id]?.();
-
-		successActions[id]?.();
 	}
 
 	function showVisual() {
 		properties.showVisual = true;
 	}
 
-	function _queueStatusUpdate({
-		status,
-		result = null,
-		animationStyle = null,
-	}: {
-		status: AnimationStatus;
-		result?: AnimationResult | null;
-		animationStyle?: SuccessLevel | null;
-		isRemove?: boolean;
-	}) {
-		if (properties.errorBlock && properties.errorBlock?.errorFallAnimationTime < 1) {
-			const logicBlock = blocks?.find((block) => block?.id === properties.errorBlock?.id);
-			if (logicBlock) {
-				logicBlock.isErrorBlock = false;
-				blocksVisual.resetBlockFromLogicBlock(logicBlock);
-			}
-			properties.errorBlock = null;
-		}
+	function _queueStatusUpdate({ status, result = null, animationStyle = null }: QueueArgs) {
 		statusUpdateQueue.push(() => (result ? _updateStatusAndResult({ status, result, animationStyle }) : _canUpdateStatus(status)));
 	}
 
 	function reset() {
 		_queueStatusUpdate({ status: AnimationStatus.NOT_STARTED, result: AnimationResult.NONE });
-		removeCanvas = false;
 	}
 
 	function setStart() {
@@ -212,16 +182,15 @@ const StateManager = () => {
 		removeCanvas = true;
 	}
 	function setRestart() {
-		console.debug(`removeCanvas= ${removeCanvas}`);
 		if (removeCanvas) {
 			gameEndedSignal.dispatch();
-		} else {
-			statusUpdateQueue.push(() => {
-				if (_canUpdateStatus(AnimationStatus.RESTART)) {
-					stopAnimationEndedSignal.dispatch();
-				}
-			});
 		}
+		statusUpdateQueue.push(() => {
+			if (_canUpdateStatus(AnimationStatus.RESTART)) {
+				console.debug('when does this happen');
+				restartSignal.dispatch();
+			}
+		});
 	}
 
 	function init() {

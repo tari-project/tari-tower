@@ -64,6 +64,6 @@ export const propertiesInitialState: PropertiesType = {
 	minSpawnedBlocksForTheErrorBlock: maxFreeBlocksCount - 2,
 	...baseStyleProperties,
 };
-const properties = propertiesInitialState;
+const properties = { ...propertiesInitialState };
 
 export { properties };

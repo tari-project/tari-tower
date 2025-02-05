@@ -268,15 +268,9 @@ const Hero = () => {
 		});
 	}
 
-	function reset(resetHero = false) {
+	function reset() {
 		heroState.successColorRatio = 0;
 		heroState._blockList.forEach((block) => block.reset());
-
-		if (resetHero) {
-			heroContainer.position.y = -2.5;
-			heroState._baseMesh = undefined;
-			heroState.heroSharedUniforms = heroSharedUniforms;
-		}
 	}
 
 	function resetBlockFromLogicBlock(logicBlock) {

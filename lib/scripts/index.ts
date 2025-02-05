@@ -45,12 +45,10 @@ export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: s
 
 export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 	if (!document.getElementById(canvasId)) return;
-
-	const alreadyStopped = currentStatus === 'not-started';
-	if (!alreadyStopped) {
+	if (currentStatus === 'not-started') {
+		gameEndedSignal.dispatch();
+	} else {
 		stateManager.setRemove();
 		setAnimationState('stop');
-	} else {
-		gameEndedSignal.dispatch();
 	}
 }

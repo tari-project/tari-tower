@@ -129,13 +129,10 @@ const SystemManager = () => {
 	}
 
 	function reset(opts?: { isDestroy?: boolean; resetHero?: boolean }) {
-		const { isDestroy, resetHero } = opts || {};
-		if (isDestroy) {
-			firstStartAnimationRatio = 0;
-			canvasSignal.dispatch();
-		}
+		const isDestroy = opts?.isDestroy;
+
 		blocks.forEach((block) => block.reset());
-		blocksVisual.reset(resetHero);
+		blocksVisual.reset();
 		board.reset();
 
 		blocks = [];
@@ -148,7 +145,13 @@ const SystemManager = () => {
 		_startNewCycle();
 
 		if (needsRestart) {
+			console.debug(`was it this?`, isDestroy);
 			stateManager.setStart();
+		}
+
+		if (isDestroy) {
+			canvasSignal.dispatch();
+			firstStartAnimationRatio = 0;
 		}
 
 		completeAnimationEndedSignal.remove(() => {
@@ -210,7 +213,6 @@ const SystemManager = () => {
 			reset();
 			return;
 		}
-
 		if (isResultAnimation) {
 			stateManager.setRestartAnimation();
 		}
@@ -260,5 +262,7 @@ const SystemManager = () => {
 		reset,
 	};
 };
-export default SystemManager;
+const game = SystemManager();
+export default game;
+
 export { firstStartAnimationRatio, blocks, lastSpawnedBlock, previousSuccessBlocksAnimationRatio };

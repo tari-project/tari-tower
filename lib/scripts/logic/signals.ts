@@ -8,6 +8,7 @@ export const gameEndedSignal = new MinSignal();
 export const errorAnimationEndedSignal = new MinSignal();
 export const completeAnimationEndedSignal = new MinSignal();
 export const stopAnimationEndedSignal = new MinSignal();
+export const restartSignal = new MinSignal();
 
 export const canvasSignal = new MinSignal();
 

@@ -5,7 +5,7 @@ import { heroBlocks, heroContainer } from './visuals/hero/hero.ts';
 import { coinContainer, Coins } from './visuals/coins/coins.ts';
 import BlueNoise from './utils/blueNoise/blueNoise.ts';
 import { OrbitControls } from './controls/OrbitControls';
-import SystemManager from './logic/systemManager.ts';
+import game from './logic/systemManager.ts';
 import { Background, bgContainer } from './visuals/bg/bg.ts';
 import loader from './core/loader.ts';
 import { OrthographicCamera } from 'three';
@@ -18,7 +18,6 @@ const TariTower = () => {
 	const background = Background();
 	const blueNoise = BlueNoise();
 	const coins = Coins();
-	const game = SystemManager();
 
 	let canvas: HTMLCanvasElement;
 	let orbitControls: OrbitControls;
@@ -164,12 +163,9 @@ const TariTower = () => {
 		renderer.render(properties.scene, camera);
 	}
 	function destroy() {
-		game.reset({ resetHero: true });
-		properties.showVisual = settings.SHOW_BLOCK;
 		canvas.remove();
-		renderer.state.reset();
-		renderer.resetState();
 		renderer.dispose();
+		game.reset();
 
 		canvasSignal.remove(() => {
 			destroy();
