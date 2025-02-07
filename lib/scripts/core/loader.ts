@@ -9,7 +9,6 @@ import LOSE_ANIMATION from 'public/assets/LOSE_ANIMATION.buf?url&inline';
 import gobo from 'public/assets/gobo.jpg';
 import LDR_RGB1_0 from 'public/assets/LDR_RGB1_0.png';
 import matcap_gold from 'public/assets/matcap_gold.jpg';
-import { renderer } from '../tower.ts';
 
 interface LoaderItems {
 	list: (() => void | Promise<void>)[];
@@ -106,7 +105,7 @@ const Loader = () => {
 					texture.minFilter = THREE.LinearMipMapLinearFilter;
 					texture.magFilter = THREE.LinearFilter;
 					texture.generateMipmaps = true;
-					texture.anisotropy = renderer.capabilities.getMaxAnisotropy() || 1;
+					texture.anisotropy = 1;
 					texture.flipY = true;
 					if (cb) cb(texture);
 					_onLoad();

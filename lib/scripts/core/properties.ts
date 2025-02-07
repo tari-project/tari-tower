@@ -28,7 +28,7 @@ const baseStyleProperties = {
 	particlesOpacity: 0.75,
 	particlesSize: 0.01,
 };
-const propertiesInitialState: PropertiesType = {
+export const propertiesInitialState: PropertiesType = {
 	canvasId: undefined,
 	time: 0,
 	deltaTime: 0,
@@ -64,10 +64,6 @@ const propertiesInitialState: PropertiesType = {
 	minSpawnedBlocksForTheErrorBlock: maxFreeBlocksCount - 2,
 	...baseStyleProperties,
 };
-let properties = propertiesInitialState;
-
-export function resetProperties() {
-	properties = propertiesInitialState;
-}
+const properties = { ...propertiesInitialState };
 
 export { properties };

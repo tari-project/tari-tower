@@ -1,8 +1,8 @@
 import { loadTowerAnimation, removeTowerAnimation } from './scripts/index';
 import { properties } from './scripts/core/properties';
-import { result, stateManager, status, statusIndex } from './scripts/logic/stateManager';
+import { stateManager } from './scripts/logic/stateManager';
 
-export function setAnimationState(id: string, isReplay = false) {
+export function setAnimationState(id: string, isReplay?: boolean) {
 	stateManager.set(id, isReplay);
 }
 interface Property {
@@ -15,4 +15,4 @@ export function setAnimationProperties(newProps: Property[]) {
 	}
 }
 
-export { loadTowerAnimation, removeTowerAnimation, status as animationStatus, statusIndex as animationStatusIndex, result as animationResult };
+export { loadTowerAnimation, removeTowerAnimation };

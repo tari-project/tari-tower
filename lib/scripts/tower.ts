@@ -1,25 +1,23 @@
 import * as THREE from 'three';
 import settings, { WEBGL_OPTS } from './core/settings.ts';
 import { properties } from './core/properties.ts';
-import { Hero, heroContainer } from './visuals/hero/hero.ts';
+import { heroBlocks, heroContainer } from './visuals/hero/hero.ts';
 import { coinContainer, Coins } from './visuals/coins/coins.ts';
 import BlueNoise from './utils/blueNoise/blueNoise.ts';
 import { OrbitControls } from './controls/OrbitControls';
-import SystemManager from './logic/systemManager.ts';
+import game from './logic/systemManager.ts';
 import { Background, bgContainer } from './visuals/bg/bg.ts';
 import loader from './core/loader.ts';
 import { OrthographicCamera } from 'three';
+import { canvasSignal, gameEndedSignal } from './logic/signals.ts';
 
 THREE.ColorManagement.enabled = false;
 
-export const heroBlocks = Hero();
-export const renderer = new THREE.WebGLRenderer(WEBGL_OPTS);
-
 const TariTower = () => {
+	const renderer = new THREE.WebGLRenderer(WEBGL_OPTS);
 	const background = Background();
 	const blueNoise = BlueNoise();
 	const coins = Coins();
-	const game = SystemManager();
 
 	let canvas: HTMLCanvasElement;
 	let orbitControls: OrbitControls;
@@ -87,6 +85,9 @@ const TariTower = () => {
 	}
 
 	async function preload({ canvasId, initCallback }: { canvasId: string; initCallback: () => void }) {
+		canvasSignal.addOnce(() => {
+			destroy();
+		});
 		_canvasId = canvasId;
 		await _handleRenderer();
 		await heroBlocks.preload();
@@ -161,7 +162,11 @@ const TariTower = () => {
 
 		renderer.render(properties.scene, camera);
 	}
-
+	function destroy() {
+		canvas.remove();
+		renderer.dispose();
+		game.resetPostDestroy();
+	}
 	return {
 		preload,
 		renderer,
