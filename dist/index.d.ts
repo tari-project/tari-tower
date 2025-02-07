@@ -1,3 +1,15 @@
+declare enum AnimationStatus {
+    NOT_STARTED = "not-started",
+    STARTED = "started",
+    FREE = "free",
+    RESULT = "result",
+    RESULT_ANIMATION = "result_animation",
+    RESTART_ANIMATION = "restart_animation",
+    RESTART = "restart"
+}
+
+export declare let animationStatus: AnimationStatus;
+
 export declare function loadTowerAnimation({ canvasId, offset }: {
     canvasId: string;
     offset?: number;

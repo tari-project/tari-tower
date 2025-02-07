@@ -2367,6 +2367,7 @@ function XP(B) {
     M[w.property] = w.value;
 }
 export {
+  W as animationStatus,
   uP as loadTowerAnimation,
   pP as removeTowerAnimation,
   XP as setAnimationProperties,
