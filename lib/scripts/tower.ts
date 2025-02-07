@@ -9,7 +9,7 @@ import game from './logic/systemManager.ts';
 import { Background, bgContainer } from './visuals/bg/bg.ts';
 import loader from './core/loader.ts';
 import { OrthographicCamera } from 'three';
-import { canvasSignal, gameEndedSignal } from './logic/signals.ts';
+import { canvasSignal } from './logic/signals.ts';
 
 THREE.ColorManagement.enabled = false;
 
@@ -34,7 +34,7 @@ const TariTower = () => {
 		if (_canvasId && renderer) {
 			renderer.domElement.id = _canvasId;
 			canvas = renderer.domElement;
-			document.body.appendChild(renderer.domElement);
+			document.body.appendChild(canvas);
 
 			renderer.shadowMap.enabled = true;
 			renderer.shadowMap.type = THREE.PCFShadowMap;
@@ -90,6 +90,7 @@ const TariTower = () => {
 		});
 		_canvasId = canvasId;
 		await _handleRenderer();
+
 		await heroBlocks.preload();
 		await blueNoise.preInit();
 		await coins.preload();
@@ -159,13 +160,13 @@ const TariTower = () => {
 		heroBlocks.update(dt);
 		coins.update(dt);
 		background.update(dt);
-
 		renderer.render(properties.scene, camera);
 	}
 	function destroy() {
 		canvas.remove();
-		renderer.dispose();
 		game.resetPostDestroy();
+
+		renderer.state.reset();
 	}
 	return {
 		preload,

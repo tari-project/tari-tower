@@ -4,7 +4,7 @@ var U = (B, w, o) => n8(B, typeof w != "symbol" ? w + "" : w, o);
 import * as v from "three";
 import { EventDispatcher as s8, Vector3 as MA, MOUSE as EA, TOUCH as aA, Quaternion as Gw, Spherical as Vw, Vector2 as _ } from "three";
 import S from "min-signal";
-const WA = "", U8 = Math.min(2, window.devicePixelRatio || 1), N8 = !0, O8 = 2560 * 1440, x8 = 12, b8 = !0, F8 = !1, j8 = !0, k8 = [-20, 18, 20], l8 = [0, 0, 0], K8 = { antialias: !0, alpha: !1, powerPreference: "low-power" }, cA = {
+const WA = "", U8 = Math.min(2, window.devicePixelRatio || 1), N8 = !0, O8 = 2560 * 1440, x8 = 12, b8 = !0, F8 = !1, j8 = !1, k8 = [-20, 18, 20], l8 = [0, 0, 0], K8 = { antialias: !0, alpha: !1, powerPreference: "low-power" }, cA = {
   DPR: U8,
   USE_PIXEL_LIMIT: N8,
   MAX_PIXEL_COUNT: O8,
@@ -2286,7 +2286,7 @@ const xP = () => {
   let z;
   async function n() {
     if (N && B) {
-      if (B.domElement.id = N, t = B.domElement, document.body.appendChild(B.domElement), B.shadowMap.enabled = !0, B.shadowMap.type = v.PCFShadowMap, M.sharedUniforms) {
+      if (B.domElement.id = N, t = B.domElement, document.body.appendChild(t), B.shadowMap.enabled = !0, B.shadowMap.type = v.PCFShadowMap, M.sharedUniforms) {
         const Q = M.sharedUniforms.u_bgColor1.value, E = M.sharedUniforms.u_bgColor2.value;
         Q.set(M.bgColor1).convertSRGBToLinear(), E.set(M.bgColor2).convertSRGBToLinear();
       }
@@ -2324,7 +2324,7 @@ const xP = () => {
     m.zoom = E, m.left = -i / 2 - T * i / E / 2, m.right = i / 2 - T * i / E / 2, m.top = r / 2 - I * r / E / 2, m.bottom = -r / 2 - I * r / E / 2, m.updateProjectionMatrix(), c == null || c.update(), z == null || z.updateMatrix(), z == null || z.matrix.decompose(m.position, m.quaternion, m.scale), m.matrix.compose(m.position, m.quaternion, m.scale), o.update(Q), cw.update(Q), OA.update(Q), A.update(Q), w.update(Q), B.render(M.scene, m);
   }
   function D() {
-    t.remove(), B.dispose(), cw.resetPostDestroy();
+    t.remove(), cw.resetPostDestroy(), B.state.reset();
   }
   return {
     preload: a,
