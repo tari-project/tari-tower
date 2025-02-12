@@ -4,7 +4,7 @@ var U = (B, w, o) => n8(B, typeof w != "symbol" ? w + "" : w, o);
 import * as v from "three";
 import { EventDispatcher as s8, Vector3 as MA, MOUSE as EA, TOUCH as aA, Quaternion as Gw, Spherical as Vw, Vector2 as _ } from "three";
 import S from "min-signal";
-const WA = "", U8 = Math.min(2, window.devicePixelRatio || 1), N8 = !0, O8 = 2560 * 1440, x8 = 12, b8 = !0, F8 = !1, j8 = !1, k8 = [-20, 18, 20], l8 = [0, 0, 0], K8 = { antialias: !0, alpha: !1, powerPreference: "low-power" }, cA = {
+const WA = "", U8 = Math.min(2, window.devicePixelRatio || 1), N8 = !0, O8 = 2560 * 1440, x8 = 12, b8 = !0, F8 = !1, j8 = !1, k8 = [-20, 18, 20], l8 = [0, 0, 0], K8 = { antialias: !0, alpha: !1, powerPreference: "low-power" }, fA = {
   DPR: U8,
   USE_PIXEL_LIMIT: N8,
   MAX_PIXEL_COUNT: O8,
@@ -66,13 +66,13 @@ const p8 = () => {
   function B() {
     QA = Array.from(
       { length: q },
-      (i, r) => Array.from({ length: q }, (T, I) => {
-        const m = r - L, z = I - L;
-        return new h8(r * q + I, m, z);
+      (i, r) => Array.from({ length: q }, (T, g) => {
+        const m = r - L, z = g - L;
+        return new h8(r * q + g, m, z);
       })
     ), QA.forEach(
-      (i, r) => i.forEach((T, I) => {
-        T.neighbours = A(r - L, I - L), T.init();
+      (i, r) => i.forEach((T, g) => {
+        T.neighbours = A(r - L, g - L), T.init();
       })
     ), jA = w(0, 0);
   }
@@ -86,7 +86,7 @@ const p8 = () => {
   }
   function A(i, r) {
     return [-1, 0, 1].flatMap(
-      (T) => [-1, 0, 1].map((I) => T === 0 && I === 0 ? null : w(i + T, r + I)).filter(Boolean)
+      (T) => [-1, 0, 1].map((g) => T === 0 && g === 0 ? null : w(i + T, r + g)).filter(Boolean)
     );
   }
   function t() {
@@ -143,7 +143,7 @@ const p8 = () => {
   orbitTarget: null,
   sharedUniforms: X8,
   isPaused: !1,
-  showVisual: cA.SHOW_BLOCK,
+  showVisual: fA.SHOW_BLOCK,
   loadList: [],
   animationSpeed: 1.1,
   activeBlocksCount: 0,
@@ -171,7 +171,7 @@ const p8 = () => {
     "textures/matcap_gold.jpg": Y8
   };
   let w = [], o = 0, A = null;
-  function t(T, I) {
+  function t(T, g) {
     const m = B[T];
     w.push(async () => {
       try {
@@ -179,31 +179,31 @@ const p8 = () => {
         let f = 4 + b;
         const D = new v.BufferGeometry(), Q = {};
         e.forEach((E) => {
-          const { id: s, componentSize: g, storageType: F, needsPack: Z, packedComponents: J } = E, AA = s === "indices" ? H : a, HA = window[F], xA = new HA(n, f, AA * g), yA = HA.BYTES_PER_ELEMENT;
+          const { id: s, componentSize: I, storageType: F, needsPack: Z, packedComponents: J } = E, AA = s === "indices" ? H : a, oA = window[F], xA = new oA(n, f, AA * I), yA = oA.BYTES_PER_ELEMENT;
           let eA;
-          Z ? eA = c(xA, AA, g, J, F) : (Q[s] = f, eA = xA), s === "indices" ? D.setIndex(new v.BufferAttribute(eA, 1)) : D.setAttribute(s, new v.BufferAttribute(eA, g)), f += AA * g * yA;
-        }), I && I(D), r();
+          Z ? eA = c(xA, AA, I, J, F) : (Q[s] = f, eA = xA), s === "indices" ? D.setIndex(new v.BufferAttribute(eA, 1)) : D.setAttribute(s, new v.BufferAttribute(eA, I)), f += AA * I * yA;
+        }), g && g(D), r();
       } catch (z) {
         console.error("Error loading buffer:", z);
       }
     });
   }
-  function c(T, I, m, z, n) {
-    const b = z.length, k = n.indexOf("Int") === 0, a = 1 << T.BYTES_PER_ELEMENT * 8, H = k ? a * 0.5 : 0, e = 1 / a, f = new Float32Array(I * m);
-    for (let D = 0, Q = 0; D < I; D++)
+  function c(T, g, m, z, n) {
+    const b = z.length, k = n.indexOf("Int") === 0, a = 1 << T.BYTES_PER_ELEMENT * 8, H = k ? a * 0.5 : 0, e = 1 / a, f = new Float32Array(g * m);
+    for (let D = 0, Q = 0; D < g; D++)
       for (let E = 0; E < b; E++) {
-        const { delta: s, from: g } = z[E];
-        f[Q] = (T[Q] + H) * e * s + g, Q++;
+        const { delta: s, from: I } = z[E];
+        f[Q] = (T[Q] + H) * e * s + I, Q++;
       }
     return f;
   }
-  function N(T, I) {
+  function N(T, g) {
     const m = B[T];
     w.push(() => {
       new v.TextureLoader().load(
         m,
         (z) => {
-          z.minFilter = v.LinearMipMapLinearFilter, z.magFilter = v.LinearFilter, z.generateMipmaps = !0, z.anisotropy = 1, z.flipY = !0, I && I(z), r();
+          z.minFilter = v.LinearMipMapLinearFilter, z.magFilter = v.LinearFilter, z.generateMipmaps = !0, z.anisotropy = 1, z.flipY = !0, g && g(z), r();
         },
         void 0,
         (z) => console.error("Error loading texture:", z)
@@ -211,7 +211,7 @@ const p8 = () => {
     });
   }
   function i(T) {
-    o = 0, A = T, w.forEach((I) => I());
+    o = 0, A = T, w.forEach((g) => g());
   }
   function r() {
     o++, o === w.length && (w = [], A == null || A());
@@ -273,14 +273,14 @@ const O = new J8(), _8 = () => {
 function $8(B, w, o, A, t) {
   if (B === 0) return 0;
   if (B === 1) return 1;
-  function c(r, T, I, m, z) {
-    const n = 3 * (I - T), b = 3 * (m - I) - n;
+  function c(r, T, g, m, z) {
+    const n = 3 * (g - T), b = 3 * (m - g) - n;
     return (((z - T - n - b) * r + b) * r + n) * r + T;
   }
-  function N(r, T, I, m = 1e-6) {
+  function N(r, T, g, m = 1e-6) {
     let z = 0, n = 1, b = r;
     for (; z < n; ) {
-      const k = c(b, 0, T, I, 1);
+      const k = c(b, 0, T, g, 1);
       if (Math.abs(k - r) < m)
         return b;
       k < r ? z = b : n = b, b = (z + n) / 2;
@@ -320,7 +320,7 @@ vec3 getBlueNoise (vec2 coord) {
     bn_sharedUniforms: $
   };
 }, qA = new S(), PP = new S(), DP = new S(), Tw = new S(), ew = new S(), iw = new S(), Ew = new S(), CP = new S(), Q8 = new S(), QP = new S(), BP = new S();
-var l = /* @__PURE__ */ ((B) => (B.NOT_STARTED = "not-started", B.STARTED = "started", B.FREE = "free", B.RESULT = "result", B.RESULT_ANIMATION = "result_animation", B.RESTART_ANIMATION = "restart_animation", B.RESTART = "restart", B))(l || {}), j = /* @__PURE__ */ ((B) => (B.NONE = "none", B.PAUSE = "pause", B.STOP = "stop", B.COMPLETED = "completed", B.FAILED = "failed", B.REPLAY = "replay", B))(j || {}), tA = /* @__PURE__ */ ((B) => (B[B.ONE = 1] = "ONE", B[B.TWO = 2] = "TWO", B[B.THREE = 3] = "THREE", B))(tA || {});
+var l = /* @__PURE__ */ ((B) => (B.NOT_STARTED = "not-started", B.STARTED = "started", B.FREE = "free", B.RESULT = "result", B.RESULT_ANIMATION = "result_animation", B.RESTART_ANIMATION = "restart_animation", B.RESTART = "restart", B))(l || {}), j = /* @__PURE__ */ ((B) => (B.NONE = "none", B.PAUSE = "pause", B.STOP = "stop", B.COMPLETED = "completed", B.FAILED = "failed", B.REPLAY = "replay", B))(j || {}), HA = /* @__PURE__ */ ((B) => (B[B.ONE = 1] = "ONE", B[B.TWO = 2] = "TWO", B[B.THREE = 3] = "THREE", B))(HA || {});
 const MP = [l.NOT_STARTED, l.RESTART_ANIMATION, l.RESTART, l.STARTED], zP = [j.FAILED, j.COMPLETED];
 let W = l.NOT_STARTED, V = j.NONE, kA = !0, Rw = !1, LA = !1, Dw = !1, dA = !1, B8 = !1, aw = !1, rw = !1, Cw = !1, Qw = !1;
 const vP = () => {
@@ -331,25 +331,25 @@ const vP = () => {
     if (M.errorBlock && (M.errorBlock.isErrorBlockFalling || M.errorBlock.errorLifeCycle < M.errorBlockMaxLifeCycle))
       return;
     Rw ? n() : Dw && f();
-    const g = A.shift();
-    g == null || g();
+    const I = A.shift();
+    I == null || I();
   }
   function c() {
     kA = W === l.NOT_STARTED, Rw = W === l.STARTED, LA = W === l.FREE, Dw = W === l.RESULT, dA = W === l.RESULT_ANIMATION, B8 = W === l.RESTART;
-    const g = Dw || dA;
-    aw = g && V === j.REPLAY, rw = g && V === j.COMPLETED, Cw = g && V === j.FAILED, Qw = g && V === j.STOP;
+    const I = Dw || dA;
+    aw = I && V === j.REPLAY, rw = I && V === j.COMPLETED, Cw = I && V === j.FAILED, Qw = I && V === j.STOP;
   }
-  function N(g, F) {
+  function N(I, F) {
     if (!M.showVisual) return !1;
     const Z = !!F;
-    F === j.REPLAY && w === 0 && (w = 2);
-    const AA = B.indexOf(g);
+    F === j.REPLAY && w === 0 && (w = 2), I === l.NOT_STARTED && F === j.NONE && w === 5 && (w = 6);
+    const AA = B.indexOf(I);
     return (w + 1) % B.length === AA ? (w = AA, W = B[w], Z || (c(), qA.dispatch(W, F)), !0) : !1;
   }
-  function i({ status: g, result: F, animationStyle: Z }) {
-    N(g, F) && (M.errorBlock && !M.errorBlock.isErrorBlockFalling && (M.errorBlock.preventErrorBlockFallAnimation(), M.errorBlock = null), F && (V = F), c(), qA.dispatch(W, V, Z));
+  function i({ status: I, result: F, animationStyle: Z }) {
+    N(I, F) && (M.errorBlock && !M.errorBlock.isErrorBlockFalling && (M.errorBlock.preventErrorBlockFallAnimation(), M.errorBlock = null), F && (V = F), c(), qA.dispatch(W, V, Z));
   }
-  function r(g, F) {
+  function r(I, F) {
     var J;
     const Z = {
       start: () => z(),
@@ -363,53 +363,53 @@ const vP = () => {
       success2: () => a(F),
       success3: () => H(F)
     };
-    (J = Z[g]) == null || J.call(Z);
+    (J = Z[I]) == null || J.call(Z);
   }
   function T() {
     M.showVisual = !0;
   }
-  function I({ status: g, result: F = null, animationStyle: Z = null }) {
-    A.push(() => F ? i({ status: g, result: F, animationStyle: Z }) : N(g));
+  function g({ status: I, result: F = null, animationStyle: Z = null }) {
+    A.push(() => F ? i({ status: I, result: F, animationStyle: Z }) : N(I));
   }
   function m() {
     if (o) {
       W = l.NOT_STARTED, V = j.NONE, Q(!1);
       return;
     }
-    I({ status: l.NOT_STARTED, result: j.NONE });
+    g({ status: l.NOT_STARTED, result: j.NONE });
   }
   function z() {
-    W = l.NOT_STARTED, I({ status: l.STARTED });
+    W = l.NOT_STARTED, g({ status: l.STARTED });
   }
   function n() {
-    I({ status: l.FREE });
+    g({ status: l.FREE });
   }
   function b() {
-    I({ status: l.RESULT, result: j.STOP });
+    g({ status: l.RESULT, result: j.STOP });
   }
-  function k(g = !1) {
-    const F = g && kA ? j.REPLAY : j.COMPLETED;
-    I({ status: l.RESULT, result: F, animationStyle: tA.ONE });
+  function k(I = !1) {
+    const F = I && kA ? j.REPLAY : j.COMPLETED;
+    g({ status: l.RESULT, result: F, animationStyle: HA.ONE });
   }
-  function a(g = !1) {
-    const F = g && kA ? j.REPLAY : j.COMPLETED;
-    I({ status: l.RESULT, result: F, animationStyle: tA.TWO });
+  function a(I = !1) {
+    const F = I && kA ? j.REPLAY : j.COMPLETED;
+    g({ status: l.RESULT, result: F, animationStyle: HA.TWO });
   }
-  function H(g = !1) {
-    const F = g && kA ? j.REPLAY : j.COMPLETED;
-    I({ status: l.RESULT, result: F, animationStyle: tA.THREE });
+  function H(I = !1) {
+    const F = I && kA ? j.REPLAY : j.COMPLETED;
+    g({ status: l.RESULT, result: F, animationStyle: HA.THREE });
   }
   function e() {
-    I({ status: l.RESULT, result: j.FAILED });
+    g({ status: l.RESULT, result: j.FAILED });
   }
   function f() {
-    I({ status: l.RESULT_ANIMATION });
+    g({ status: l.RESULT_ANIMATION });
   }
   function D() {
-    I({ status: l.RESTART_ANIMATION });
+    g({ status: l.RESTART_ANIMATION });
   }
-  function Q(g) {
-    o = g;
+  function Q(I) {
+    o = I;
   }
   function E() {
     if (o) {
@@ -519,7 +519,7 @@ class Ww {
     this.hasBeenSpawned ? this._updateMovement(w) : this._updateSpawnAnimation(w), this.isErrorBlockFalling && (this.errorFallAnimationTime = this.errorFallAnimationTime + 3 * M.animationSpeed * w), this.isErrorBlock && (this.errorPreFallAnimationTimeScale = this.errorPreFallAnimationTimeScale + 3 * w, this.errorPreFallAnimationTimeScale = Math.min(20, this.errorPreFallAnimationTimeScale), this.errorPreFallAnimationTime = this.errorPreFallAnimationTime + this.errorPreFallAnimationTimeScale * w, this.skipFallAnimation && (this.errorPreFallAnimationTime = 0, this.errorPreFallAnimationTimeScale = 0)), this._updateTileRatios();
   }
 }
-let vw = !1, oA = 0;
+let vw = !1, cA = 0;
 const oP = 2.5;
 let GA = 0, VA = 0;
 const cP = () => {
@@ -529,10 +529,10 @@ const cP = () => {
     });
   }
   function w() {
-    oA = 0, VA = 0, GA = 0, vw = !1;
+    cA = 0, VA = 0, GA = 0, vw = !1;
   }
   function o(A) {
-    oA += (vw ? 1 : 0) * A / oP, oA = O.clamp(oA, 0, 1), GA = O.fit(oA, 0, 0.5, 0, 2.5), VA = O.fit(oA, 0.4, 0.65, 0, 1), oA >= 1 && (Ew.dispatch(), w());
+    cA += (vw ? 1 : 0) * A / oP, cA = O.clamp(cA, 0, 1), GA = O.fit(cA, 0, 0.5, 0, 2.5), VA = O.fit(cA, 0.4, 0.65, 0, 1), cA >= 1 && (Ew.dispatch(), w());
   }
   return {
     init: B,
@@ -542,7 +542,7 @@ const cP = () => {
 }, qw = cP();
 let ow = !1, DA = 0;
 const fP = 3.5;
-let nA = 0, fA = 0, Bw = 0, ZA = 0;
+let nA = 0, tA = 0, Bw = 0, ZA = 0;
 const tP = () => {
   function B() {
     qA.add((A, t) => {
@@ -550,10 +550,10 @@ const tP = () => {
     });
   }
   function w() {
-    DA = 0, nA = 0, fA = 0, ZA = 0, Bw = 0, ow = !1;
+    DA = 0, nA = 0, tA = 0, ZA = 0, Bw = 0, ow = !1;
   }
   function o(A) {
-    DA += (ow ? 1 : 0) * A / fP, DA = O.clamp(DA, 0, 1), nA = O.fit(DA, 0, 0.3, 0, 1), fA = O.fit(DA, 0.35, 0.65, 0, 1), Bw = O.fit(DA, 0.3, 0.55, 0, 2.5), ZA = O.fit(DA, 0.6, 0.8, 0, 1), DA >= 1 && (ew.dispatch(), w());
+    DA += (ow ? 1 : 0) * A / fP, DA = O.clamp(DA, 0, 1), nA = O.fit(DA, 0, 0.3, 0, 1), tA = O.fit(DA, 0.35, 0.65, 0, 1), Bw = O.fit(DA, 0.3, 0.55, 0, 2.5), ZA = O.fit(DA, 0.6, 0.8, 0, 1), DA >= 1 && (ew.dispatch(), w());
   }
   return {
     init: B,
@@ -587,13 +587,13 @@ const eP = () => {
   }
   function N(i) {
     switch (h += (JA ? 1 : 0) * i / HP, h = O.clamp(h, 0, 1), JA) {
-      case tA.ONE:
+      case HA.ONE:
         A();
         break;
-      case tA.TWO:
+      case HA.TWO:
         t();
         break;
-      case tA.THREE:
+      case HA.THREE:
         c();
         break;
     }
@@ -663,7 +663,7 @@ const iP = () => {
       n.lifeCycle > 0 ? z = !!(z && n.hasBeenEvaluated && n.hasAnimationEnded) : z = z && n.spawnAnimationRatio === 1;
     }), z || dA || Cw || Qw;
   }
-  function I(z) {
+  function g(z) {
     if (r(z), dw.update(z), qw.update(z), Lw.update(z), kA) {
       t();
       return;
@@ -687,7 +687,7 @@ const iP = () => {
   }
   return {
     init: m,
-    update: I,
+    update: g,
     reset: i,
     resetPostDestroy: N
   };
@@ -1320,8 +1320,8 @@ const FA = 2 * Y, X = new v.Vector2(), Aw = new v.Vector2(), IA = new v.Vector3(
         const D = H * q + f;
         e.loseAnimationPositionArray = new Float32Array(C.animationTotalFrames * 3), e.loseAnimationOrientArray = new Float32Array(C.animationTotalFrames * 4);
         for (let s = 0; s < C.animationTotalFrames; s++) {
-          const g = (s * Y + D) * 3, F = (s * Y + D) * 4;
-          e.loseAnimationPositionArray.set(((Q = C.heroLoseAnimationPositionArray) == null ? void 0 : Q.subarray(g, g + 3)) || [], s * 3), e.loseAnimationOrientArray.set(((E = C.heroLoseAnimationOrientArray) == null ? void 0 : E.subarray(F, F + 4)) || [], s * 4);
+          const I = (s * Y + D) * 3, F = (s * Y + D) * 4;
+          e.loseAnimationPositionArray.set(((Q = C.heroLoseAnimationPositionArray) == null ? void 0 : Q.subarray(I, I + 3)) || [], s * 3), e.loseAnimationOrientArray.set(((E = C.heroLoseAnimationOrientArray) == null ? void 0 : E.subarray(F, F + 4)) || [], s * 4);
         }
       });
     });
@@ -1334,7 +1334,7 @@ const FA = 2 * Y, X = new v.Vector2(), Aw = new v.Vector2(), IA = new v.Vector3(
   }
   function i(a) {
     var H, e;
-    _w.set(M.mainColor), ww.set(M.successColor), tw.set(M.failColor), gA.set(M.neutralColor), zA.copy(_w), V === j.FAILED && fA > 0 && zA.copy(tw), (V === j.COMPLETED || V === j.REPLAY) && (C.successColorRatio = Math.min(1, C.successColorRatio + 0.5 * a), zA.lerp(ww, C.successColorRatio)), V !== j.REPLAY && V !== j.COMPLETED && zA.lerp(gA, O.saturate(VA + ZA)), zA.convertSRGBToLinear(), gA.convertSRGBToLinear(), ww.convertSRGBToLinear();
+    _w.set(M.mainColor), ww.set(M.successColor), tw.set(M.failColor), gA.set(M.neutralColor), zA.copy(_w), V === j.FAILED && tA > 0 && zA.copy(tw), (V === j.COMPLETED || V === j.REPLAY) && (C.successColorRatio = Math.min(1, C.successColorRatio + 0.5 * a), zA.lerp(ww, C.successColorRatio)), V !== j.REPLAY && V !== j.COMPLETED && zA.lerp(gA, O.saturate(VA + ZA)), zA.convertSRGBToLinear(), gA.convertSRGBToLinear(), ww.convertSRGBToLinear();
     for (let f = 0; f < FA; f++) {
       const D = K.filter((s) => s.id === f)[0], Q = f < K.length + (u ? 1 : 0), E = Q ? zA : gA;
       if (Q && (D != null && D.isErrorBlock)) {
@@ -1351,7 +1351,7 @@ const FA = 2 * Y, X = new v.Vector2(), Aw = new v.Vector2(), IA = new v.Vector3(
       a.forEach((H) => {
         const e = H.id % q + 1, D = ((Math.floor(H.id / q) + 1) * CA + e) * 4;
         let Q = 0.5 * sA * O.fit(NA, 0, 0.1, 1, 0);
-        Q += (fA > 0 ? 1 : 0) * O.fit(ZA, 0, 0.1, 1, 0), Q += GA * O.fit(VA, 0, 0.1, 1, 0), Q = Math.min(1, Q), C.infoTexture && (C.infoTexture.image.data[D] = H.activeRatio * (1 - Q), C.infoTexture.image.data[D + 1] = H.isOccupied || H.willBeOccupied ? 1 : 0, C.infoTexture.image.data[D + 2] = H.isMain ? 1 : 0, C.infoTexture.image.data[D + 3] = H.isBorder ? 1 : 0);
+        Q += (tA > 0 ? 1 : 0) * O.fit(ZA, 0, 0.1, 1, 0), Q += GA * O.fit(VA, 0, 0.1, 1, 0), Q = Math.min(1, Q), C.infoTexture && (C.infoTexture.image.data[D] = H.activeRatio * (1 - Q), C.infoTexture.image.data[D + 1] = H.isOccupied || H.willBeOccupied ? 1 : 0, C.infoTexture.image.data[D + 2] = H.isMain ? 1 : 0, C.infoTexture.image.data[D + 3] = H.isBorder ? 1 : 0);
       });
     }), C.infoTexture && C.infoTextureLinear && (C.infoTexture.needsUpdate = !0, C.infoTextureLinear.needsUpdate = !0);
   }
@@ -1367,7 +1367,7 @@ const FA = 2 * Y, X = new v.Vector2(), Aw = new v.Vector2(), IA = new v.Vector3(
       f && (f.showRatio = mA(O.saturate(e.spawnAnimationRatioUnclamped)), e.currentTile && f.boardPos.set((D = e.currentTile) == null ? void 0 : D.row, (Q = e.currentTile) == null ? void 0 : Q.col), e.targetTile && f.boardDir.set(e.targetTile.row - (((E = e.currentTile) == null ? void 0 : E.row) || 0), e.targetTile.col - (((s = e.currentTile) == null ? void 0 : s.col) || 0)), f.animation = e.hasAnimationEnded ? 0 : e.easedAnimationRatio);
     });
   }
-  function I(a) {
+  function g(a) {
     var e, f;
     for (let D = 0; D < a; D++) {
       const Q = C._blockRenderList[D];
@@ -1401,8 +1401,8 @@ const FA = 2 * Y, X = new v.Vector2(), Aw = new v.Vector2(), IA = new v.Vector3(
     if (V === j.FAILED) {
       if (a) {
         const f = a.currentTile;
-        if (fA > 0) {
-          const D = Math.floor(fA * C.animationTotalFrames), Q = Math.min(D + 1, C.animationTotalFrames - 1), E = fA * C.animationTotalFrames - D;
+        if (tA > 0) {
+          const D = Math.floor(tA * C.animationTotalFrames), Q = Math.min(D + 1, C.animationTotalFrames - 1), E = tA * C.animationTotalFrames - D;
           IA.fromArray(f.loseAnimationPositionArray, D * 3), Sw.fromArray(f.loseAnimationPositionArray, Q * 3), IA.lerp(Sw, E), IA.y *= 0.5, H.pos.set(IA.z, IA.y, -IA.x), fw.fromArray(f.loseAnimationOrientArray, D * 4), Jw.fromArray(f.loseAnimationOrientArray, Q * 4), fw.slerp(Jw, E), H.orient.copy(fw);
         }
         if (nA > 0) {
@@ -1432,10 +1432,10 @@ const FA = 2 * Y, X = new v.Vector2(), Aw = new v.Vector2(), IA = new v.Vector3(
     for (let Q = 0; Q < FA; Q++) {
       const E = C._blockList[Q];
       E.update(a);
-      const s = K.filter((g) => g.id === Q)[0];
+      const s = K.filter((I) => I.id === Q)[0];
       E.showRatio > 0 && (C._blockRenderList[H++] = E), n(s, E, Q), z(s, E), m(E, Q), b(s, E);
     }
-    r(), I(H);
+    r(), g(H);
     const e = Math.min(1, VA + ZA + NA), f = bA.backOut(e, 3), D = 1 - mA(pA);
     TA.position.y = -f - 2 * D, TA.rotation.y = 0.5 * Math.PI * D, TA.rotation.y += 2 * Math.PI * bA.quartInOut(lA), C._baseMesh && (C._baseMesh.material.uniforms.u_yDisplacement.value = -f - 5 * D, C._baseMesh.material.uniforms.u_successAnimationRatio.value = hA), R.u_endAnimationRatio.value = Math.min(
       1,
@@ -1688,7 +1688,7 @@ void main() {
     gl_FragColor = packDepthToRGBA( fragCoordZ );
 }
 `, M8 = new v.Object3D(), mP = () => {
-  let B, w = null, o = null, A = null, t = null, c = null, N = null, i = null, r = null, T = 0, I = 0, m, z;
+  let B, w = null, o = null, A = null, t = null, c = null, N = null, i = null, r = null, T = 0, g = 0, m, z;
   const n = {
     u_time: { value: 0 },
     u_ratio: { value: 0 },
@@ -1701,8 +1701,8 @@ void main() {
     }), BA.loadBuf(`${D}/COIN.buf`, (E) => {
       B = E;
     }), BA.loadBuf(`${D}/COIN_PLACEMENT.buf`, (E) => {
-      const { position: s, aoN: g, aoP: F, curveu: Z, orient: J } = E.attributes;
-      t = s.array, i = g.array, r = F.array, N = Z.array, c = J.array, T = s.count;
+      const { position: s, aoN: I, aoP: F, curveu: Z, orient: J } = E.attributes;
+      t = s.array, i = I.array, r = F.array, N = Z.array, c = J.array, T = s.count;
     });
   }
   function k() {
@@ -1718,8 +1718,8 @@ void main() {
       ["a_instanceAoN", i, 3],
       ["a_instanceAoP", r, 3],
       ["a_instanceRand", z, 3]
-    ].forEach(([E, s, g]) => {
-      D.setAttribute(E, new v.InstancedBufferAttribute(s, g));
+    ].forEach(([E, s, I]) => {
+      D.setAttribute(E, new v.InstancedBufferAttribute(s, I));
     }), o = D;
   }
   function H() {
@@ -1747,7 +1747,7 @@ void main() {
   }
   function f(D) {
     const Q = UA === 0;
-    I = Q ? KA : UA, n.u_ratio.value = I, n.u_time.value += D, n.u_isFloating.value = Q ? 1 : 0, w && (w.rotation.y = 0 * I, w.visible = I > 0 && I < 1);
+    g = Q ? KA : UA, n.u_ratio.value = g, n.u_time.value += D, n.u_isFloating.value = Q ? 1 : 0, w && (w.rotation.y = 0 * g, w.visible = g > 0 && g < 1);
   }
   return {
     preload: b,
@@ -1763,11 +1763,11 @@ class TP extends s8 {
       const P = new MA(), x = new Gw().setFromUnitVectors(w.up, new MA(0, 1, 0)), p = x.clone().invert(), G = new MA(), y = new Gw(), iA = 2 * Math.PI;
       return function() {
         const pw = A.object.position;
-        P.copy(pw).sub(A.target), P.applyQuaternion(x), i.setFromVector3(P), A.autoRotate && c === t.NONE && g(E()), A.enableDamping ? (i.theta += r.theta * A.dampingFactor, i.phi += r.phi * A.dampingFactor) : (i.theta += r.theta, i.phi += r.phi);
+        P.copy(pw).sub(A.target), P.applyQuaternion(x), i.setFromVector3(P), A.autoRotate && c === t.NONE && I(E()), A.enableDamping ? (i.theta += r.theta * A.dampingFactor, i.phi += r.phi * A.dampingFactor) : (i.theta += r.theta, i.phi += r.phi);
         let wA = A.minAzimuthAngle, PA = A.maxAzimuthAngle;
         isFinite(wA) && isFinite(PA) && (wA < -Math.PI ? wA += iA : wA > Math.PI && (wA -= iA), PA < -Math.PI ? PA += iA : PA > Math.PI && (PA -= iA), wA <= PA ? i.theta = Math.max(wA, Math.min(PA, i.theta)) : i.theta = i.theta > (wA + PA) / 2 ? Math.max(wA, i.theta) : Math.min(PA, i.theta)), i.phi = Math.max(A.minPolarAngle, Math.min(A.maxPolarAngle, i.phi)), i.makeSafe();
         let Xw = A.enableDamping ? (A.scale - 1) * A.dampingFactor + 1 : A.scale;
-        return i.radius *= Xw, i.radius = Math.max(A.minDistance, Math.min(A.maxDistance, i.radius)), A.enableDamping === !0 ? A.target.addScaledVector(T, A.dampingFactor) : A.target.add(T), P.setFromSpherical(i), P.applyQuaternion(p), pw.copy(A.target).add(P), A.object.lookAt(A.target), A.enableDamping === !0 ? (r.theta *= 1 - A.dampingFactor, r.phi *= 1 - A.dampingFactor, T.multiplyScalar(1 - A.dampingFactor)) : (r.set(0, 0, 0), T.set(0, 0, 0)), A.scale = A.scale / Xw, I || G.distanceToSquared(A.object.position) > N || 8 * (1 - y.dot(A.object.quaternion)) > N ? (A.dispatchEvent(A8), G.copy(A.object.position), y.copy(A.object.quaternion), I = !1, !0) : !1;
+        return i.radius *= Xw, i.radius = Math.max(A.minDistance, Math.min(A.maxDistance, i.radius)), A.enableDamping === !0 ? A.target.addScaledVector(T, A.dampingFactor) : A.target.add(T), P.setFromSpherical(i), P.applyQuaternion(p), pw.copy(A.target).add(P), A.object.lookAt(A.target), A.enableDamping === !0 ? (r.theta *= 1 - A.dampingFactor, r.phi *= 1 - A.dampingFactor, T.multiplyScalar(1 - A.dampingFactor)) : (r.set(0, 0, 0), T.set(0, 0, 0)), A.scale = A.scale / Xw, g || G.distanceToSquared(A.object.position) > N || 8 * (1 - y.dot(A.object.quaternion)) > N ? (A.dispatchEvent(A8), G.copy(A.object.position), y.copy(A.object.quaternion), g = !1, !0) : !1;
       };
     }();
     const A = this, t = {
@@ -1782,7 +1782,7 @@ class TP extends s8 {
     };
     let c = t.NONE;
     const N = 1e-6, i = new Vw(), r = new Vw(), T = new MA();
-    let I = !1;
+    let g = !1;
     const m = new _(), z = new _(), n = new _(), b = new _(), k = new _(), a = new _(), H = new _(), e = new _(), f = new _(), D = [], Q = {};
     function E() {
       return 2 * Math.PI / 60 / 60 * A.autoRotateSpeed;
@@ -1790,7 +1790,7 @@ class TP extends s8 {
     function s() {
       return Math.pow(0.95, A.zoomSpeed);
     }
-    function g(P) {
+    function I(P) {
       r.theta -= P;
     }
     function F(P) {
@@ -1818,11 +1818,11 @@ class TP extends s8 {
         } else A.object.isOrthographicCamera ? (Z(p * (A.object.right - A.object.left) / A.object.zoom / y.clientWidth, A.object.matrix), J(G * (A.object.top - A.object.bottom) / A.object.zoom / y.clientHeight, A.object.matrix)) : (console.warn("WARNING: OrbitControls.js encountered an unknown camera type - pan disabled."), A.enablePan = !1);
       };
     }();
-    function HA(P) {
-      A.object.isPerspectiveCamera ? A.scale /= P : A.object.isOrthographicCamera ? (A.object.zoom = Math.max(A.minZoom, Math.min(A.maxZoom, A.object.zoom * P)), A.object.updateProjectionMatrix(), I = !0) : (console.warn("WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled."), A.enableZoom = !1);
+    function oA(P) {
+      A.object.isPerspectiveCamera ? A.scale /= P : A.object.isOrthographicCamera ? (A.object.zoom = Math.max(A.minZoom, Math.min(A.maxZoom, A.object.zoom * P)), A.object.updateProjectionMatrix(), g = !0) : (console.warn("WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled."), A.enableZoom = !1);
     }
     function xA(P) {
-      A.object.isPerspectiveCamera ? A.scale *= P : A.object.isOrthographicCamera ? (A.object.zoom = Math.max(A.minZoom, Math.min(A.maxZoom, A.object.zoom / P)), A.object.updateProjectionMatrix(), I = !0) : (console.warn("WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled."), A.enableZoom = !1);
+      A.object.isPerspectiveCamera ? A.scale *= P : A.object.isOrthographicCamera ? (A.object.zoom = Math.max(A.minZoom, Math.min(A.maxZoom, A.object.zoom / P)), A.object.updateProjectionMatrix(), g = !0) : (console.warn("WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled."), A.enableZoom = !1);
     }
     function yA(P) {
       m.set(P.clientX, P.clientY);
@@ -1836,16 +1836,16 @@ class TP extends s8 {
     function v8(P) {
       z.set(P.clientX, P.clientY), n.subVectors(z, m).multiplyScalar(A.rotateSpeed);
       const x = A.domElement;
-      g(2 * Math.PI * n.x / x.clientHeight), F(2 * Math.PI * n.y / x.clientHeight), m.copy(z), A.update();
+      I(2 * Math.PI * n.x / x.clientHeight), F(2 * Math.PI * n.y / x.clientHeight), m.copy(z), A.update();
     }
     function o8(P) {
-      e.set(P.clientX, P.clientY), f.subVectors(e, H), f.y > 0 ? HA(s()) : f.y < 0 && xA(s()), H.copy(e), A.update();
+      e.set(P.clientX, P.clientY), f.subVectors(e, H), f.y > 0 ? oA(s()) : f.y < 0 && xA(s()), H.copy(e), A.update();
     }
     function c8(P) {
       k.set(P.clientX, P.clientY), a.subVectors(k, b).multiplyScalar(A.panSpeed), AA(a.x, a.y), b.copy(k), A.update();
     }
     function f8(P) {
-      P.deltaY < 0 ? xA(s()) : P.deltaY > 0 && HA(s()), A.update();
+      P.deltaY < 0 ? xA(s()) : P.deltaY > 0 && oA(s()), A.update();
     }
     function sw() {
       if (D.length === 1)
@@ -1882,7 +1882,7 @@ class TP extends s8 {
       }
       n.subVectors(z, m).multiplyScalar(A.rotateSpeed);
       const x = A.domElement;
-      g(2 * Math.PI * n.x / x.clientHeight), F(2 * Math.PI * n.y / x.clientHeight), m.copy(z);
+      I(2 * Math.PI * n.x / x.clientHeight), F(2 * Math.PI * n.y / x.clientHeight), m.copy(z);
     }
     function xw(P) {
       if (D.length === 1)
@@ -1895,7 +1895,7 @@ class TP extends s8 {
     }
     function bw(P) {
       const x = zw(P), p = P.pageX - x.x, G = P.pageY - x.y, y = Math.sqrt(p * p + G * G);
-      e.set(0, y), f.set(0, Math.pow(e.y / H.y, A.zoomSpeed)), HA(f.y), H.copy(e);
+      e.set(0, y), f.set(0, Math.pow(e.y / H.y, A.zoomSpeed)), oA(f.y), H.copy(e);
     }
     function e8(P) {
       A.enableZoom && bw(P), A.enablePan && xw(P);
@@ -2250,7 +2250,7 @@ void main() {
     c.renderOrder = 1, Iw.add(c), o();
   }
   function o() {
-    var I, m;
+    var g, m;
     const c = new v.PlaneGeometry(1, 1), N = new v.InstancedBufferGeometry();
     N.index = c.index, Object.keys(c.attributes).forEach((z) => {
       N.setAttribute(z, c.attributes[z]);
@@ -2260,7 +2260,7 @@ void main() {
       i[z * 3] = 3 * (Math.random() * 2 - 1), i[z * 3 + 1] = Math.random() * 2 - 1, i[z * 3 + 2] = 0.5 + 0.5 * Math.random(), r[z * 3] = Math.random(), r[z * 3 + 1] = Math.random(), r[z * 3 + 2] = Math.random();
     N.setAttribute("a_instancePosition", new v.InstancedBufferAttribute(i, 3)), N.setAttribute("a_instanceRandom", new v.InstancedBufferAttribute(r, 3));
     const T = {
-      u_time: ((I = M.sharedUniforms) == null ? void 0 : I.u_time) || { value: M.time },
+      u_time: ((g = M.sharedUniforms) == null ? void 0 : g.u_time) || { value: M.time },
       u_resolution: ((m = M.sharedUniforms) == null ? void 0 : m.u_resolution) || { value: M.resolution },
       u_size: { value: 0.01 },
       u_color: { value: new v.Color() },
@@ -2282,7 +2282,7 @@ v.ColorManagement.enabled = !1;
 const xP = () => {
   const B = new v.WebGLRenderer(K8), w = OP(), o = wP(), A = mP();
   let t, c, N, i = window.innerWidth, r = window.innerHeight, T = 0;
-  const I = 0, m = new v.OrthographicCamera(-1, 1, 1, -1, 1, 60);
+  const g = 0, m = new v.OrthographicCamera(-1, 1, 1, -1, 1, 60);
   let z;
   async function n() {
     if (N && B) {
@@ -2295,9 +2295,9 @@ const xP = () => {
   }
   function b(Q, E) {
     i = Q, r = E, M.viewportResolution.set(Q, window.innerHeight);
-    let s = Q * cA.DPR, g = E * cA.DPR;
-    const F = s / g;
-    g * s > cA.MAX_PIXEL_COUNT && (g = Math.sqrt(cA.MAX_PIXEL_COUNT / F), s = Math.ceil(g * F), g = Math.ceil(g)), M.width = s, M.height = g, M.resolution.set(s, g), m.updateProjectionMatrix(), B.setSize(s, g), t.style.width = Q + "px", t.style.height = E + "px";
+    let s = Q * fA.DPR, I = E * fA.DPR;
+    const F = s / I;
+    I * s > fA.MAX_PIXEL_COUNT && (I = Math.sqrt(fA.MAX_PIXEL_COUNT / F), s = Math.ceil(I * F), I = Math.ceil(I)), M.width = s, M.height = I, M.resolution.set(s, I), m.updateProjectionMatrix(), B.setSize(s, I), t.style.width = Q + "px", t.style.height = E + "px";
   }
   function k(Q = 0) {
     T = Q ? Q / window.innerWidth : 0, b(window.innerWidth, window.innerHeight);
@@ -2308,7 +2308,7 @@ const xP = () => {
     }), N = Q, await n(), await OA.preload(), await o.preInit(), await A.preload(), BA.start(E);
   }
   async function H() {
-    M.scene.add(m), m.position.fromArray(cA.DEFAULT_POSITION), z = m.clone(), c = new TP(z, t), c.target0.fromArray(cA.DEFAULT_LOOKAT_POSITION), c.reset();
+    M.scene.add(m), m.position.fromArray(fA.DEFAULT_POSITION), z = m.clone(), c = new TP(z, t), c.target0.fromArray(fA.DEFAULT_LOOKAT_POSITION), c.reset();
   }
   async function e() {
     await H();
@@ -2321,7 +2321,7 @@ const xP = () => {
   function f(Q) {
     t || (Q *= 0), Q = Math.min(Q, 1 / 15), M.time += Q, M.deltaTime = Q, M.sharedUniforms && (M.sharedUniforms.u_time.value = M.time, M.sharedUniforms.u_deltaTime.value = Q);
     const E = M.cameraZoom * r / 10;
-    m.zoom = E, m.left = -i / 2 - T * i / E / 2, m.right = i / 2 - T * i / E / 2, m.top = r / 2 - I * r / E / 2, m.bottom = -r / 2 - I * r / E / 2, m.updateProjectionMatrix(), c == null || c.update(), z == null || z.updateMatrix(), z == null || z.matrix.decompose(m.position, m.quaternion, m.scale), m.matrix.compose(m.position, m.quaternion, m.scale), o.update(Q), cw.update(Q), OA.update(Q), A.update(Q), w.update(Q), B.render(M.scene, m);
+    m.zoom = E, m.left = -i / 2 - T * i / E / 2, m.right = i / 2 - T * i / E / 2, m.top = r / 2 - g * r / E / 2, m.bottom = -r / 2 - g * r / E / 2, m.updateProjectionMatrix(), c == null || c.update(), z == null || z.updateMatrix(), z == null || z.matrix.decompose(m.position, m.quaternion, m.scale), m.matrix.compose(m.position, m.quaternion, m.scale), o.update(Q), cw.update(Q), OA.update(Q), A.update(Q), w.update(Q), B.render(M.scene, m);
   }
   function D() {
     t.remove(), cw.resetPostDestroy(), B.state.reset();

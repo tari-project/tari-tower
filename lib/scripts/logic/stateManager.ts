@@ -73,8 +73,13 @@ const StateManager = () => {
 			statusIndex = 2;
 		}
 
+		if (newStatus === AnimationStatus.NOT_STARTED && result === AnimationResult.NONE && statusIndex === 5) {
+			statusIndex = 6;
+		}
+
 		const newStateIndex = statusOrder.indexOf(newStatus);
-		if ((statusIndex + 1) % statusOrder.length === newStateIndex) {
+		const canChange = (statusIndex + 1) % statusOrder.length === newStateIndex;
+		if (canChange) {
 			statusIndex = newStateIndex;
 			status = statusOrder[statusIndex];
 			if (!hasResult) {
