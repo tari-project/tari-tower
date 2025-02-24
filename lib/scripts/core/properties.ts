@@ -6,14 +6,7 @@ import { PropertiesType } from '../../types/properties';
 
 const resolution = new THREE.Vector2();
 const viewportResolution = new THREE.Vector2();
-const sharedUniforms: PropertiesType['sharedUniforms'] = {
-	u_time: { value: 0 },
-	u_deltaTime: { value: 1 },
-	u_resolution: { value: resolution },
-	u_viewportResolution: { value: viewportResolution },
-	u_bgColor1: { value: new THREE.Color() },
-	u_bgColor2: { value: new THREE.Color() },
-};
+
 const maxFreeBlocksCount = TOTAL_TILES - 5;
 
 const baseStyleProperties = {
@@ -45,11 +38,18 @@ export const propertiesInitialState: PropertiesType = {
 	viewportResolution,
 	canvas: null,
 	orbitTarget: null,
-	sharedUniforms,
+	sharedUniforms: {
+		u_time: { value: 0 },
+		u_deltaTime: { value: 1 },
+		u_resolution: { value: resolution },
+		u_viewportResolution: { value: viewportResolution },
+		u_bgColor1: { value: new THREE.Color() },
+		u_bgColor2: { value: new THREE.Color() },
+	},
 	isPaused: false,
 	showVisual: settings.SHOW_BLOCK,
 	loadList: [],
-	animationSpeed: 1.1,
+	animationSpeed: 1,
 	activeBlocksCount: 0,
 	maxFreeBlocksCount,
 	lightPositionX: -2,

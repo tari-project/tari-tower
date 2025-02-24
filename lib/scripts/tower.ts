@@ -45,7 +45,6 @@ const TariTower = () => {
 				bgColor1.set(properties.bgColor1).convertSRGBToLinear();
 				bgColor2.set(properties.bgColor2).convertSRGBToLinear();
 			}
-
 			renderer.setClearColor(properties.bgColor1, 1);
 		}
 	}
