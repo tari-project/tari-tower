@@ -16,6 +16,14 @@ interface Property {
 export function setAnimationProperties(newProps: Property[]) {
 	for (const item of newProps) {
 		properties[item.property] = item.value;
+
+		if (item.property === 'bgColor1' && properties.sharedUniforms) {
+			properties.sharedUniforms.u_bgColor1.value.set(item.value).convertSRGBToLinear();
+		}
+
+		if (item.property === 'bgColor2' && properties.sharedUniforms) {
+			properties.sharedUniforms.u_bgColor2.value.set(item.value).convertSRGBToLinear();
+		}
 	}
 }
 

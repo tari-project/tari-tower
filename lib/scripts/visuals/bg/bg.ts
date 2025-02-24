@@ -77,11 +77,6 @@ const Background = () => {
 		particles.material.uniforms.u_size.value = properties.particlesSize;
 		particles.material.uniforms.u_color.value.set(properties.particlesColor);
 		particles.material.uniforms.u_opacity.value = properties.particlesOpacity;
-		mesh.material.uniforms.u_bgColor1.value = properties.sharedUniforms?.u_bgColor1.value;
-		mesh.material.uniforms.u_bgColor2.value = properties.sharedUniforms?.u_bgColor2.value;
-		mesh.material.uniformsNeedUpdate = true;
-		mesh.material.needsUpdate = true;
-		// container.updateWorldMatrix(false, true);
 	}
 
 	return { init, update };

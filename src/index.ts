@@ -18,8 +18,14 @@ if (import.meta.env.MODE === 'development') {
 		success2: () => setAnimationState('success2'),
 		success3: () => setAnimationState('success3', true),
 		fail: () => setAnimationState('fail'),
-		darkMode: () => setAnimationProperties(animationDarkBg),
-		lightMode: () => setAnimationProperties(animationLightBg),
+		darkMode: () => {
+			setAnimationProperties(animationDarkBg);
+			document.getElementById('root')!.style.backgroundColor = '#000';
+		},
+		lightMode: () => {
+			setAnimationProperties(animationLightBg);
+			document.getElementById('root')!.style.backgroundColor = '#fff';
+		},
 	};
 
 	gui.add(actions, 'showVisual');
@@ -34,16 +40,16 @@ if (import.meta.env.MODE === 'development') {
 	gui.add(actions, 'lightMode');
 	gui.add(actions, 'initCanvas');
 
-	// function handleLoad() {
-	// 	loadTowerAnimation({ canvasId: 'canvas-id', offset: 0 });
-	// }
-	//
-	// document.addEventListener('DOMContentLoaded', handleLoad);
-	//
-	// const timeOutId = setTimeout(() => {
-	// 	document.removeEventListener('DOMContentLoaded', handleLoad);
-	// 	clearTimeout(timeOutId);
-	// }, 500);
+	function handleLoad() {
+		loadTowerAnimation({ canvasId: 'canvas-id', offset: 0 });
+	}
+
+	document.addEventListener('DOMContentLoaded', handleLoad);
+
+	const timeOutId = setTimeout(() => {
+		document.removeEventListener('DOMContentLoaded', handleLoad);
+		clearTimeout(timeOutId);
+	}, 500);
 
 	const animationLightBg = [
 		{ property: 'bgColor1', value: '#ffffff' },
