@@ -12,6 +12,10 @@ export default [
 		languageOptions: {
 			globals: globals.browser,
 			parser: tsParser,
+			parserOptions: {
+				projectService: true,
+				tsconfigRootDir: import.meta.dirname,
+			},
 		},
 		rules: {
 			'no-unused-vars': 'off', // base rule must be disabled
