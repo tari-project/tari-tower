@@ -5,12 +5,12 @@ import getBlueNoiseShader from './getBlueNoise.glsl?raw';
 import { SharedUniforms } from '../../../types/properties';
 import { ASSETS_PATH } from '../../core/settings';
 
+const bn_sharedUniforms: SharedUniforms = {
+	u_blueNoiseTexture: { value: null },
+	u_blueNoiseTexelSize: { value: null },
+	u_blueNoiseCoordOffset: { value: new THREE.Vector2() },
+};
 const BlueNoise = () => {
-	const bn_sharedUniforms: SharedUniforms = {
-		u_blueNoiseTexture: { value: null },
-		u_blueNoiseTexelSize: { value: null },
-		u_blueNoiseCoordOffset: { value: new THREE.Vector2() },
-	};
 	const TEXTURE_SIZE = 128;
 
 	async function preInit() {
@@ -39,5 +39,5 @@ const BlueNoise = () => {
 	};
 };
 
-const blueNoise = BlueNoise();
-export default blueNoise;
+export default BlueNoise;
+export { bn_sharedUniforms };

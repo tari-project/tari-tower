@@ -4,7 +4,7 @@
 name: Publish package to npmjs
 on:
     push:
-        branches: main
+        branches: dev
 
 jobs:
     # Publish the lib to the NPM registry

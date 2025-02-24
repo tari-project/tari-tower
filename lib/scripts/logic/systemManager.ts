@@ -1,22 +1,21 @@
 import math from '../utils/math';
 import { properties } from '../core/properties';
 import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
-
 import {
-	hasNotStarted,
-	isFailResult,
-	isFree,
-	isReplayResult,
-	isRestart,
-	isResult,
-	isResultAnimation,
-	isStopped,
-	isSuccessResult,
 	PREVENT_CYCLE_STATES,
 	resetCycleResults,
-	result,
-	stateManager,
-	status,
+	stateManager as sM,
+	status as stateStatus,
+	result as stateResult,
+	isSuccessResult,
+	isReplayResult,
+	isFree,
+	isFailResult,
+	isStopped,
+	isResult,
+	isResultAnimation,
+	isRestart,
+	hasNotStarted,
 } from './stateManager';
 import { board, mainTile, TOTAL_TILES } from './board';
 import Block from './Block';
@@ -24,8 +23,9 @@ import Block from './Block';
 import { stopAnimationManager } from './stopAnimationManager';
 import { errorAnimationManager } from './errorAnimationManager';
 import { successAnimationManager } from '../logic/successAnimationManager';
-import { completeAnimationEndedSignal, endCycleSignal, errorAnimationEndedSignal, spawnSignal, stopAnimationEndedSignal } from '../logic/signals';
+import { canvasSignal, completeAnimationEndedSignal, endCycleSignal, errorAnimationEndedSignal, gameEndedSignal, spawnSignal, stopAnimationEndedSignal } from '../logic/signals';
 import { SystemManagerState } from '../../types/systemManager';
+import { AnimationStatus } from '../../types';
 
 let firstStartAnimationRatio: SystemManagerState['firstStartAnimationRatio'] = 0;
 let blocks: SystemManagerState['blocks'] = [];
@@ -48,7 +48,7 @@ const SystemManager = () => {
 	}
 
 	function _shouldPreventSpawn() {
-		return isFailResult || result === 'failed' || isStopped || blocks.length >= TOTAL_TILES || (mainTile?.isOccupied && !isSuccessResult && !isReplayResult);
+		return isFailResult || isStopped || blocks.length >= TOTAL_TILES || (mainTile?.isOccupied && !isSuccessResult && !isReplayResult);
 	}
 
 	function _spawnMultipleBlocks() {
@@ -73,9 +73,8 @@ const SystemManager = () => {
 
 	function _spawnSingleBlock() {
 		let block: Block | null | undefined = null;
-
 		const needsErrorBlockReplacement = Boolean(properties.errorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle);
-		const canAddNewBlock = Boolean(blocks.length < properties.maxFreeBlocksCount && isFree);
+		const canAddNewBlock = Boolean(blocks.length < properties.maxFreeBlocksCount && stateStatus === AnimationStatus.FREE);
 		if (!needsErrorBlockReplacement) {
 			if (canAddNewBlock) {
 				block = new Block(blocks.length);
@@ -89,21 +88,20 @@ const SystemManager = () => {
 		}
 		if (block) {
 			block.currentTile = mainTile;
+
 			block.init();
 			block.updateTile();
 		}
 	}
 
 	function _startNewCycle() {
-		stateManager.updateAfterCycle();
-		if (PREVENT_CYCLE_STATES.includes(status)) return;
-
+		sM.updateAfterCycle();
+		if (PREVENT_CYCLE_STATES.includes(stateStatus)) return;
 		if (lastSpawnedBlock) {
 			blocks = [lastSpawnedBlock, ...blocks];
 			lastSpawnedBlock = null;
 		}
 		properties.activeBlocksCount = blocks.length;
-
 		if (isFailResult || isStopped) return;
 
 		blocks.forEach((block) => block.resetAfterCycle());
@@ -129,7 +127,7 @@ const SystemManager = () => {
 		});
 	}
 
-	function reset() {
+	function resetPostDestroy() {
 		blocks.forEach((block) => block.reset());
 		blocksVisual.reset();
 		board.reset();
@@ -137,28 +135,44 @@ const SystemManager = () => {
 		blocks = [];
 		lastSpawnedBlock = null;
 		cycleIndex = 0;
+		animationSpeedRatio = 0;
+		firstStartAnimationRatio = 0;
+	}
 
+	function reset(isDestroy = false) {
+		blocks.forEach((block) => block.reset());
+		blocksVisual.reset();
+		board.reset();
+
+		blocks = [];
+		lastSpawnedBlock = null;
+		cycleIndex = 0;
 		animationSpeedRatio = 0;
 
-		const needsRestart = resetCycleResults.includes(result);
-		stateManager.reset();
+		const needsRestart = resetCycleResults.includes(stateResult);
+		sM.reset();
 		_startNewCycle();
 
 		if (needsRestart) {
-			stateManager.setStart();
+			sM.setStart();
+		}
+
+		if (isDestroy) {
+			canvasSignal.dispatch();
+			firstStartAnimationRatio = 0;
 		}
 
 		completeAnimationEndedSignal.remove(() => {
-			stateManager.setRestart();
+			sM.setRestart();
 			_startNewCycle();
 			previousSuccessBlocksAnimationRatio = 1;
 		});
 		stopAnimationEndedSignal.remove(() => {
-			stateManager.setRestart();
+			sM.setRestart();
 			reset();
 		});
 		errorAnimationEndedSignal.remove(() => {
-			stateManager.setRestart();
+			sM.setRestart();
 			_startNewCycle();
 		});
 	}
@@ -166,6 +180,7 @@ const SystemManager = () => {
 	function _updateAnimationRatios(dt: number) {
 		const _isResult = isResult;
 		firstStartAnimationRatio = math.saturate(firstStartAnimationRatio + dt * (properties.showVisual ? 1 : 0));
+
 		animationSpeedRatio = Math.min(1, animationSpeedRatio + dt * (_isResult ? 1 : 0));
 		previousSuccessBlocksAnimationRatio = math.saturate(previousSuccessBlocksAnimationRatio - dt / 1.5);
 	}
@@ -203,9 +218,8 @@ const SystemManager = () => {
 			reset();
 			return;
 		}
-
 		if (isResultAnimation) {
-			stateManager.setRestartAnimation();
+			sM.setRestartAnimation();
 		}
 
 		board.preUpdate(dt);
@@ -222,25 +236,28 @@ const SystemManager = () => {
 		}
 	}
 
-	function init() {
-		stateManager.init();
+	async function init() {
+		sM.init();
 		successAnimationManager.init();
 		stopAnimationManager.init();
 		errorAnimationManager.init();
 		board.init();
 
 		completeAnimationEndedSignal.add(() => {
-			stateManager.setRestart();
+			sM.setRestart();
 			_startNewCycle();
 			previousSuccessBlocksAnimationRatio = 1;
 		});
 		stopAnimationEndedSignal.add(() => {
-			stateManager.setRestart();
+			sM.setRestart();
 			reset();
 		});
 		errorAnimationEndedSignal.add(() => {
-			stateManager.setRestart();
+			sM.setRestart();
 			_startNewCycle();
+		});
+		gameEndedSignal.addOnce(() => {
+			reset(true);
 		});
 	}
 
@@ -248,8 +265,10 @@ const SystemManager = () => {
 		init,
 		update,
 		reset,
+		resetPostDestroy,
 	};
 };
 const game = SystemManager();
 export default game;
+
 export { firstStartAnimationRatio, blocks, lastSpawnedBlock, previousSuccessBlocksAnimationRatio };

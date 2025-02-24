@@ -2,7 +2,7 @@ import * as THREE from 'three';
 
 import loader from '../../core/loader';
 import { properties } from '../../core/properties';
-import blueNoise from '../../utils/blueNoise/blueNoise';
+import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
 import { heroSharedUniforms } from '../hero/hero';
 
 import vert from './coins.vert?raw';
@@ -12,30 +12,33 @@ import { floatingCoinsRatio, vortexCoinsRatio } from '../../logic/successAnimati
 import { BufferGeometry, InstancedBufferGeometry, Mesh, ShaderMaterial } from 'three';
 import { ASSETS_PATH } from '../../core/settings';
 const coinContainer = new THREE.Object3D();
-let coinMesh: Mesh | null = null;
-let coinGeometry: InstancedBufferGeometry | null = null;
-let coinMaterial: ShaderMaterial | null = null;
-let positionsArray = null;
-let orientArray = null;
-let curveuArray = null;
-let aoNArray = null;
-let aoPArray = null;
-let coinsCount = 0;
-let animationRatio = 0;
-const isFloating = true;
-let matcapTexture;
-let refGeometry: BufferGeometry;
-let randsArray;
-const coinsSharedUniforms = {
-	u_time: { value: 0 },
-	u_ratio: { value: 0 },
-	u_isFloating: { value: 1 },
-};
 
 const Coins = () => {
+	let refGeometry: BufferGeometry;
+	let coinMesh: Mesh | null = null;
+	let coinGeometry: InstancedBufferGeometry | null = null;
+	let coinMaterial: ShaderMaterial | null = null;
+	let positionsArray = null;
+	let orientArray = null;
+	let curveuArray = null;
+	let aoNArray = null;
+	let aoPArray = null;
+	let coinsCount = 0;
+	let animationRatio = 0;
+	const isFloating = true;
+	let matcapTexture;
+
+	let randsArray;
+	const coinsSharedUniforms = {
+		u_time: { value: 0 },
+		u_ratio: { value: 0 },
+		u_isFloating: { value: 1 },
+	};
+
 	async function preload() {
 		const modelPath = ASSETS_PATH + 'models';
 		const texturePath = ASSETS_PATH + 'textures';
+
 		loader.loadTexture(`${texturePath}/matcap_gold.jpg`, (texture) => {
 			matcapTexture = texture;
 			matcapTexture.needsUpdate = true;
@@ -94,7 +97,7 @@ const Coins = () => {
 				...heroSharedUniforms,
 				...properties.sharedUniforms,
 				...coinsSharedUniforms,
-				...blueNoise.bn_sharedUniforms,
+				...bn_sharedUniforms,
 				...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
 				u_matcapTexture: { value: matcapTexture },
 			},
@@ -142,6 +145,4 @@ const Coins = () => {
 	};
 };
 
-const coins = Coins();
-
-export { coins, coinContainer };
+export { Coins, coinContainer };

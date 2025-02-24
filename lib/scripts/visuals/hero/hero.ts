@@ -4,9 +4,9 @@ import loader from '../../core/loader';
 import { properties } from '../../core/properties';
 import math from '../../utils/math';
 import ease, { customEasing } from '../../utils/ease';
-import blueNoise from '../../utils/blueNoise/blueNoise';
+import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
 import { blocks, firstStartAnimationRatio, lastSpawnedBlock, previousSuccessBlocksAnimationRatio } from '../../logic/systemManager';
-import { result } from '../../logic/stateManager';
+import { result as stateResult } from '../../logic/stateManager';
 import { HALF_SIZE, SIZE, TOTAL_TILES, SIZE_WITH_PADDING, TOTAL_TILES_WITH_PADDING, tiles, board } from '../../logic/board';
 
 import vert from './hero.vert?raw';
@@ -109,7 +109,7 @@ const Hero = () => {
 			...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
 			...properties.sharedUniforms,
 			...heroSharedUniforms,
-			// ...blueNoise.sharedUniforms,
+			...bn_sharedUniforms,
 			u_color: { value: new THREE.Color(properties.neutralColor) },
 			u_blocksColor: { value: new THREE.Color() },
 			u_yDisplacement: { value: 0 },
@@ -166,7 +166,7 @@ const Hero = () => {
 				...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
 				...properties.sharedUniforms,
 				...heroSharedUniforms,
-				...blueNoise.bn_sharedUniforms,
+				...bn_sharedUniforms,
 			},
 			vertexShader: vert,
 			fragmentShader: frag,
@@ -286,16 +286,16 @@ const Hero = () => {
 
 		_c.copy(MAIN_COLOR);
 
-		if (result === AnimationResult.FAILED && failFloatingCubesRatio > 0) {
+		if (stateResult === AnimationResult.FAILED && failFloatingCubesRatio > 0) {
 			_c.copy(ERROR_COLOR);
 		}
 
-		if (result === AnimationResult.COMPLETED || result === AnimationResult.REPLAY) {
+		if (stateResult === AnimationResult.COMPLETED || stateResult === AnimationResult.REPLAY) {
 			heroState.successColorRatio = Math.min(1, heroState.successColorRatio + 0.5 * dt);
 			_c.lerp(SUCCESS_COLOR, heroState.successColorRatio);
 		}
 
-		if (result !== AnimationResult.REPLAY && result !== AnimationResult.COMPLETED) {
+		if (stateResult !== AnimationResult.REPLAY && stateResult !== AnimationResult.COMPLETED) {
 			_c.lerp(DEFAULT_COLOR, math.saturate(stopPushDownRatio + failPushDownRatio));
 		}
 
@@ -416,7 +416,7 @@ const Hero = () => {
 	}
 
 	function _updateStopAnimation(block, i) {
-		if (result === AnimationResult.STOP) {
+		if (stateResult === AnimationResult.STOP) {
 			if (i >= TOTAL_TILES) {
 				const _i = i - TOTAL_TILES;
 				const col = (_i % SIZE) - HALF_SIZE;
@@ -452,7 +452,7 @@ const Hero = () => {
 		}
 	}
 	function _updateFailAnimation(logicBlock, block, i) {
-		if (result === AnimationResult.FAILED) {
+		if (stateResult === AnimationResult.FAILED) {
 			if (logicBlock) {
 				const tile = logicBlock.currentTile;
 
@@ -513,7 +513,7 @@ const Hero = () => {
 	}
 
 	function _updateFloatAnimation(logicBlock, block) {
-		if (result === AnimationResult.COMPLETED || result === AnimationResult.REPLAY) {
+		if (stateResult === AnimationResult.COMPLETED || stateResult === AnimationResult.REPLAY) {
 			if (logicBlock) {
 				const tile = logicBlock.currentTile;
 				const delay = 0.1 * tile.randomDelay;
@@ -586,6 +586,5 @@ const Hero = () => {
 		update,
 	};
 };
-
 const heroBlocks = Hero();
 export { heroBlocks, heroContainer, heroSharedUniforms };

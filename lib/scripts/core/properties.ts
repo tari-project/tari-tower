@@ -28,7 +28,7 @@ const baseStyleProperties = {
 	particlesOpacity: 0.75,
 	particlesSize: 0.01,
 };
-const propertiesInitialState: PropertiesType = {
+export const propertiesInitialState: PropertiesType = {
 	canvasId: undefined,
 	time: 0,
 	deltaTime: 0,
@@ -36,13 +36,10 @@ const propertiesInitialState: PropertiesType = {
 	height: 0,
 	viewportWidth: 0,
 	viewportHeight: 0,
-	camera: undefined,
-	orbitCamera: undefined,
 	cameraZoom: 1,
 	cameraOffsetX: 0,
 	cameraOffsetY: 0,
-	renderer: undefined,
-	scene: undefined,
+	scene: new THREE.Scene(),
 	postprocessing: false,
 	resolution,
 	viewportResolution,
@@ -67,10 +64,6 @@ const propertiesInitialState: PropertiesType = {
 	minSpawnedBlocksForTheErrorBlock: maxFreeBlocksCount - 2,
 	...baseStyleProperties,
 };
-let properties = propertiesInitialState;
-
-export function resetProperties() {
-	properties = propertiesInitialState;
-}
+const properties = { ...propertiesInitialState };
 
 export { properties };

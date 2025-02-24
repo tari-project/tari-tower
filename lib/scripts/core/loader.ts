@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { properties } from './properties';
 
 import BASE from 'public/assets/BASE.buf?url&inline';
 import BOX from 'public/assets/BOX.buf?url&inline';
@@ -17,17 +16,17 @@ interface LoaderItems {
 	onLoadCallback: (() => void) | null;
 }
 
-const assets = {
-	'models/BASE.buf': BASE,
-	'models/BOX.buf': BOX,
-	'models/COIN.buf': COIN,
-	'models/COIN_PLACEMENT.buf': COIN_PLACEMENT,
-	'models/LOSE_ANIMATION.buf': LOSE_ANIMATION,
-	'textures/gobo.jpg': gobo,
-	'textures/LDR_RGB1_0.png': LDR_RGB1_0,
-	'textures/matcap_gold.jpg': matcap_gold,
-};
 const Loader = () => {
+	const assets = {
+		'models/BASE.buf': BASE,
+		'models/BOX.buf': BOX,
+		'models/COIN.buf': COIN,
+		'models/COIN_PLACEMENT.buf': COIN_PLACEMENT,
+		'models/LOSE_ANIMATION.buf': LOSE_ANIMATION,
+		'textures/gobo.jpg': gobo,
+		'textures/LDR_RGB1_0.png': LDR_RGB1_0,
+		'textures/matcap_gold.jpg': matcap_gold,
+	};
 	let list: LoaderItems['list'] = [];
 	let loadedCount: LoaderItems['loadedCount'] = 0;
 	let onLoadCallback: LoaderItems['onLoadCallback'] = null;
@@ -37,7 +36,6 @@ const Loader = () => {
 		list.push(async () => {
 			try {
 				const response = await fetch(url);
-				console.debug(response);
 				const buffer = await response.arrayBuffer();
 				const schematicJsonSize = new Uint32Array(buffer, 0, 1)[0];
 				const schematic = JSON.parse(new TextDecoder().decode(new Uint8Array(buffer, 4, schematicJsonSize)));
@@ -107,7 +105,7 @@ const Loader = () => {
 					texture.minFilter = THREE.LinearMipMapLinearFilter;
 					texture.magFilter = THREE.LinearFilter;
 					texture.generateMipmaps = true;
-					texture.anisotropy = properties.renderer?.capabilities.getMaxAnisotropy() || 1;
+					texture.anisotropy = 1;
 					texture.flipY = true;
 					if (cb) cb(texture);
 					_onLoad();
@@ -126,11 +124,10 @@ const Loader = () => {
 
 	function _onLoad() {
 		loadedCount++;
+
 		if (loadedCount === list.length) {
 			list = [];
-			if (onLoadCallback) {
-				onLoadCallback();
-			}
+			onLoadCallback?.();
 		}
 	}
 

@@ -1,16 +1,16 @@
 import * as THREE from 'three';
+import { Mesh, ShaderMaterial } from 'three';
 import { properties } from '../../core/properties';
-import blueNoise from '../../utils/blueNoise/blueNoise';
+import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
 
 import vert from './bg.vert?raw';
 import frag from './bg.frag?raw';
 import particlesVert from './particles.vert?raw';
 import particlesFrag from './particles.frag?raw';
-import { Mesh, ShaderMaterial } from 'three';
 
+const container = new THREE.Object3D();
 const Background = () => {
-	const container = new THREE.Object3D();
-	let particles: Mesh & { material: ShaderMaterial };
+	const particles: Mesh & { material: ShaderMaterial } = new THREE.Mesh();
 
 	function init() {
 		const material = new THREE.ShaderMaterial({
@@ -20,15 +20,15 @@ const Background = () => {
 					u_bgColor1: properties.sharedUniforms?.u_bgColor1,
 					u_bgColor2: properties.sharedUniforms?.u_bgColor2,
 				},
-				blueNoise.bn_sharedUniforms,
+				bn_sharedUniforms,
 			),
 			vertexShader: vert,
+
 			fragmentShader: frag,
 		});
 		const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
 		mesh.renderOrder = 1;
 		container.add(mesh);
-
 		initParticles();
 	}
 
@@ -58,22 +58,20 @@ const Background = () => {
 
 		geometry.setAttribute('a_instancePosition', new THREE.InstancedBufferAttribute(positionArray, 3));
 		geometry.setAttribute('a_instanceRandom', new THREE.InstancedBufferAttribute(randomArray, 3));
-
-		const material = new THREE.ShaderMaterial({
+		const uniforms = {
+			u_time: properties.sharedUniforms?.u_time || { value: properties.time },
+			u_resolution: properties.sharedUniforms?.u_resolution || { value: properties.resolution },
+			u_size: { value: 0.01 },
+			u_color: { value: new THREE.Color() },
+			u_opacity: { value: 0 },
+		};
+		particles.material = new THREE.ShaderMaterial({
 			vertexShader: particlesVert,
 			fragmentShader: particlesFrag,
-			uniforms: {
-				u_time: properties.sharedUniforms?.u_time || { value: properties.time },
-				u_resolution: properties.sharedUniforms?.u_resolution || { value: properties.resolution },
-				u_size: { value: 0.01 },
-				u_color: { value: new THREE.Color() },
-				u_opacity: { value: 0 },
-			},
+			uniforms,
 			transparent: true,
 		});
-
-		particles = new THREE.Mesh(geometry, material);
-		particles.renderOrder = 2;
+		particles.geometry = geometry;
 		particles.frustumCulled = false;
 		container.add(particles);
 	}
@@ -84,7 +82,7 @@ const Background = () => {
 		particles.material.uniforms.u_opacity.value = properties.particlesOpacity;
 	}
 
-	return { init, container, update };
+	return { init, update };
 };
 
-export default Background;
+export { Background, container as bgContainer };
