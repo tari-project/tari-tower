@@ -10,6 +10,8 @@ declare enum AnimationStatus {
 
 export declare let animationStatus: AnimationStatus;
 
+export declare function initAudio(notificationSoundCB: () => void, blockWinSoundCB: (tier: number) => void): void;
+
 export declare function loadTowerAnimation({ canvasId, offset }: {
     canvasId: string;
     offset?: number;

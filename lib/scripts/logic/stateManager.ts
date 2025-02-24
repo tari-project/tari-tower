@@ -1,3 +1,5 @@
+let successNotificationTimeout: NodeJS.Timeout | undefined;
+let notificationSoundTimeout: NodeJS.Timeout | undefined;
 import { properties } from '../core/properties';
 import settings from '../core/settings';
 import { gameEndedSignal, restartSignal, stateSignal } from './signals';
@@ -30,6 +32,8 @@ const StateManager = () => {
 	const statusOrder = Object.values(AnimationStatus);
 	let statusIndex = 0;
 	let removeCanvas = false;
+	let notificationSoundCB: (() => void) | undefined = undefined;
+	let blockWinSoundCB: ((tier: number) => void) | undefined = undefined;
 
 	const statusUpdateQueue: StatusManagerState['statusUpdateQueue'] = [];
 	function updateAfterCycle() {
@@ -127,7 +131,40 @@ const StateManager = () => {
 	}
 
 	function _queueStatusUpdate({ status, result = null, animationStyle = null }: QueueArgs) {
-		statusUpdateQueue.push(() => (result ? _updateStatusAndResult({ status, result, animationStyle }) : _canUpdateStatus(status)));
+		const shouldDelay = result && result === AnimationResult.COMPLETED;
+
+		if (!shouldDelay) {
+			statusUpdateQueue.push(() => (result ? _updateStatusAndResult({ status, result, animationStyle }) : _canUpdateStatus(status)));
+		} else {
+			const notificationSoundDelay = 2; // seconds
+			const soundDelayDiffs = {
+				[SuccessLevel.ONE]: 0,
+				[SuccessLevel.TWO]: 4,
+				[SuccessLevel.THREE]: 3,
+			};
+
+			const delay = (notificationSoundDelay + soundDelayDiffs[animationStyle ?? 0]) * 1000;
+			if (successNotificationTimeout) {
+				clearTimeout(successNotificationTimeout);
+			}
+
+			if (notificationSoundTimeout) {
+				clearTimeout(notificationSoundTimeout);
+			}
+
+			notificationSoundTimeout = setTimeout(() => playBlockWinSound(animationStyle), notificationSoundDelay * 1000);
+			successNotificationTimeout = setTimeout(() => {
+				statusUpdateQueue.push(() => (result ? _updateStatusAndResult({ status, result, animationStyle }) : _canUpdateStatus(status)));
+			}, delay);
+		}
+	}
+
+	function playNotificationSound() {
+		notificationSoundCB?.();
+	}
+
+	function playBlockWinSound(tier) {
+		blockWinSoundCB?.(tier);
 	}
 
 	function reset() {
@@ -158,16 +195,19 @@ const StateManager = () => {
 
 	function setComplete(isReplay = false) {
 		const result = isReplay && hasNotStarted ? AnimationResult.REPLAY : AnimationResult.COMPLETED;
+		if (!isReplay) playNotificationSound();
 		_queueStatusUpdate({ status: AnimationStatus.RESULT, result, animationStyle: SuccessLevel.ONE });
 	}
 
 	function setComplete2(isReplay = false) {
 		const result = isReplay && hasNotStarted ? AnimationResult.REPLAY : AnimationResult.COMPLETED;
+		if (!isReplay) playNotificationSound();
 		_queueStatusUpdate({ status: AnimationStatus.RESULT, result, animationStyle: SuccessLevel.TWO });
 	}
 
 	function setComplete3(isReplay = false) {
 		const result = isReplay && hasNotStarted ? AnimationResult.REPLAY : AnimationResult.COMPLETED;
+		if (!isReplay) playNotificationSound();
 		_queueStatusUpdate({ status: AnimationStatus.RESULT, result, animationStyle: SuccessLevel.THREE });
 	}
 
@@ -205,8 +245,14 @@ const StateManager = () => {
 			setStart();
 		}
 	}
+
+	function initAudio(_notificationSoundCB: () => void, _blockWinSoundCB: (tier: number) => void) {
+		notificationSoundCB = _notificationSoundCB;
+		blockWinSoundCB = _blockWinSoundCB;
+	}
 	return {
 		init,
+		initAudio,
 		updateAfterCycle,
 		set,
 		showVisual,
