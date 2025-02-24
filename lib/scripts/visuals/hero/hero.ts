@@ -282,7 +282,7 @@ const Hero = () => {
 		MAIN_COLOR.set(properties.mainColor);
 		SUCCESS_COLOR.set(properties.successColor);
 		ERROR_COLOR.set(properties.failColor);
-		DEFAULT_COLOR.set(properties.neutralColor);
+		DEFAULT_COLOR.set(properties.neutralColor).convertSRGBToLinear();
 
 		_c.copy(MAIN_COLOR);
 
@@ -331,7 +331,7 @@ const Hero = () => {
 			heroState._baseMesh.material.uniforms.u_blocksColor.value.copy(_c);
 			heroState._baseMesh.material.uniforms.u_successColor.value.copy(SUCCESS_COLOR);
 
-			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.set(DEFAULT_COLOR);
+			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.set(DEFAULT_COLOR).convertSRGBToLinear();
 
 			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(_c.set(properties.successColor), previousSuccessBlocksAnimationRatio);
 			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.convertSRGBToLinear();

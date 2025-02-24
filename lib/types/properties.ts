@@ -24,6 +24,7 @@ export interface PropertiesType {
 	sharedUniforms: SharedUniforms;
 	loadList?: unknown;
 	animationSpeed: number;
+	bgColor?: ColorRepresentation;
 	bgColor1: ColorRepresentation;
 	bgColor2: ColorRepresentation;
 	neutralColor: ColorRepresentation;

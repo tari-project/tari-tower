@@ -11,22 +11,19 @@ import particlesFrag from './particles.frag?raw';
 const container = new THREE.Object3D();
 const Background = () => {
 	const particles: Mesh & { material: ShaderMaterial } = new THREE.Mesh();
-
+	const mesh: Mesh & { material: ShaderMaterial } = new THREE.Mesh(new THREE.PlaneGeometry(2, 2));
 	function init() {
-		const material = new THREE.ShaderMaterial({
-			uniforms: Object.assign(
-				{
-					u_resolution: properties.sharedUniforms?.u_resolution,
-					u_bgColor1: properties.sharedUniforms?.u_bgColor1,
-					u_bgColor2: properties.sharedUniforms?.u_bgColor2,
-				},
-				bn_sharedUniforms,
-			),
+		const uniforms = {
+			u_resolution: properties.sharedUniforms?.u_resolution,
+			u_bgColor1: properties.sharedUniforms?.u_bgColor1,
+			u_bgColor2: properties.sharedUniforms?.u_bgColor2,
+			...bn_sharedUniforms,
+		} as unknown as ShaderMaterial['uniforms'];
+		mesh.material = new THREE.ShaderMaterial({
+			uniforms,
 			vertexShader: vert,
-
 			fragmentShader: frag,
 		});
-		const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
 		mesh.renderOrder = 1;
 		container.add(mesh);
 		initParticles();
@@ -80,6 +77,11 @@ const Background = () => {
 		particles.material.uniforms.u_size.value = properties.particlesSize;
 		particles.material.uniforms.u_color.value.set(properties.particlesColor);
 		particles.material.uniforms.u_opacity.value = properties.particlesOpacity;
+		mesh.material.uniforms.u_bgColor1.value = properties.sharedUniforms?.u_bgColor1.value;
+		mesh.material.uniforms.u_bgColor2.value = properties.sharedUniforms?.u_bgColor2.value;
+		mesh.material.uniformsNeedUpdate = true;
+		mesh.material.needsUpdate = true;
+		// container.updateWorldMatrix(false, true);
 	}
 
 	return { init, update };
