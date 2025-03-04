@@ -22,12 +22,13 @@ const TariTower = () => {
 	let canvas: HTMLCanvasElement;
 	let orbitControls: OrbitControls;
 	let _canvasId: string | undefined = undefined;
-	let _viewportWidth = window.innerWidth;
-	let _viewportHeight = window.innerHeight;
-	let cameraOffsetX = 0;
-	const cameraOffsetY = 0;
 
-	const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 1, 60);
+	const aspect = window.innerWidth / window.innerHeight;
+	const viewHeight = 15;
+	const viewWidth = viewHeight * aspect;
+
+	const camera = new THREE.OrthographicCamera(viewWidth / -2, viewWidth / 2, viewHeight / 2, viewHeight / -2, 1, 1000);
+
 	let orbitCamera: OrthographicCamera;
 
 	async function _handleRenderer() {
@@ -50,10 +51,10 @@ const TariTower = () => {
 	}
 
 	function _handleResize(viewportWidth: number, viewportHeight: number) {
-		_viewportWidth = viewportWidth;
-		_viewportHeight = viewportHeight;
-
+		properties.viewportWidth = viewportWidth;
+		properties.viewportHeight = viewportHeight;
 		properties.viewportResolution.set(viewportWidth, window.innerHeight);
+		properties.sharedUniforms.u_viewportResolution.value = properties.viewportResolution;
 
 		let dprWidth = viewportWidth * settings.DPR;
 		let dprHeight = viewportHeight * settings.DPR;
@@ -69,17 +70,14 @@ const TariTower = () => {
 		properties.width = dprWidth;
 		properties.height = dprHeight;
 		properties.resolution.set(dprWidth, dprHeight);
-
 		camera.updateProjectionMatrix();
 
 		renderer.setSize(dprWidth, dprHeight);
-
 		canvas.style.width = viewportWidth + 'px';
 		canvas.style.height = viewportHeight + 'px';
 	}
 
-	function onResize(offset = 0) {
-		cameraOffsetX = offset ? offset / window.innerWidth : 0;
+	function onResize() {
 		_handleResize(window.innerWidth, window.innerHeight);
 	}
 
@@ -100,6 +98,7 @@ const TariTower = () => {
 	async function _initScene() {
 		properties.scene.add(camera);
 		camera.position.fromArray(settings.DEFAULT_POSITION);
+		camera.updateProjectionMatrix();
 		orbitCamera = camera.clone();
 		orbitControls = new OrbitControls(orbitCamera, canvas);
 		orbitControls.target0.fromArray(settings.DEFAULT_LOOKAT_POSITION);
@@ -139,18 +138,28 @@ const TariTower = () => {
 			properties.sharedUniforms.u_deltaTime.value = dt;
 		}
 
-		const cameraZoom = (properties.cameraZoom * _viewportHeight) / 10;
+		const aspect = (window.innerWidth - properties.cameraOffsetX) / window.innerHeight;
+		const viewHeight = 10;
+		const viewWidth = viewHeight * aspect;
 
-		camera.zoom = cameraZoom;
-		camera.left = -_viewportWidth / 2 - (cameraOffsetX * _viewportWidth) / cameraZoom / 2;
-		camera.right = _viewportWidth / 2 - (cameraOffsetX * _viewportWidth) / cameraZoom / 2;
-		camera.top = _viewportHeight / 2 - (cameraOffsetY * _viewportHeight) / cameraZoom / 2;
-		camera.bottom = -_viewportHeight / 2 - (cameraOffsetY * _viewportHeight) / cameraZoom / 2;
+		let offsetX = 0;
+
+		if (properties.offsetX) {
+			const offP = (properties.offsetX / window.innerWidth) * 100;
+			offsetX = (viewWidth * offP) / 100;
+		}
+
+		const left = -viewWidth / 2 - offsetX / 2;
+		const right = viewWidth / 2 - offsetX / 2;
+
+		camera.left = left;
+		camera.right = right;
+		camera.top = viewHeight / 2;
+		camera.bottom = viewHeight / -2;
 
 		camera.updateProjectionMatrix();
 		orbitControls?.update();
 		orbitCamera?.updateMatrix();
-
 		orbitCamera?.matrix.decompose(camera.position, camera.quaternion, camera.scale);
 		camera.matrix.compose(camera.position, camera.quaternion, camera.scale);
 

@@ -1,5 +1,6 @@
-import { Vector2, ColorRepresentation, ShaderMaterialParameters, Object3D } from 'three';
+import { Vector2, ColorRepresentation, Object3D } from 'three';
 import Block from '../scripts/logic/Block';
+import * as THREE from 'three';
 
 export interface PropertiesType {
 	canvasId?: string;
@@ -9,9 +10,9 @@ export interface PropertiesType {
 	height: number;
 	viewportWidth: number;
 	viewportHeight: number;
-
 	cameraZoom: number;
 	scene: Object3D;
+	offsetX: number;
 	cameraOffsetX: number;
 	cameraOffsetY: number;
 	postprocessing?: boolean;
@@ -49,4 +50,15 @@ export interface PropertiesType {
 	minSpawnedBlocksForTheErrorBlock: number;
 }
 
-export type SharedUniforms = ShaderMaterialParameters['uniforms'];
+export interface Uniform<T = unknown> {
+	value: T;
+}
+
+export interface SharedUniforms {
+	u_time: Uniform<number>;
+	u_deltaTime: Uniform<number>;
+	u_resolution: Uniform<THREE.Vector2>;
+	u_viewportResolution: Uniform<THREE.Vector2>;
+	u_bgColor1: Uniform<THREE.Color>;
+	u_bgColor2: Uniform<THREE.Color>;
+}
