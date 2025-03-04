@@ -20,8 +20,7 @@ import HeroBlockCoordinates from './HeroBlockCoordinates';
 import { lightCameraHelperSignal, lightCameraUpdateSignal } from '../../logic/signals';
 
 import { InstancedBufferAttribute } from 'three';
-import { SharedUniforms } from '../../../types/properties';
-import { HeroType } from '../../../types/hero';
+import { HeroSharedUniforms, HeroType } from '../../../types/hero';
 import { AnimationResult } from '../../../types';
 import { ASSETS_PATH } from '../../core/settings';
 
@@ -40,7 +39,7 @@ const _c = new THREE.Color();
 const _c2 = new THREE.Color();
 const heroContainer = new THREE.Object3D();
 
-const heroSharedUniforms: SharedUniforms = {
+const heroSharedUniforms: HeroSharedUniforms = {
 	u_lightPosition: { value: new THREE.Vector3(-2, 6, -4) },
 	u_goboTexture: { value: null },
 	u_goboIntensity: { value: 0.45 },
@@ -106,8 +105,8 @@ const Hero = () => {
 
 	function _onBaseBlocksLoaded(geometry) {
 		const uniforms = {
-			...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
 			...properties.sharedUniforms,
+			...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
 			...heroSharedUniforms,
 			...bn_sharedUniforms,
 			u_color: { value: new THREE.Color(properties.neutralColor) },

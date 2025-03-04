@@ -4,6 +4,9 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import dts from 'vite-plugin-dts';
 
 export default defineConfig({
+	server: {
+		port: 3001,
+	},
 	plugins: [dts({ include: ['lib'], rollupTypes: true, tsconfigPath: './tsconfig.app.json' }), tsconfigPaths(), eslint({ eslintOptions: { cache: false, fix: true } })],
 	build: {
 		lib: {

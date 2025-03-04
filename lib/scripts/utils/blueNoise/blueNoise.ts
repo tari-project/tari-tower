@@ -2,10 +2,15 @@ import * as THREE from 'three';
 import loader from '../../core/loader';
 
 import getBlueNoiseShader from './getBlueNoise.glsl?raw';
-import { SharedUniforms } from '../../../types/properties';
+import { Uniform } from '../../../types/properties';
 import { ASSETS_PATH } from '../../core/settings';
 
-const bn_sharedUniforms: SharedUniforms = {
+export interface BN_Uniforms {
+	u_blueNoiseTexture: Uniform;
+	u_blueNoiseTexelSize: Uniform<THREE.Vector2 | null>;
+	u_blueNoiseCoordOffset: Uniform<THREE.Vector2>;
+}
+const bn_sharedUniforms: BN_Uniforms = {
 	u_blueNoiseTexture: { value: null },
 	u_blueNoiseTexelSize: { value: null },
 	u_blueNoiseCoordOffset: { value: new THREE.Vector2() },
