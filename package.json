@@ -1,6 +1,6 @@
 {
 	"name": "@tari-project/tari-tower",
-	"version": "0.0.19",
+	"version": "0.0.20",
 	"private": false,
 	"description": "the tower animation used in Tari Universe",
 	"homepage": "https://github.com/tari-project/tari-tower#readme",
