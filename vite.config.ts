@@ -33,7 +33,7 @@ export default defineConfig({
 				assetFileNames: 'assets/[name][extname]',
 				compact: true,
 				globals: {
-					'three': 'three',
+					'three': 'THREE',
 					'min-signal': 'MinSignal',
 				},
 				generatedCode: {
@@ -41,6 +41,7 @@ export default defineConfig({
 				},
 				interop: 'esModule',
 			},
+			makeAbsoluteExternalsRelative: true,
 			preserveEntrySignatures: 'exports-only',
 		},
 	},
