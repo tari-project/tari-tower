@@ -54,7 +54,6 @@
 		"three": "^0.174.0"
 	},
 	"publishConfig": {
-		"access": "public",
-		"tag": "0.0.21"
+		"access": "public"
 	}
 }
