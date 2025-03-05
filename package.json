@@ -1,6 +1,6 @@
 {
 	"name": "@tari-project/tari-tower",
-	"version": "0.0.20",
+	"version": "0.0.21",
 	"private": false,
 	"description": "the tower animation used in Tari Universe",
 	"homepage": "https://github.com/tari-project/tari-tower#readme",
@@ -20,8 +20,7 @@
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"files": [
-		"/dist",
-		"/public"
+		"/dist"
 	],
 	"scripts": {
 		"dev": "vite",
@@ -55,6 +54,7 @@
 		"three": "^0.174.0"
 	},
 	"publishConfig": {
-		"access": "public"
+		"access": "public",
+		"tag": "0.0.21"
 	}
 }

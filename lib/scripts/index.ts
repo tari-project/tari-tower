@@ -1,5 +1,5 @@
 import TariTower from './tower.ts';
-import { setAnimationState } from '../main';
+import { setAnimationState } from '../index.ts';
 import { stateManager, status } from './logic/stateManager.ts';
 import { gameEndedSignal } from './logic/signals.ts';
 import { properties } from './core/properties.ts';

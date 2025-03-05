@@ -21,7 +21,7 @@ import { lightCameraHelperSignal, lightCameraUpdateSignal } from '../../logic/si
 
 import { InstancedBufferAttribute } from 'three';
 import { HeroSharedUniforms, HeroType } from '../../../types/hero';
-import { AnimationResult } from '../../../types';
+import { AnimationResult } from '../../../types/stateManager';
 import { ASSETS_PATH } from '../../core/settings';
 
 const TOTAL_BLOCKS = 2 * TOTAL_TILES;
