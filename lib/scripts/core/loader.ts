@@ -1,10 +1,10 @@
 import * as THREE from 'three';
 
-import BASE from 'public/assets/BASE.buf?url&inline';
-import BOX from 'public/assets/BOX.buf?url&inline';
-import COIN from 'public/assets/COIN.buf?url&inline';
-import COIN_PLACEMENT from 'public/assets/COIN_PLACEMENT.buf?url&inline';
-import LOSE_ANIMATION from 'public/assets/LOSE_ANIMATION.buf?url&inline';
+import BASE from 'public/assets/BASE.buf?url';
+import BOX from 'public/assets/BOX.buf?url';
+import COIN from 'public/assets/COIN.buf?url';
+import COIN_PLACEMENT from 'public/assets/COIN_PLACEMENT.buf?url';
+import LOSE_ANIMATION from 'public/assets/LOSE_ANIMATION.buf?url';
 
 import gobo from 'public/assets/gobo.jpg';
 import LDR_RGB1_0 from 'public/assets/LDR_RGB1_0.png';

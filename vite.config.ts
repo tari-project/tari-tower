@@ -1,13 +1,23 @@
 import { defineConfig } from 'vite';
 import eslint from '@nabla/vite-plugin-eslint';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import libAssetsPlugin from '@laynezh/vite-plugin-lib-assets';
 import dts from 'vite-plugin-dts';
 
 export default defineConfig({
 	server: {
 		port: 3001,
 	},
-	plugins: [dts({ include: ['lib'], rollupTypes: true, tsconfigPath: './tsconfig.app.json' }), tsconfigPaths(), eslint({ eslintOptions: { cache: false, fix: true } })],
+	plugins: [
+		libAssetsPlugin({
+			include: /\.a?buf(\?.*)?$/,
+			name: '[name].[ext][query]',
+			limit: 0,
+		}),
+		dts({ include: ['lib'], rollupTypes: true, tsconfigPath: './tsconfig.app.json' }),
+		tsconfigPaths(),
+		eslint({ eslintOptions: { cache: false, fix: true } }),
+	],
 	build: {
 		lib: {
 			entry: 'lib/index.ts',
