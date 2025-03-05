@@ -24,6 +24,7 @@ export default defineConfig({
 			name: '@tari-project/tari-tower',
 			formats: ['es'],
 		},
+		assetsDir: 'assets',
 		rollupOptions: {
 			input: 'lib/index.ts',
 			external: ['three', 'min-signal'],
