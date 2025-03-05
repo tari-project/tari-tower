@@ -14,7 +14,7 @@ export default defineConfig({
 			name: '[name].[ext][query]',
 			limit: 0,
 		}),
-		dts({ include: ['lib'], rollupTypes: true, tsconfigPath: './tsconfig.app.json' }),
+		dts({ include: ['lib'], rollupTypes: true, tsconfigPath: './tsconfig.app.json', strictOutput: true, clearPureImport: true }),
 		tsconfigPaths(),
 		eslint({ eslintOptions: { cache: false, fix: true } }),
 	],
@@ -27,12 +27,11 @@ export default defineConfig({
 		assetsDir: 'assets',
 		rollupOptions: {
 			input: 'lib/index.ts',
-			external: ['three', 'min-signal'],
+			external: ['min-signal'],
 			output: {
 				entryFileNames: '[name].js',
 				assetFileNames: 'assets/[name][extname]',
 				globals: {
-					'three': 'Three',
 					'min-signal': 'MinSignal',
 				},
 			},
