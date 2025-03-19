@@ -4,7 +4,7 @@ var n = (B, w, o) => s8(B, typeof w != "symbol" ? w + "" : w, o);
 import * as M from "three";
 import { EventDispatcher as U8, Vector3 as fA, MOUSE as IA, TOUCH as gA, Quaternion as Rw, Spherical as Ww, Vector2 as PA } from "three";
 import AA from "min-signal";
-const LA = "", N8 = Math.min(2, window.devicePixelRatio || 1), O8 = !0, x8 = 2560 * 1440, b8 = 12, F8 = !0, j8 = !1, l8 = !1, k8 = [-20, 18, 20], K8 = [0, 0, 0], h8 = { antialias: !0, alpha: !1, powerPreference: "low-power" }, iA = {
+const LA = "", N8 = Math.min(2, window.devicePixelRatio || 1), O8 = !0, x8 = 2560 * 1440, b8 = 12, F8 = !0, j8 = !1, l8 = !0, k8 = [-20, 18, 20], K8 = [0, 0, 0], h8 = { antialias: !0, alpha: !1, powerPreference: "low-power" }, iA = {
   DPR: N8,
   USE_PIXEL_LIMIT: O8,
   MAX_PIXEL_COUNT: x8,
