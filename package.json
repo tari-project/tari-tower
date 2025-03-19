@@ -24,12 +24,6 @@
 			"default": "./dist/index.js"
 		}
 	},
-	"main": "dist/index.js",
-	"types": "dist/index.d.ts",
-	"files": [
-		"/dist",
-		"/public"
-	],
 	"dependencies": {
 		"min-signal": "^1.0.2",
 		"three": "^0.174.0"
@@ -37,7 +31,6 @@
 	"devDependencies": {
 		"@eslint/js": "^9.19.0",
 		"@nabla/vite-plugin-eslint": "^2.0.5",
-		"@types/eslint__js": "^8.42.3",
 		"@types/node": "^22.13.10",
 		"@types/three": "^0.174.0",
 		"@typescript-eslint/parser": "^8.24.1",

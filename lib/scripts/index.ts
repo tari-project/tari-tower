@@ -1,5 +1,4 @@
 import TariTower from './tower.ts';
-import { setAnimationState } from '../main';
 import { stateManager, status } from './logic/stateManager.ts';
 import { gameEndedSignal } from './logic/signals.ts';
 import { properties } from './core/properties.ts';
@@ -52,6 +51,6 @@ export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 		gameEndedSignal.dispatch();
 	} else {
 		stateManager.setRemove(true);
-		setAnimationState('stop');
+		stateManager.set('stop');
 	}
 }
