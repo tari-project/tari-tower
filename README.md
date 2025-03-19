@@ -47,7 +47,7 @@ note: _must be built first to be able to reference the lib locally_
 ```
 
 -   make changes in the `lib` directory
--   export anything you want available in `/lib/main.ts`
+-   export anything you want available in `/lib/index.ts`
 -   update readme
 
 ### Distribution

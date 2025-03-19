@@ -73,7 +73,7 @@ const Loader = () => {
 				if (cb) cb(geometry);
 				_onLoad();
 			} catch (error) {
-				console.error('Error loading buffer:', error);
+				console.error(`Tower animation | error loading buffer: ${file}`, error);
 			}
 		});
 	}
@@ -111,7 +111,7 @@ const Loader = () => {
 					_onLoad();
 				},
 				undefined,
-				(error) => console.error('Error loading texture:', error),
+				(error) => console.error(`Tower animation | error loading texture: ${file}`, error),
 			);
 		});
 	}

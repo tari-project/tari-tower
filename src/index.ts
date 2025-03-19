@@ -1,8 +1,7 @@
 import GUI from 'lil-gui';
 
+// import { loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState } from '../lib';
 import { loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState } from '@tari-project/tari-tower';
-
-// import { loadTowerAnimation, removeTowerAnimation, setAnimationState } from '../lib';
 
 if (import.meta.env.MODE === 'development') {
 	const gui = new GUI();
@@ -41,7 +40,7 @@ if (import.meta.env.MODE === 'development') {
 	gui.add(actions, 'initCanvas');
 
 	function handleLoad() {
-		loadTowerAnimation({ canvasId: 'canvas-id', offset: 340 });
+		loadTowerAnimation({ canvasId: 'canvas-id', offset: 0 });
 	}
 
 	document.addEventListener('DOMContentLoaded', handleLoad);

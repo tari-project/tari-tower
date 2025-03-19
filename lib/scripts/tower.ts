@@ -120,7 +120,7 @@ const TariTower = () => {
 			properties.scene.add(bgContainer);
 			properties.scene.add(heroContainer);
 		} catch (error) {
-			console.error(error);
+			console.error('init tower error: ', error);
 		}
 	}
 
