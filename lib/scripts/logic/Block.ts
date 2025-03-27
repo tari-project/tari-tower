@@ -3,6 +3,7 @@ import math from '../utils/math';
 import { customEasing } from '../utils/ease';
 import { BlockType } from '../../types/block';
 import { stateManagerStore } from '../../store/stateManagerStore';
+import { animationCycleStore } from '../../store/animationCycleStore.ts';
 
 export default class Block {
     id: BlockType['id'] = -1;
@@ -110,11 +111,13 @@ export default class Block {
             (free) => (isFree = free)
         );
 
+        const activeBlocksCount = animationCycleStore.getState().blocks?.length;
+
         if (
             this.currentTile?.isBorder &&
             !properties.errorBlock &&
             Math.random() < 0.5 &&
-            properties.activeBlocksCount >= properties.minSpawnedBlocksForTheErrorBlock &&
+            activeBlocksCount >= properties.minSpawnedBlocksForTheErrorBlock &&
             isFree
         ) {
             properties.errorBlock = this;
@@ -122,6 +125,7 @@ export default class Block {
         }
 
         this._setNewEasingFunction();
+
         this.updateTile();
     }
 
@@ -182,6 +186,7 @@ export default class Block {
             (state) => state.flags,
             (flags) => {
                 const { isResultAnimation, isFree, isResult } = flags;
+
                 if ((this.isMoving && !this.hasAnimationEnded) || isResultAnimation) {
                     this.moveAnimationRatio = Math.min(
                         1,
@@ -193,7 +198,8 @@ export default class Block {
                         this._onMovementEnd();
                     }
                 }
-            }
+            },
+            { fireImmediately: true }
         );
     }
 

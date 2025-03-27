@@ -8,9 +8,9 @@ import { stopAnimationManager } from './stopAnimationManager';
 import { errorAnimationManager } from './errorAnimationManager';
 import { successAnimationManager } from '../logic/successAnimationManager';
 
-import { AnimationStatus, PREVENT_CYCLE_STATES, resetCycleResults } from '../../types/stateManager';
+import { PREVENT_CYCLE_STATES, resetCycleResults } from '../../types/stateManager';
 import { setRestart, setStart, stateManagerStore, updateFlags } from '../../store/stateManagerStore';
-import { shallow } from 'zustand/vanilla/shallow';
+
 import {
     addBlock,
     animationCycleStore,
@@ -21,7 +21,6 @@ import {
 const SystemManager = () => {
     let lastSpawnedBlock = animationCycleStore.getState().lastSpawnedBlock;
     let blocks = animationCycleStore.getState().blocks;
-
     animationCycleStore.subscribe(
         (state) => state.lastSpawnedBlock,
         (_lastSpawnedBlock) => (lastSpawnedBlock = _lastSpawnedBlock)
@@ -33,13 +32,14 @@ const SystemManager = () => {
 
     function _spawnBlock() {
         const flags = stateManagerStore.getState().flags;
+
         const { isFailResult, isStopped, isSuccessResult, isReplayResult, isFree } = flags;
+
         const preventSpawn =
             isFailResult ||
             isStopped ||
             blocks.length >= TOTAL_TILES ||
             (mainTile?.isOccupied && !isSuccessResult && !isReplayResult);
-
         if (preventSpawn) return;
 
         if (isSuccessResult || isReplayResult) {
@@ -52,7 +52,8 @@ const SystemManager = () => {
     }
 
     function _spawnMultipleBlocks() {
-        let blocksToSpawn = TOTAL_TILES - properties.activeBlocksCount;
+        const activeBlocksCount = animationCycleStore.getState().blocks?.length;
+        let blocksToSpawn = TOTAL_TILES - activeBlocksCount;
         if (properties.errorBlock) {
             if (properties.errorBlock.currentTile) {
                 properties.errorBlock.currentTile.isOccupied = false;
@@ -73,13 +74,11 @@ const SystemManager = () => {
 
     function _spawnSingleBlock() {
         let block: Block | null | undefined = null;
-        const stateStatus = stateManagerStore.getState().status;
+        const isFree = stateManagerStore.getState().flags.isFree;
         const needsErrorBlockReplacement = Boolean(
             properties.errorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle
         );
-        const canAddNewBlock = Boolean(
-            blocks.length < properties.maxFreeBlocksCount && stateStatus === AnimationStatus.FREE
-        );
+        const canAddNewBlock = Boolean(blocks.length < properties.maxFreeBlocksCount && isFree);
         if (!needsErrorBlockReplacement) {
             if (canAddNewBlock) {
                 block = new Block(blocks.length);
@@ -93,10 +92,8 @@ const SystemManager = () => {
         }
         if (block) {
             block.currentTile = mainTile;
-
             block.init();
             block.updateTile();
-            addBlock(block);
         }
     }
 
@@ -108,7 +105,6 @@ const SystemManager = () => {
         if (PREVENT_CYCLE_STATES.includes(stateStatus)) return;
         if (lastSpawnedBlock) {
             addBlock(lastSpawnedBlock);
-            setLastSpawnedBlock(null);
         }
 
         if (isFailResult || isStopped) return;
@@ -123,11 +119,13 @@ const SystemManager = () => {
 
     function _calculatePaths() {
         const cycleIndex = animationCycleStore.getState().cycleIndex;
+        const activeBlocksCount = animationCycleStore.getState().blocks?.length;
+        const isFree = stateManagerStore.getState().flags.isFree;
         if (lastSpawnedBlock?.hasBeenSpawned) {
-            lastSpawnedBlock.moveToNextTile(stateManagerStore.getState().flags.isFree, 0);
+            lastSpawnedBlock.moveToNextTile(isFree, 0);
         }
 
-        const _isFree = cycleIndex % 2 === 0 ? true : properties.activeBlocksCount < properties.maxFreeBlocksCount - 1;
+        const _isFree = cycleIndex % 2 === 0 ? true : activeBlocksCount < properties.maxFreeBlocksCount - 1;
 
         blocks.forEach((block, index) => {
             if (!block.hasBeenEvaluated && block.hasBeenSpawned) {
@@ -147,7 +145,7 @@ const SystemManager = () => {
         blocks.forEach((block) => block.reset());
         blocksVisual.reset();
         board.reset();
-
+        stateManagerStore.getState().setAnimationTypeEnded(null);
         animationCycleStore.getState().reset();
 
         const stateResult = stateManagerStore.getState().result;
@@ -186,14 +184,14 @@ const SystemManager = () => {
     function _checkCycleCompletion() {
         let isCycleComplete = true;
         if (lastSpawnedBlock) {
-            isCycleComplete = Boolean(isCycleComplete && lastSpawnedBlock.hasBeenSpawned);
+            isCycleComplete = !!lastSpawnedBlock?.hasBeenSpawned;
         }
 
         blocks.forEach((block) => {
             if (block.lifeCycle > 0) {
-                isCycleComplete = Boolean(isCycleComplete && block.hasBeenEvaluated && block.hasAnimationEnded);
+                isCycleComplete = Boolean(block.hasBeenEvaluated && block.hasAnimationEnded);
             } else {
-                isCycleComplete = isCycleComplete && block.spawnAnimationRatio === 1;
+                isCycleComplete = block.spawnAnimationRatio === 1;
             }
         });
 
@@ -226,8 +224,7 @@ const SystemManager = () => {
                 if (isResultAnimation) {
                     setRestart();
                 }
-            },
-            { equalityFn: shallow }
+            }
         );
 
         board.preUpdate(dt);
@@ -238,7 +235,6 @@ const SystemManager = () => {
         board.update(dt);
 
         const isCycleComplete = _checkCycleCompletion();
-
         if (isCycleComplete) {
             _startNewCycle();
         }
@@ -251,9 +247,13 @@ const SystemManager = () => {
                 if (status !== prevStatus) {
                     updateFlags();
                 }
-            },
-            { fireImmediately: true }
+            }
         );
+
+        successAnimationManager.init();
+        stopAnimationManager.init();
+        errorAnimationManager.init();
+        board.init();
 
         stateManagerStore.subscribe(
             (state) => state.animationTypeEnded,
@@ -275,14 +275,9 @@ const SystemManager = () => {
                             break;
                         }
                     }
-                    stateManagerStore.getState().setAnimationTypeEnded(null);
                 }
             }
         );
-        successAnimationManager.init();
-        stopAnimationManager.init();
-        errorAnimationManager.init();
-        board.init();
     }
 
     return {
