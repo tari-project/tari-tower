@@ -44,7 +44,7 @@ import {
 import HeroBlockCoordinates from './HeroBlockCoordinates';
 import { InstancedBufferAttribute } from 'three';
 import { HeroSharedUniforms, HeroType } from '../../../types/hero';
-import { AnimationResult } from '../../../types';
+import { AnimationResult } from '../../../types/stateManager';
 import { ASSETS_PATH } from '../../core/settings';
 import { stateManagerStore } from '../../../store/stateManagerStore';
 
@@ -312,20 +312,26 @@ const Hero = () => {
 
         _c.copy(MAIN_COLOR);
 
-        stateManagerStore.subscribe((state) => {
-            if (state.result === AnimationResult.FAILED && failFloatingCubesRatio > 0) {
-                _c.copy(ERROR_COLOR);
-            }
-
-            if (state.result === AnimationResult.COMPLETED || state.result === AnimationResult.REPLAY) {
-                heroState.successColorRatio = Math.min(1, heroState.successColorRatio + 0.5 * dt);
-                _c.lerp(SUCCESS_COLOR, heroState.successColorRatio);
-            }
-
-            if (state.result !== AnimationResult.REPLAY && state.result !== AnimationResult.COMPLETED) {
-                _c.lerp(DEFAULT_COLOR, math.saturate(stopPushDownRatio + failPushDownRatio));
+        let result = stateManagerStore.getState().result;
+        stateManagerStore.subscribe((state, prevState) => {
+            if (state.result !== prevState.result) {
+                console.debug(`state.result= ${state.result}`);
+                result = state.result;
             }
         });
+
+        if (result === AnimationResult.FAILED && failFloatingCubesRatio > 0) {
+            _c.copy(ERROR_COLOR);
+        }
+
+        if (result === AnimationResult.COMPLETED || result === AnimationResult.REPLAY) {
+            heroState.successColorRatio = Math.min(1, heroState.successColorRatio + 0.5 * dt);
+            _c.lerp(SUCCESS_COLOR, heroState.successColorRatio);
+        }
+
+        if (result !== AnimationResult.REPLAY && result !== AnimationResult.COMPLETED) {
+            _c.lerp(DEFAULT_COLOR, math.saturate(stopPushDownRatio + failPushDownRatio));
+        }
 
         _c.convertSRGBToLinear();
         DEFAULT_COLOR.convertSRGBToLinear();
@@ -562,8 +568,13 @@ const Hero = () => {
     function update(dt: number) {
         _updateFreeBlocks();
         _updateColors(dt);
-
-        const result = stateManagerStore.getState().result;
+        let result = stateManagerStore.getState().result;
+        stateManagerStore.subscribe((state, prevState) => {
+            if (state.result !== prevState.result) {
+                console.debug(`state.result= ${state.result}`);
+                result = state.result;
+            }
+        });
         // update blocks;
         let renderCount = 0;
         for (let i = 0; i < TOTAL_BLOCKS; i++) {
@@ -586,7 +597,6 @@ const Hero = () => {
                 _updateStopAnimation(block, i);
             }
         }
-
         _updateInfoTexture();
         _updateAttributes(renderCount);
 

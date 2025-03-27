@@ -1,49 +1,22 @@
 import { createStore } from 'zustand/vanilla';
-
-import { AnimationResult, AnimationStatus, SuccessLevel } from '../types';
 import { properties } from '../scripts/core/properties.ts';
-
-const _FLAG_TYPES = [
-    'hasNotStarted',
-    'isStart',
-    'isFree',
-    'isResult',
-    'isResultAnimation',
-    'isRestart',
-    'isReplayResult',
-    'isSuccessResult',
-    'isFailResult',
-    'isStopped',
-    'isAnyResult',
-] as const;
-type FlagTypeTuple = typeof _FLAG_TYPES;
-export type FlagType = FlagTypeTuple[number];
-export type Flags = Record<FlagType, boolean>;
+import { AnimationResult, AnimationStatus, Flags, SuccessLevel } from '../types/stateManager.ts';
 
 interface SetWinArgs {
-    isReplay: boolean;
+    isReplay?: boolean;
     completeAnimationLevel?: SuccessLevel | null;
 }
 
 interface State {
     status: AnimationStatus;
-    result: AnimationResult;
     preventRestartCycle: boolean;
+    result: AnimationResult;
     destroyCanvas: boolean;
     completeAnimationLevel?: SuccessLevel | null;
     animationTypeEnded?: 'stop' | 'win' | 'lose' | null;
     flags: Flags;
 }
 interface Actions {
-    addState: ({
-        status,
-        result,
-        completeAnimationLevel,
-    }: {
-        status: AnimationStatus;
-        result?: AnimationResult | null;
-        completeAnimationLevel?: SuccessLevel | null;
-    }) => void;
     setPreventRestartCycle: (preventRestartCycle: boolean) => void;
     setDestroyCanvas: (destroyCanvas: boolean) => void;
     setAnimationTypeEnded: (animationTypeEnded?: 'stop' | 'win' | 'lose' | null) => void;
@@ -75,8 +48,6 @@ const initialState: State = {
 };
 export const stateManagerStore = createStore<ManagerState>()((set) => ({
     ...initialState,
-    addState: () =>
-        set(({ status, result, completeAnimationLevel }: ManagerState) => ({ status, result, completeAnimationLevel })),
     setPreventRestartCycle: (preventRestartCycle) => set({ preventRestartCycle }),
     setDestroyCanvas: (destroyCanvas: boolean) => set({ destroyCanvas }),
     setAnimationTypeEnded: (animationTypeEnded) => set({ animationTypeEnded }),
@@ -121,7 +92,7 @@ export const setStop = () =>
 export const setWin = ({ isReplay, completeAnimationLevel }: SetWinArgs) => {
     const notStarted = stateManagerStore.getState().flags.hasNotStarted;
     const result = isReplay && notStarted ? AnimationResult.REPLAY : AnimationResult.COMPLETED;
-    stateManagerStore.getState().addState({ status: AnimationStatus.RESULT, result, completeAnimationLevel });
+    stateManagerStore.setState({ status: AnimationStatus.RESULT, result, completeAnimationLevel });
 };
 export function showVisual() {
     properties.showVisual = true;

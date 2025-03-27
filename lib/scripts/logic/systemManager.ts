@@ -8,7 +8,7 @@ import { stopAnimationManager } from './stopAnimationManager';
 import { errorAnimationManager } from './errorAnimationManager';
 import { successAnimationManager } from '../logic/successAnimationManager';
 import { SystemManagerState } from '../../types/systemManager';
-import { AnimationStatus, PREVENT_CYCLE_STATES, resetCycleResults } from '../../types';
+import { AnimationStatus, PREVENT_CYCLE_STATES, resetCycleResults } from '../../types/stateManager';
 import { setRestart, setStart, stateManagerStore } from '../../store/stateManagerStore';
 
 let firstStartAnimationRatio: SystemManagerState['firstStartAnimationRatio'] = 0;

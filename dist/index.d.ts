@@ -14,6 +14,25 @@ export declare function removeTowerAnimation({ canvasId }: {
 
 export declare function setAnimationProperties(newProps: Property[]): void;
 
-export declare function setAnimationState(id: string, isReplay?: boolean): void;
+export declare const setLose: () => void;
+
+export declare const setStart: () => void;
+
+export declare const setStop: () => void;
+
+export declare const setWin: ({ isReplay, completeAnimationLevel }: SetWinArgs) => void;
+
+declare interface SetWinArgs {
+    isReplay?: boolean;
+    completeAnimationLevel?: SuccessLevel | null;
+}
+
+export declare function showVisual(): void;
+
+export declare enum SuccessLevel {
+    ONE = 1,
+    TWO = 2,
+    THREE = 3
+}
 
 export { }

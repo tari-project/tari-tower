@@ -1,6 +1,16 @@
 import GUI from 'lil-gui';
 
-import { loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState } from '../lib';
+import {
+    loadTowerAnimation,
+    removeTowerAnimation,
+    setAnimationProperties,
+    setLose,
+    setStart,
+    setStop,
+    setWin,
+    showVisual,
+    SuccessLevel,
+} from '../lib';
 // import {
 //     loadTowerAnimation,
 //     removeTowerAnimation,
@@ -15,13 +25,13 @@ if (import.meta.env.MODE === 'development') {
     const actions = {
         removeCanvas: () => removeTowerAnimation({ canvasId: 'canvas-id' }),
         initCanvas: () => loadTowerAnimation({ canvasId: 'canvas-id', offset: 0 }),
-        showVisual: () => setAnimationState('showVisual'),
-        start: () => setAnimationState('start'),
-        stopVis: () => setAnimationState('stop'),
-        success: () => setAnimationState('success'),
-        success2: () => setAnimationState('success2'),
-        success3: () => setAnimationState('success3', true),
-        fail: () => setAnimationState('fail'),
+        showVisual: () => showVisual(),
+        start: () => setStart(),
+        stopVis: () => setStop(),
+        success: () => setWin({ completeAnimationLevel: SuccessLevel.ONE }),
+        success2: () => setWin({ completeAnimationLevel: SuccessLevel.TWO, isReplay: true }),
+        success3: () => setWin({ completeAnimationLevel: SuccessLevel.THREE }),
+        fail: () => setLose(),
         darkMode: () => {
             setAnimationProperties(animationDarkBg);
             document.getElementById('root')!.style.backgroundColor = '#000';

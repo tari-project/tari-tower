@@ -1,6 +1,5 @@
-import { Vector2, ColorRepresentation, Object3D } from 'three';
+import { Vector2, ColorRepresentation, Object3D, Color } from 'three';
 import Block from '../scripts/logic/Block';
-import * as THREE from 'three';
 
 export interface PropertiesType {
     canvasId?: string;
@@ -57,8 +56,8 @@ export interface Uniform<T = unknown> {
 export interface SharedUniforms {
     u_time: Uniform<number>;
     u_deltaTime: Uniform<number>;
-    u_resolution: Uniform<THREE.Vector2>;
-    u_viewportResolution: Uniform<THREE.Vector2>;
-    u_bgColor1: Uniform<THREE.Color>;
-    u_bgColor2: Uniform<THREE.Color>;
+    u_resolution: Uniform<Vector2>;
+    u_viewportResolution: Uniform<Vector2>;
+    u_bgColor1: Uniform<Color>;
+    u_bgColor2: Uniform<Color>;
 }

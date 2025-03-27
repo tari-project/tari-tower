@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { properties } from './scripts/core/properties';
 import { loadTowerAnimation, removeTowerAnimation } from './scripts/index';
+import { setStop, setLose, setStart, showVisual, setWin } from './store/stateManagerStore.ts';
+import { SuccessLevel } from './types/stateManager.ts';
 
 interface Property {
     property: string;
@@ -21,4 +23,14 @@ function setAnimationProperties(newProps: Property[]) {
     }
 }
 
-export { loadTowerAnimation, removeTowerAnimation, setAnimationProperties };
+export {
+    loadTowerAnimation,
+    removeTowerAnimation,
+    setAnimationProperties,
+    setStop,
+    setLose,
+    setStart,
+    showVisual,
+    setWin,
+    SuccessLevel,
+};

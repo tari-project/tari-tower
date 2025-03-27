@@ -48,3 +48,20 @@ export const PREVENT_CYCLE_STATES = [
     AnimationStatus.STARTED,
 ];
 export const resetCycleResults = [AnimationResult.FAILED, AnimationResult.COMPLETED];
+
+const _FLAG_TYPES = [
+    'hasNotStarted',
+    'isStart',
+    'isFree',
+    'isResult',
+    'isResultAnimation',
+    'isRestart',
+    'isReplayResult',
+    'isSuccessResult',
+    'isFailResult',
+    'isStopped',
+    'isAnyResult',
+] as const;
+type FlagTypeTuple = typeof _FLAG_TYPES;
+export type FlagType = FlagTypeTuple[number];
+export type Flags = Record<FlagType, boolean>;
