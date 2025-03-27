@@ -185,8 +185,6 @@ const TariTower = () => {
     }
     function destroy() {
         canvas.remove();
-        game.resetPostDestroy();
-
         renderer.state.reset();
     }
     return {

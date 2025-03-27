@@ -45,4 +45,4 @@ const StopAnimationManager = () => {
     };
 };
 const stopAnimationManager = StopAnimationManager();
-export { stopAnimationManager, stopSpawnRatio, stopPushDownRatio, stopAnimationDuration };
+export { stopAnimationManager, stopSpawnRatio, stopPushDownRatio };

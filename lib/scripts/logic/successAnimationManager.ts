@@ -4,7 +4,7 @@ import { stateManagerStore } from '../../store/stateManagerStore';
 
 let currentAnimationStyle: SuccessLevel | null;
 let successRatio = 0;
-const successAnimationDuration = 6.5; // seconds
+const successAnimationDuration = 6; // seconds
 let towerRotationRatio = 0;
 let floatingCoinsRatio = 0;
 let floatingCubesRatio = 0;
@@ -80,7 +80,6 @@ const SuccessAnimationManager = () => {
     function update(dt: number) {
         successRatio += ((currentAnimationStyle ? 1 : 0) * dt) / successAnimationDuration;
         successRatio = math.clamp(successRatio, 0, 1);
-
         switch (currentAnimationStyle) {
             case SuccessLevel.ONE:
                 _updateRatios1();
@@ -117,5 +116,4 @@ export {
     successPushDownRatio,
     successColorTowerRatio,
     floatingCubesDisplacement,
-    successAnimationDuration,
 };

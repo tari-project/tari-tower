@@ -58,5 +58,4 @@ export {
     failFloatingCubesRatio,
     failSpawnRatio,
     failPushDownRatio,
-    errorAnimationDuration,
 };

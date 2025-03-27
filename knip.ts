@@ -1,7 +1,6 @@
 import type { KnipConfig } from 'knip';
 
 const config: KnipConfig = {
-    project: ['lib/**/*.{js,ts,tsx}'],
     rules: {
         files: 'error',
         dependencies: 'warn',
@@ -10,7 +9,7 @@ const config: KnipConfig = {
         types: 'warn',
         duplicates: 'error',
     },
-    ignoreExportsUsedInFile: true,
+    ignoreExportsUsedInFile: false,
 };
 
 export default config;

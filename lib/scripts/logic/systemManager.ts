@@ -127,14 +127,7 @@ const SystemManager = () => {
         });
     }
 
-    function resetPostDestroy() {
-        blocks.forEach((block) => block.reset());
-        blocksVisual.reset();
-        board.reset();
-        animationCycleStore.getState().reset();
-    }
-
-    function reset() {
+    function reset(preventRestart = false) {
         blocks.forEach((block) => block.reset());
         blocksVisual.reset();
         board.reset();
@@ -145,7 +138,7 @@ const SystemManager = () => {
         stateManagerStore.getState().reset();
         _startNewCycle();
 
-        if (needsRestart) {
+        if (!preventRestart && needsRestart) {
             setStart();
         }
     }
@@ -261,19 +254,20 @@ const SystemManager = () => {
                 if (animationTypeEnded) {
                     switch (animationTypeEnded) {
                         case 'win': {
+                            reset();
                             setAnimationRatios({ previousSuccessBlocksAnimationRatio: 1 });
                             _startNewCycle();
                             break;
                         }
                         case 'lose': {
+                            reset();
                             _startNewCycle();
                             break;
                         }
                         case 'stop':
-                        default: {
-                            reset();
+                        default:
+                            reset(true);
                             break;
-                        }
                     }
                 }
             },
@@ -285,7 +279,6 @@ const SystemManager = () => {
         init,
         update,
         reset,
-        resetPostDestroy,
     };
 };
 const game = SystemManager();

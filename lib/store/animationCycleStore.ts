@@ -29,7 +29,7 @@ export const animationCycleStore = createStore<AnimationCycleState>()(
     subscribeWithSelector((set) => ({
         ...initialState,
         incCycleIndex: () => set((state) => ({ cycleIndex: state.cycleIndex + 1 })),
-        reset: () => set(initialState),
+        reset: () => set((s) => ({ ...initialState, firstStartAnimationRatio: s.firstStartAnimationRatio })),
     }))
 );
 
