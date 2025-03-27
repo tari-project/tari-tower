@@ -5,12 +5,6 @@ import { properties } from '../../core/properties';
 import math from '../../utils/math';
 import ease, { customEasing } from '../../utils/ease';
 import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
-import {
-    blocks,
-    firstStartAnimationRatio,
-    lastSpawnedBlock,
-    previousSuccessBlocksAnimationRatio,
-} from '../../logic/systemManager';
 
 import {
     HALF_SIZE,
@@ -47,6 +41,7 @@ import { HeroSharedUniforms, HeroType } from '../../../types/hero';
 import { AnimationResult } from '../../../types/stateManager';
 import { ASSETS_PATH } from '../../core/settings';
 import { stateManagerStore } from '../../../store/stateManagerStore';
+import { animationCycleStore } from '../../../store/animationCycleStore.ts';
 
 const TOTAL_BLOCKS = 2 * TOTAL_TILES;
 const _v2_0 = new THREE.Vector2();
@@ -98,6 +93,9 @@ const heroState: HeroType = {
 };
 
 const Hero = () => {
+    const blocks = animationCycleStore.getState().blocks;
+    const lastSpawnedBlock = animationCycleStore.getState().lastSpawnedBlock;
+
     async function preload() {
         const arr = Array.from({ length: TOTAL_BLOCKS });
         heroState._blockList = arr.map((_) => new HeroBlockCoordinates());
@@ -313,12 +311,14 @@ const Hero = () => {
         _c.copy(MAIN_COLOR);
 
         let result = stateManagerStore.getState().result;
-        stateManagerStore.subscribe((state, prevState) => {
-            if (state.result !== prevState.result) {
-                console.debug(`state.result= ${state.result}`);
-                result = state.result;
+        stateManagerStore.subscribe(
+            (state) => state.result,
+            (_result, prevResult) => {
+                if (_result !== prevResult) {
+                    result = _result;
+                }
             }
-        });
+        );
 
         if (result === AnimationResult.FAILED && failFloatingCubesRatio > 0) {
             _c.copy(ERROR_COLOR);
@@ -369,7 +369,7 @@ const Hero = () => {
 
             heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(
                 _c.set(properties.successColor),
-                previousSuccessBlocksAnimationRatio
+                animationCycleStore.getState().previousSuccessBlocksAnimationRatio
             );
             heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.convertSRGBToLinear();
         }
@@ -602,7 +602,7 @@ const Hero = () => {
 
         const pushDownRatio = Math.min(1, stopPushDownRatio + failPushDownRatio + successPushDownRatio);
         const easedRestartAnimationRatio = ease.backOut(pushDownRatio, 3);
-        const easedFirstStartAnimationRatio = 1 - customEasing(firstStartAnimationRatio);
+        const easedFirstStartAnimationRatio = 1 - customEasing(animationCycleStore.getState().firstStartAnimationRatio);
         heroContainer.position.y = -easedRestartAnimationRatio - 2 * easedFirstStartAnimationRatio;
         heroContainer.rotation.y = 0.5 * Math.PI * easedFirstStartAnimationRatio;
         heroContainer.rotation.y += 2 * Math.PI * ease.quartInOut(towerRotationRatio);

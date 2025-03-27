@@ -13,11 +13,13 @@ let failPushDownRatio = 0;
 
 const ErrorAnimationManager = () => {
     function init() {
-        stateManagerStore.subscribe((state) => {
-            if (state.status === AnimationStatus.RESULT && state.result === AnimationResult.FAILED) {
+        const listen: Parameters<typeof stateManagerStore.subscribe>[0] = ({ status, result }) => {
+            if (status === AnimationStatus.RESULT && result === AnimationResult.FAILED) {
                 isActive = true;
             }
-        });
+        };
+
+        stateManagerStore.subscribe((state) => state, listen);
     }
 
     function resetRatios() {

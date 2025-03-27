@@ -7,18 +7,21 @@ import Block from './Block';
 import { stopAnimationManager } from './stopAnimationManager';
 import { errorAnimationManager } from './errorAnimationManager';
 import { successAnimationManager } from '../logic/successAnimationManager';
-import { SystemManagerState } from '../../types/systemManager';
-import { AnimationStatus, PREVENT_CYCLE_STATES, resetCycleResults } from '../../types/stateManager';
-import { setRestart, setStart, stateManagerStore } from '../../store/stateManagerStore';
 
-let firstStartAnimationRatio: SystemManagerState['firstStartAnimationRatio'] = 0;
-let blocks: SystemManagerState['blocks'] = [];
-let lastSpawnedBlock: SystemManagerState['lastSpawnedBlock'] = null;
-let cycleIndex: SystemManagerState['cycleIndex'] = 0;
-let animationSpeedRatio: SystemManagerState['animationSpeedRatio'] = 0;
-let previousSuccessBlocksAnimationRatio: SystemManagerState['previousSuccessBlocksAnimationRatio'] = 0;
+import { AnimationStatus, PREVENT_CYCLE_STATES, resetCycleResults } from '../../types/stateManager';
+import { setRestart, setStart, stateManagerStore, updateFlags } from '../../store/stateManagerStore';
+import { shallow } from 'zustand/vanilla/shallow';
+import {
+    addBlock,
+    animationCycleStore,
+    setAnimationRatios,
+    setLastSpawnedBlock,
+} from '../../store/animationCycleStore.ts';
 
 const SystemManager = () => {
+    const lastSpawnedBlock = animationCycleStore.getState().lastSpawnedBlock;
+    const blocks = animationCycleStore.getState().blocks;
+
     function _spawnBlock() {
         const flags = stateManagerStore.getState().flags;
         const { isFailResult, isStopped, isSuccessResult, isReplayResult, isFree } = flags;
@@ -54,7 +57,7 @@ const SystemManager = () => {
                 block.currentTile = newTile;
                 block.init();
                 block.updateTile();
-                blocks = [block, ...blocks];
+                addBlock(block);
             }
         }
     }
@@ -71,7 +74,7 @@ const SystemManager = () => {
         if (!needsErrorBlockReplacement) {
             if (canAddNewBlock) {
                 block = new Block(blocks.length);
-                lastSpawnedBlock = block;
+                setLastSpawnedBlock(block);
             }
         } else {
             properties.errorBlock?.reset(true);
@@ -94,21 +97,22 @@ const SystemManager = () => {
 
         if (PREVENT_CYCLE_STATES.includes(stateStatus)) return;
         if (lastSpawnedBlock) {
-            blocks = [lastSpawnedBlock, ...blocks];
-            lastSpawnedBlock = null;
+            addBlock(lastSpawnedBlock);
+            setLastSpawnedBlock(null);
         }
-        properties.activeBlocksCount = blocks.length;
+
         if (isFailResult || isStopped) return;
 
         blocks.forEach((block) => block.resetAfterCycle());
 
-        cycleIndex++;
+        animationCycleStore.getState().incCycleIndex();
 
         _spawnBlock();
         _calculatePaths();
     }
 
     function _calculatePaths() {
+        const cycleIndex = animationCycleStore.getState().cycleIndex;
         if (lastSpawnedBlock?.hasBeenSpawned) {
             lastSpawnedBlock.moveToNextTile(stateManagerStore.getState().flags.isFree, 0);
         }
@@ -126,12 +130,7 @@ const SystemManager = () => {
         blocks.forEach((block) => block.reset());
         blocksVisual.reset();
         board.reset();
-
-        blocks = [];
-        lastSpawnedBlock = null;
-        cycleIndex = 0;
-        animationSpeedRatio = 0;
-        firstStartAnimationRatio = 0;
+        animationCycleStore.getState().reset();
     }
 
     function reset() {
@@ -139,10 +138,7 @@ const SystemManager = () => {
         blocksVisual.reset();
         board.reset();
 
-        blocks = [];
-        lastSpawnedBlock = null;
-        cycleIndex = 0;
-        animationSpeedRatio = 0;
+        animationCycleStore.getState().reset();
 
         const stateResult = stateManagerStore.getState().result;
         const preventRestartCycle = stateManagerStore.getState().preventRestartCycle;
@@ -155,18 +151,26 @@ const SystemManager = () => {
         }
 
         if (stateManagerStore.getState().destroyCanvas) {
-            firstStartAnimationRatio = 0;
+            setAnimationRatios({ firstStartAnimationRatio: 0 });
         }
     }
 
     function _updateAnimationRatios(dt: number) {
-        firstStartAnimationRatio = math.saturate(firstStartAnimationRatio + dt * (properties.showVisual ? 1 : 0));
+        const isResult = stateManagerStore.getState().flags.isResult;
+        const speedRatio = animationCycleStore.getState().animationSpeedRatio;
+        const firstStartRatio = animationCycleStore.getState().firstStartAnimationRatio;
+        const prevSuccessRatio = animationCycleStore.getState().previousSuccessBlocksAnimationRatio;
 
-        animationSpeedRatio = Math.min(
-            1,
-            animationSpeedRatio + dt * (stateManagerStore.getState().flags.isResult ? 1 : 0)
-        );
-        previousSuccessBlocksAnimationRatio = math.saturate(previousSuccessBlocksAnimationRatio - dt / 1.5);
+        const animationSpeedRatio = Math.min(1, speedRatio + dt * (isResult ? 1 : 0));
+
+        const previousSuccessBlocksAnimationRatio = math.saturate(prevSuccessRatio - dt / 1.5);
+        const firstStartAnimationRatio = math.saturate(firstStartRatio + dt * (properties.showVisual ? 1 : 0));
+
+        setAnimationRatios({
+            animationSpeedRatio,
+            firstStartAnimationRatio,
+            previousSuccessBlocksAnimationRatio,
+        });
     }
 
     function _checkCycleCompletion() {
@@ -195,23 +199,26 @@ const SystemManager = () => {
         stopAnimationManager.update(dt);
         errorAnimationManager.update(dt);
 
-        stateManagerStore.subscribe((state) => {
-            const { flags } = state;
-            const { hasNotStarted, isRestart, isResultAnimation } = flags;
+        stateManagerStore.subscribe(
+            (state) => state.flags,
+            (flags) => {
+                const { hasNotStarted, isRestart, isResultAnimation } = flags;
 
-            if (hasNotStarted) {
-                _startNewCycle();
-                return;
-            }
+                if (hasNotStarted) {
+                    _startNewCycle();
+                    return;
+                }
 
-            if (isRestart) {
-                reset();
-                return;
-            }
-            if (isResultAnimation) {
-                setRestart();
-            }
-        });
+                if (isRestart) {
+                    reset();
+                    return;
+                }
+                if (isResultAnimation) {
+                    setRestart();
+                }
+            },
+            { equalityFn: shallow }
+        );
 
         board.preUpdate(dt);
         if (lastSpawnedBlock) {
@@ -228,31 +235,40 @@ const SystemManager = () => {
     }
 
     async function init() {
-        stateManagerStore.subscribe((state, prevState) => {
-            if (state.status !== prevState.status || state.result !== prevState.result) {
-                state.updateFlags();
-            }
-
-            if (state.animationTypeEnded) {
-                switch (state.animationTypeEnded) {
-                    case 'win': {
-                        previousSuccessBlocksAnimationRatio = 1;
-                        _startNewCycle();
-                        break;
-                    }
-                    case 'lose': {
-                        _startNewCycle();
-                        break;
-                    }
-                    case 'stop':
-                    default: {
-                        reset();
-                        break;
-                    }
+        stateManagerStore.subscribe(
+            (state) => state.status,
+            (status, prevStatus) => {
+                if (status !== prevStatus) {
+                    updateFlags();
                 }
-                state.setAnimationTypeEnded(null);
+            },
+            { fireImmediately: true }
+        );
+
+        stateManagerStore.subscribe(
+            (state) => state.animationTypeEnded,
+            (animationTypeEnded) => {
+                if (animationTypeEnded) {
+                    switch (animationTypeEnded) {
+                        case 'win': {
+                            setAnimationRatios({ previousSuccessBlocksAnimationRatio: 1 });
+                            _startNewCycle();
+                            break;
+                        }
+                        case 'lose': {
+                            _startNewCycle();
+                            break;
+                        }
+                        case 'stop':
+                        default: {
+                            reset();
+                            break;
+                        }
+                    }
+                    stateManagerStore.getState().setAnimationTypeEnded(null);
+                }
             }
-        });
+        );
         successAnimationManager.init();
         stopAnimationManager.init();
         errorAnimationManager.init();
@@ -268,5 +284,3 @@ const SystemManager = () => {
 };
 const game = SystemManager();
 export default game;
-
-export { firstStartAnimationRatio, blocks, lastSpawnedBlock, previousSuccessBlocksAnimationRatio };

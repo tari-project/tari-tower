@@ -15,15 +15,19 @@ let floatingCubesDisplacement = 1;
 
 const SuccessAnimationManager = () => {
     function init() {
-        stateManagerStore.subscribe((state) => {
-            const { status, result, completeAnimationLevel } = state;
+        const listen: Parameters<typeof stateManagerStore.subscribe>[0] = ({
+            status,
+            result,
+            completeAnimationLevel,
+        }) => {
             if (
                 status === AnimationStatus.RESULT &&
                 (result === AnimationResult.COMPLETED || result === AnimationResult.REPLAY)
             ) {
                 _triggerNewAnimation(completeAnimationLevel);
             }
-        });
+        };
+        stateManagerStore.subscribe((state) => state, listen);
     }
 
     function _triggerNewAnimation(animationStyle) {

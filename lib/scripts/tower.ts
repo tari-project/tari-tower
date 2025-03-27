@@ -9,7 +9,7 @@ import game from './logic/systemManager.ts';
 import { Background, bgContainer } from './visuals/bg/bg.ts';
 import loader from './core/loader.ts';
 import { OrthographicCamera } from 'three';
-import { ManagerState, stateManagerStore } from '../store/stateManagerStore';
+import { stateManagerStore } from '../store/stateManagerStore';
 
 THREE.ColorManagement.enabled = false;
 
@@ -89,11 +89,14 @@ const TariTower = () => {
     }
 
     async function preload({ canvasId, initCallback }: { canvasId: string; initCallback: () => void }) {
-        stateManagerStore.subscribe((state: ManagerState) => {
-            if (state.destroyCanvas) {
-                destroy();
+        stateManagerStore.subscribe(
+            (state) => state.destroyCanvas,
+            (destroyCanvas) => {
+                if (destroyCanvas) {
+                    destroy();
+                }
             }
-        });
+        );
 
         _canvasId = canvasId;
         await _handleRenderer();

@@ -10,11 +10,12 @@ let stopPushDownRatio = 0;
 
 const StopAnimationManager = () => {
     function init() {
-        stateManagerStore.subscribe((state) => {
-            if (state.status === AnimationStatus.RESULT && state.result === AnimationResult.STOP) {
+        const listen: Parameters<typeof stateManagerStore.subscribe>[0] = ({ status, result }) => {
+            if (status === AnimationStatus.RESULT && result === AnimationResult.STOP) {
                 isActive = true;
             }
-        });
+        };
+        stateManagerStore.subscribe((state) => state, listen);
     }
 
     function resetRatios() {
