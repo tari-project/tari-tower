@@ -1,7 +1,6 @@
 import TariTower from './tower.ts';
-import { stateManager } from './logic/stateManager.ts';
 import { properties } from './core/properties.ts';
-import { managerStore } from '../store/store.ts';
+import { setStop, stateManagerStore } from '../store/stateManagerStore';
 
 const tower = TariTower();
 
@@ -47,12 +46,12 @@ export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: s
 
 export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
     if (!document.getElementById(canvasId)) return;
-    const status = managerStore.getState().status;
+    const status = stateManagerStore.getState().status;
     if (status === 'not-started') {
-        managerStore.getState().setPreventRestartCycle(true);
-        stateManager.reset();
+        stateManagerStore.getState().setPreventRestartCycle(true);
+        stateManagerStore.getState().reset();
     } else {
-        stateManager.set('stop');
-        managerStore.getState().setDestroyCanvas(true);
+        setStop();
+        stateManagerStore.getState().setDestroyCanvas(true);
     }
 }

@@ -1,6 +1,6 @@
 import math from '../utils/math';
 import { AnimationResult, AnimationStatus, SuccessLevel } from '../../types/stateManager';
-import { managerStore } from '../../store/store.ts';
+import { stateManagerStore } from '../../store/stateManagerStore';
 
 let currentAnimationStyle: SuccessLevel | null;
 let successRatio = 0;
@@ -15,7 +15,7 @@ let floatingCubesDisplacement = 1;
 
 const SuccessAnimationManager = () => {
     function init() {
-        managerStore.subscribe((state) => {
+        stateManagerStore.subscribe((state) => {
             const { status, result, completeAnimationLevel } = state;
             if (
                 status === AnimationStatus.RESULT &&
@@ -90,7 +90,7 @@ const SuccessAnimationManager = () => {
         }
 
         if (successRatio >= 1) {
-            managerStore.getState().setAnimationTypeEnded('win');
+            stateManagerStore.getState().setAnimationTypeEnded('win');
             resetRatios();
         }
     }

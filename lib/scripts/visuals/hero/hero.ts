@@ -46,7 +46,7 @@ import { InstancedBufferAttribute } from 'three';
 import { HeroSharedUniforms, HeroType } from '../../../types/hero';
 import { AnimationResult } from '../../../types';
 import { ASSETS_PATH } from '../../core/settings';
-import { managerStore } from '../../../store/store.ts';
+import { stateManagerStore } from '../../../store/stateManagerStore';
 
 const TOTAL_BLOCKS = 2 * TOTAL_TILES;
 const _v2_0 = new THREE.Vector2();
@@ -312,7 +312,7 @@ const Hero = () => {
 
         _c.copy(MAIN_COLOR);
 
-        managerStore.subscribe((state) => {
+        stateManagerStore.subscribe((state) => {
             if (state.result === AnimationResult.FAILED && failFloatingCubesRatio > 0) {
                 _c.copy(ERROR_COLOR);
             }
@@ -563,7 +563,7 @@ const Hero = () => {
         _updateFreeBlocks();
         _updateColors(dt);
 
-        const result = managerStore.getState().result;
+        const result = stateManagerStore.getState().result;
         // update blocks;
         let renderCount = 0;
         for (let i = 0; i < TOTAL_BLOCKS; i++) {

@@ -40,3 +40,11 @@ export interface StatusManagerState {
     isStopped: boolean;
     statusUpdateQueue: (() => void)[];
 }
+
+export const PREVENT_CYCLE_STATES = [
+    AnimationStatus.NOT_STARTED,
+    AnimationStatus.RESTART_ANIMATION,
+    AnimationStatus.RESTART,
+    AnimationStatus.STARTED,
+];
+export const resetCycleResults = [AnimationResult.FAILED, AnimationResult.COMPLETED];

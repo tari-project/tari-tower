@@ -2,7 +2,7 @@ import { properties } from '../core/properties';
 import math from '../utils/math';
 import { customEasing } from '../utils/ease';
 import { BlockType } from '../../types/block';
-import { managerStore } from '../../store/store.ts';
+import { stateManagerStore } from '../../store/stateManagerStore';
 
 export default class Block {
     id: BlockType['id'] = -1;
@@ -109,7 +109,7 @@ export default class Block {
             !properties.errorBlock &&
             Math.random() < 0.5 &&
             properties.activeBlocksCount >= properties.minSpawnedBlocksForTheErrorBlock &&
-            managerStore.getState().flags.isFree
+            stateManagerStore.getState().flags.isFree
         ) {
             properties.errorBlock = this;
             this.isErrorBlock = true;
@@ -172,7 +172,7 @@ export default class Block {
     }
 
     _updateMovement(dt: number) {
-        const flags = managerStore.getState().flags;
+        const flags = stateManagerStore.getState().flags;
         const { isResultAnimation, isFree, isResult } = flags;
         if ((this.isMoving && !this.hasAnimationEnded) || isResultAnimation) {
             this.moveAnimationRatio = Math.min(

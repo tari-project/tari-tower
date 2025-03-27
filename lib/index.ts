@@ -1,14 +1,10 @@
 import * as THREE from 'three';
 import { properties } from './scripts/core/properties';
-import { stateManager } from './scripts/logic/stateManager';
 import { loadTowerAnimation, removeTowerAnimation } from './scripts/index';
 
 interface Property {
     property: string;
     value: unknown;
-}
-function setAnimationState(id: string, isReplay?: boolean) {
-    stateManager.set(id, isReplay);
 }
 
 function setAnimationProperties(newProps: Property[]) {
@@ -25,4 +21,4 @@ function setAnimationProperties(newProps: Property[]) {
     }
 }
 
-export { loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState };
+export { loadTowerAnimation, removeTowerAnimation, setAnimationProperties };

@@ -1,7 +1,7 @@
 import math from '../utils/math';
 
 import { AnimationResult, AnimationStatus } from '../../types/stateManager';
-import { managerStore } from '../../store/store.ts';
+import { stateManagerStore } from '../../store/stateManagerStore';
 
 let isActive = false;
 let failRatio = 0;
@@ -13,7 +13,7 @@ let failPushDownRatio = 0;
 
 const ErrorAnimationManager = () => {
     function init() {
-        managerStore.subscribe((state) => {
+        stateManagerStore.subscribe((state) => {
             if (state.status === AnimationStatus.RESULT && state.result === AnimationResult.FAILED) {
                 isActive = true;
             }
@@ -38,7 +38,7 @@ const ErrorAnimationManager = () => {
         failSpawnRatio = math.fit(failRatio, 0.3, 0.55, 0, 2.5);
         failPushDownRatio = math.fit(failRatio, 0.6, 0.8, 0, 1);
         if (failRatio >= 1) {
-            managerStore.getState().setAnimationTypeEnded('lose');
+            stateManagerStore.getState().setAnimationTypeEnded('lose');
             resetRatios();
         }
     }

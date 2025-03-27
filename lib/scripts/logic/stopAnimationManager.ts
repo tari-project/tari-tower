@@ -1,6 +1,6 @@
 import math from '../utils/math';
 import { AnimationResult, AnimationStatus } from '../../types/stateManager';
-import { managerStore } from '../../store/store.ts';
+import { stateManagerStore } from '../../store/stateManagerStore';
 
 let isActive = false;
 let stopRatio = 0;
@@ -10,7 +10,7 @@ let stopPushDownRatio = 0;
 
 const StopAnimationManager = () => {
     function init() {
-        managerStore.subscribe((state) => {
+        stateManagerStore.subscribe((state) => {
             if (state.status === AnimationStatus.RESULT && state.result === AnimationResult.STOP) {
                 isActive = true;
             }
@@ -32,7 +32,7 @@ const StopAnimationManager = () => {
         stopPushDownRatio = math.fit(stopRatio, 0.4, 0.65, 0, 1);
 
         if (stopRatio >= 1) {
-            managerStore.getState().setAnimationTypeEnded('stop');
+            stateManagerStore.getState().setAnimationTypeEnded('stop');
             resetRatios();
         }
     }

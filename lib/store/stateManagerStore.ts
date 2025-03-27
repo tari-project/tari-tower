@@ -1,6 +1,7 @@
 import { createStore } from 'zustand/vanilla';
 
 import { AnimationResult, AnimationStatus, SuccessLevel } from '../types';
+import { properties } from '../scripts/core/properties.ts';
 
 const _FLAG_TYPES = [
     'hasNotStarted',
@@ -15,24 +16,14 @@ const _FLAG_TYPES = [
     'isStopped',
     'isAnyResult',
 ] as const;
-
 type FlagTypeTuple = typeof _FLAG_TYPES;
 export type FlagType = FlagTypeTuple[number];
 export type Flags = Record<FlagType, boolean>;
 
-const initialFlags: Flags = {
-    hasNotStarted: true,
-    isStart: false,
-    isFree: false,
-    isResult: false,
-    isResultAnimation: false,
-    isRestart: false,
-    isReplayResult: false,
-    isSuccessResult: false,
-    isFailResult: false,
-    isStopped: false,
-    isAnyResult: false,
-};
+interface SetWinArgs {
+    isReplay: boolean;
+    completeAnimationLevel?: SuccessLevel | null;
+}
 
 interface State {
     status: AnimationStatus;
@@ -57,10 +48,23 @@ interface Actions {
     setDestroyCanvas: (destroyCanvas: boolean) => void;
     setAnimationTypeEnded: (animationTypeEnded?: 'stop' | 'win' | 'lose' | null) => void;
     updateFlags: () => void;
+    reset: () => void;
 }
-
 export type ManagerState = State & Actions;
 
+const initialFlags: Flags = {
+    hasNotStarted: true,
+    isStart: false,
+    isFree: false,
+    isResult: false,
+    isResultAnimation: false,
+    isRestart: false,
+    isReplayResult: false,
+    isSuccessResult: false,
+    isFailResult: false,
+    isStopped: false,
+    isAnyResult: false,
+};
 const initialState: State = {
     flags: initialFlags,
     destroyCanvas: false,
@@ -69,7 +73,7 @@ const initialState: State = {
     status: AnimationStatus.NOT_STARTED,
     result: AnimationResult.NONE,
 };
-export const managerStore = createStore<ManagerState>()((set) => ({
+export const stateManagerStore = createStore<ManagerState>()((set) => ({
     ...initialState,
     addState: () =>
         set(({ status, result, completeAnimationLevel }: ManagerState) => ({ status, result, completeAnimationLevel })),
@@ -105,7 +109,20 @@ export const managerStore = createStore<ManagerState>()((set) => ({
                 },
             };
         }),
+    reset: () => set(initialState),
 }));
 
-export const setStart = () => managerStore.setState({ status: AnimationStatus.FREE });
-export const setStop = () => managerStore.setState({ status: AnimationStatus.RESULT, result: AnimationResult.STOP });
+export const setStart = () => stateManagerStore.setState({ status: AnimationStatus.FREE });
+export const setRestart = () => stateManagerStore.setState({ status: AnimationStatus.RESTART });
+export const setLose = () =>
+    stateManagerStore.setState({ status: AnimationStatus.RESULT, result: AnimationResult.FAILED });
+export const setStop = () =>
+    stateManagerStore.setState({ status: AnimationStatus.RESULT, result: AnimationResult.STOP });
+export const setWin = ({ isReplay, completeAnimationLevel }: SetWinArgs) => {
+    const notStarted = stateManagerStore.getState().flags.hasNotStarted;
+    const result = isReplay && notStarted ? AnimationResult.REPLAY : AnimationResult.COMPLETED;
+    stateManagerStore.getState().addState({ status: AnimationStatus.RESULT, result, completeAnimationLevel });
+};
+export function showVisual() {
+    properties.showVisual = true;
+}
