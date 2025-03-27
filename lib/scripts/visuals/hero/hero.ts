@@ -96,15 +96,6 @@ const Hero = () => {
     let lastSpawnedBlock = animationCycleStore.getState().lastSpawnedBlock;
     let blocks = animationCycleStore.getState().blocks;
 
-    animationCycleStore.subscribe(
-        (state) => state.lastSpawnedBlock,
-        (_lastSpawnedBlock) => (lastSpawnedBlock = _lastSpawnedBlock)
-    );
-    animationCycleStore.subscribe(
-        (state) => state.blocks,
-        (_blocks) => (blocks = _blocks)
-    );
-
     async function preload() {
         const arr = Array.from({ length: TOTAL_BLOCKS });
         heroState._blockList = arr.map((_) => new HeroBlockCoordinates());
@@ -221,6 +212,16 @@ const Hero = () => {
     }
 
     function init() {
+        animationCycleStore.subscribe(
+            (state) => state.lastSpawnedBlock,
+            (_lastSpawnedBlock) => (lastSpawnedBlock = _lastSpawnedBlock),
+            { fireImmediately: true }
+        );
+        animationCycleStore.subscribe(
+            (state) => state.blocks,
+            (_blocks) => (blocks = _blocks),
+            { fireImmediately: true }
+        );
         heroState.directLight = new THREE.DirectionalLight(0xffffff, 1);
         heroState.directLight.castShadow = true;
         heroState.directLight.shadow.camera.near = properties.lightCameraNear;
@@ -326,7 +327,8 @@ const Hero = () => {
                 if (_result !== prevResult) {
                     result = _result;
                 }
-            }
+            },
+            { fireImmediately: true }
         );
 
         if (result === AnimationResult.FAILED && failFloatingCubesRatio > 0) {
@@ -578,11 +580,15 @@ const Hero = () => {
         _updateFreeBlocks();
         _updateColors(dt);
         let result = stateManagerStore.getState().result;
-        stateManagerStore.subscribe((state, prevState) => {
-            if (state.result !== prevState.result) {
-                result = state.result;
-            }
-        });
+        stateManagerStore.subscribe(
+            (state) => state.result,
+            (_result, prevResult) => {
+                if (result !== prevResult) {
+                    result = _result;
+                }
+            },
+            { fireImmediately: true }
+        );
         // update blocks;
         let renderCount = 0;
         for (let i = 0; i < TOTAL_BLOCKS; i++) {

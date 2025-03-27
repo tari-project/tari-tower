@@ -21,14 +21,6 @@ import {
 const SystemManager = () => {
     let lastSpawnedBlock = animationCycleStore.getState().lastSpawnedBlock;
     let blocks = animationCycleStore.getState().blocks;
-    animationCycleStore.subscribe(
-        (state) => state.lastSpawnedBlock,
-        (_lastSpawnedBlock) => (lastSpawnedBlock = _lastSpawnedBlock)
-    );
-    animationCycleStore.subscribe(
-        (state) => state.blocks,
-        (_blocks) => (blocks = _blocks)
-    );
 
     function _spawnBlock() {
         const flags = stateManagerStore.getState().flags;
@@ -52,7 +44,7 @@ const SystemManager = () => {
     }
 
     function _spawnMultipleBlocks() {
-        const activeBlocksCount = animationCycleStore.getState().blocks?.length;
+        const activeBlocksCount = blocks?.length;
         let blocksToSpawn = TOTAL_TILES - activeBlocksCount;
         if (properties.errorBlock) {
             if (properties.errorBlock.currentTile) {
@@ -105,6 +97,7 @@ const SystemManager = () => {
         if (PREVENT_CYCLE_STATES.includes(stateStatus)) return;
         if (lastSpawnedBlock) {
             addBlock(lastSpawnedBlock);
+            setLastSpawnedBlock(null);
         }
 
         if (isFailResult || isStopped) return;
@@ -224,7 +217,8 @@ const SystemManager = () => {
                 if (isResultAnimation) {
                     setRestart();
                 }
-            }
+            },
+            { fireImmediately: true }
         );
 
         board.preUpdate(dt);
@@ -241,13 +235,24 @@ const SystemManager = () => {
     }
 
     async function init() {
+        animationCycleStore.subscribe(
+            (state) => state.lastSpawnedBlock,
+            (_lastSpawnedBlock) => (lastSpawnedBlock = _lastSpawnedBlock),
+            { fireImmediately: true }
+        );
+        animationCycleStore.subscribe(
+            (state) => state.blocks,
+            (_blocks) => (blocks = _blocks),
+            { fireImmediately: true }
+        );
         stateManagerStore.subscribe(
             (state) => state.status,
             (status, prevStatus) => {
                 if (status !== prevStatus) {
                     updateFlags();
                 }
-            }
+            },
+            { fireImmediately: true }
         );
 
         successAnimationManager.init();
@@ -276,7 +281,8 @@ const SystemManager = () => {
                         }
                     }
                 }
-            }
+            },
+            { fireImmediately: true }
         );
     }
 

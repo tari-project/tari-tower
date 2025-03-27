@@ -108,7 +108,8 @@ export default class Block {
         let isFree = false;
         stateManagerStore.subscribe(
             (s) => s.flags.isFree,
-            (free) => (isFree = free)
+            (free) => (isFree = free),
+            { fireImmediately: true }
         );
 
         const activeBlocksCount = animationCycleStore.getState().blocks?.length;
