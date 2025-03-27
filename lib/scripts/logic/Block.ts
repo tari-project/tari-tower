@@ -104,12 +104,18 @@ export default class Block {
             this.isErrorBlockFalling = this.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 1;
         }
 
+        let isFree = false;
+        stateManagerStore.subscribe(
+            (s) => s.flags.isFree,
+            (free) => (isFree = free)
+        );
+
         if (
             this.currentTile?.isBorder &&
             !properties.errorBlock &&
             Math.random() < 0.5 &&
             properties.activeBlocksCount >= properties.minSpawnedBlocksForTheErrorBlock &&
-            stateManagerStore.getState().flags.isFree
+            isFree
         ) {
             properties.errorBlock = this;
             this.isErrorBlock = true;
@@ -172,19 +178,23 @@ export default class Block {
     }
 
     _updateMovement(dt: number) {
-        const flags = stateManagerStore.getState().flags;
-        const { isResultAnimation, isFree, isResult } = flags;
-        if ((this.isMoving && !this.hasAnimationEnded) || isResultAnimation) {
-            this.moveAnimationRatio = Math.min(
-                1,
-                this.moveAnimationRatio + properties.animationSpeed * dt * (this.isErrorBlock ? 0.7 : 1)
-            );
-            this.easedAnimationRatio = this.easingFunction?.(Math.max(0, this.moveAnimationRatio)) || 0;
+        stateManagerStore.subscribe(
+            (state) => state.flags,
+            (flags) => {
+                const { isResultAnimation, isFree, isResult } = flags;
+                if ((this.isMoving && !this.hasAnimationEnded) || isResultAnimation) {
+                    this.moveAnimationRatio = Math.min(
+                        1,
+                        this.moveAnimationRatio + properties.animationSpeed * dt * (this.isErrorBlock ? 0.7 : 1)
+                    );
+                    this.easedAnimationRatio = this.easingFunction?.(Math.max(0, this.moveAnimationRatio)) || 0;
 
-            if (this.easedAnimationRatio === 1 && (isFree || isResult)) {
-                this._onMovementEnd();
+                    if (this.easedAnimationRatio === 1 && (isFree || isResult)) {
+                        this._onMovementEnd();
+                    }
+                }
             }
-        }
+        );
     }
 
     _updateTileRatios() {

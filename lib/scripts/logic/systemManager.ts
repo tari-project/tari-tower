@@ -19,8 +19,17 @@ import {
 } from '../../store/animationCycleStore.ts';
 
 const SystemManager = () => {
-    const lastSpawnedBlock = animationCycleStore.getState().lastSpawnedBlock;
-    const blocks = animationCycleStore.getState().blocks;
+    let lastSpawnedBlock = animationCycleStore.getState().lastSpawnedBlock;
+    let blocks = animationCycleStore.getState().blocks;
+
+    animationCycleStore.subscribe(
+        (state) => state.lastSpawnedBlock,
+        (_lastSpawnedBlock) => (lastSpawnedBlock = _lastSpawnedBlock)
+    );
+    animationCycleStore.subscribe(
+        (state) => state.blocks,
+        (_blocks) => (blocks = _blocks)
+    );
 
     function _spawnBlock() {
         const flags = stateManagerStore.getState().flags;
@@ -87,6 +96,7 @@ const SystemManager = () => {
 
             block.init();
             block.updateTile();
+            addBlock(block);
         }
     }
 

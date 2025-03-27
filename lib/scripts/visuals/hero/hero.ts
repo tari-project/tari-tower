@@ -93,8 +93,17 @@ const heroState: HeroType = {
 };
 
 const Hero = () => {
-    const blocks = animationCycleStore.getState().blocks;
-    const lastSpawnedBlock = animationCycleStore.getState().lastSpawnedBlock;
+    let lastSpawnedBlock = animationCycleStore.getState().lastSpawnedBlock;
+    let blocks = animationCycleStore.getState().blocks;
+
+    animationCycleStore.subscribe(
+        (state) => state.lastSpawnedBlock,
+        (_lastSpawnedBlock) => (lastSpawnedBlock = _lastSpawnedBlock)
+    );
+    animationCycleStore.subscribe(
+        (state) => state.blocks,
+        (_blocks) => (blocks = _blocks)
+    );
 
     async function preload() {
         const arr = Array.from({ length: TOTAL_BLOCKS });
@@ -571,7 +580,6 @@ const Hero = () => {
         let result = stateManagerStore.getState().result;
         stateManagerStore.subscribe((state, prevState) => {
             if (state.result !== prevState.result) {
-                console.debug(`state.result= ${state.result}`);
                 result = state.result;
             }
         });
