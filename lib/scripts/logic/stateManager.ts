@@ -1,5 +1,4 @@
 import { properties } from '../core/properties';
-import settings from '../core/settings';
 import { AnimationResult, AnimationStatus, StatusManagerState, SuccessLevel } from '../../types/stateManager';
 import { managerStore, setStart, setStop } from '../../store/store.ts';
 
@@ -20,37 +19,11 @@ interface QueueArgs {
 let status: AnimationStatus = AnimationStatus.NOT_STARTED;
 let result: AnimationResult = AnimationResult.NONE;
 
-let hasNotStarted = true;
-let isStart = false;
-let isFree = false;
-let isResult = false;
-let isResultAnimation = false;
-let isRestart = false;
-let isReplayResult = false;
-let isSuccessResult = false;
-let isFailResult = false;
-let isStopped = false;
 const StateManager = () => {
     const statusOrder = Object.values(AnimationStatus);
     let statusIndex = 0;
 
     const statusUpdateQueue: StatusManagerState['statusUpdateQueue'] = [];
-
-    function updateFlags() {
-        hasNotStarted = status === AnimationStatus.NOT_STARTED;
-        isStart = status === AnimationStatus.STARTED;
-        isFree = status === AnimationStatus.FREE;
-        isResult = status === AnimationStatus.RESULT;
-        isResultAnimation = status === AnimationStatus.RESULT_ANIMATION;
-        isRestart = status === AnimationStatus.RESTART;
-
-        const isAnyResult = isResult || isResultAnimation;
-
-        isReplayResult = isAnyResult && result === AnimationResult.REPLAY;
-        isSuccessResult = isAnyResult && result === AnimationResult.COMPLETED;
-        isFailResult = isAnyResult && result === AnimationResult.FAILED;
-        isStopped = isAnyResult && result === AnimationResult.STOP;
-    }
 
     function _canUpdateStatus(newStatus, result?: AnimationResult | null) {
         if (!properties.showVisual) return false;
@@ -70,8 +43,8 @@ const StateManager = () => {
             statusIndex = newStateIndex;
             status = statusOrder[statusIndex];
             if (result) {
-                updateFlags();
                 managerStore.getState().addState({ status, result });
+                managerStore.getState().updateFlags();
             }
             return true;
         }
@@ -89,9 +62,8 @@ const StateManager = () => {
                 result = newResult;
             }
 
-            updateFlags();
-            console.debug(`status= ${status}`);
             managerStore.getState().addState({ status, result, completeAnimationLevel: animationStyle });
+            managerStore.getState().updateFlags();
         }
     }
 
@@ -125,17 +97,26 @@ const StateManager = () => {
     }
 
     function setComplete(isReplay = false) {
-        const result = isReplay && hasNotStarted ? AnimationResult.REPLAY : AnimationResult.COMPLETED;
+        const result =
+            isReplay && managerStore.getState().flags.hasNotStarted
+                ? AnimationResult.REPLAY
+                : AnimationResult.COMPLETED;
         _queueStatusUpdate({ status: AnimationStatus.RESULT, result, animationStyle: SuccessLevel.ONE });
     }
 
     function setComplete2(isReplay = false) {
-        const result = isReplay && hasNotStarted ? AnimationResult.REPLAY : AnimationResult.COMPLETED;
+        const result =
+            isReplay && managerStore.getState().flags.hasNotStarted
+                ? AnimationResult.REPLAY
+                : AnimationResult.COMPLETED;
         _queueStatusUpdate({ status: AnimationStatus.RESULT, result, animationStyle: SuccessLevel.TWO });
     }
 
     function setComplete3(isReplay = false) {
-        const result = isReplay && hasNotStarted ? AnimationResult.REPLAY : AnimationResult.COMPLETED;
+        const result =
+            isReplay && managerStore.getState().flags.hasNotStarted
+                ? AnimationResult.REPLAY
+                : AnimationResult.COMPLETED;
         _queueStatusUpdate({ status: AnimationStatus.RESULT, result, animationStyle: SuccessLevel.THREE });
     }
 
@@ -152,11 +133,11 @@ const StateManager = () => {
     }
 
     function init() {
-        updateFlags();
-
-        if (settings.AUTO_START) {
-            setStart();
-        }
+        managerStore.subscribe((state, prevState) => {
+            if (state.status !== prevState.status || state.result !== prevState.result) {
+                state.updateFlags();
+            }
+        });
     }
 
     return {
@@ -170,17 +151,4 @@ const StateManager = () => {
     };
 };
 
-const stateManager = StateManager();
-export {
-    stateManager,
-    hasNotStarted,
-    isStart,
-    isFree,
-    isResult,
-    isResultAnimation,
-    isRestart,
-    isReplayResult,
-    isSuccessResult,
-    isFailResult,
-    isStopped,
-};
+export const stateManager = StateManager();

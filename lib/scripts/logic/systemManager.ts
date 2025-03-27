@@ -1,20 +1,7 @@
 import math from '../utils/math';
 import { properties } from '../core/properties';
 import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
-import {
-    PREVENT_CYCLE_STATES,
-    resetCycleResults,
-    stateManager as sM,
-    isSuccessResult,
-    isReplayResult,
-    isFree,
-    isFailResult,
-    isStopped,
-    isResult,
-    isResultAnimation,
-    isRestart,
-    hasNotStarted,
-} from './stateManager';
+import { PREVENT_CYCLE_STATES, resetCycleResults, stateManager as sM } from './stateManager';
 import { board, mainTile, TOTAL_TILES } from './board';
 import Block from './Block';
 
@@ -34,7 +21,16 @@ let previousSuccessBlocksAnimationRatio: SystemManagerState['previousSuccessBloc
 
 const SystemManager = () => {
     function _spawnBlock() {
-        if (_shouldPreventSpawn()) return;
+        const flags = managerStore.getState().flags;
+        const { isFailResult, isStopped, isSuccessResult, isReplayResult, isFree } = flags;
+        const preventSpawn =
+            isFailResult ||
+            isStopped ||
+            blocks.length >= TOTAL_TILES ||
+            (mainTile?.isOccupied && !isSuccessResult && !isReplayResult);
+
+        if (preventSpawn) return;
+
         if (isSuccessResult || isReplayResult) {
             _spawnMultipleBlocks();
         } else {
@@ -42,15 +38,6 @@ const SystemManager = () => {
         }
 
         if (blocks.length === properties.maxFreeBlocksCount && isFree) return;
-    }
-
-    function _shouldPreventSpawn() {
-        return (
-            isFailResult ||
-            isStopped ||
-            blocks.length >= TOTAL_TILES ||
-            (mainTile?.isOccupied && !isSuccessResult && !isReplayResult)
-        );
     }
 
     function _spawnMultipleBlocks() {
@@ -103,6 +90,9 @@ const SystemManager = () => {
 
     function _startNewCycle() {
         const stateStatus = managerStore.getState().status;
+        const isFailResult = managerStore.getState().flags.isFailResult;
+        const isStopped = managerStore.getState().flags.isStopped;
+
         if (PREVENT_CYCLE_STATES.includes(stateStatus)) return;
         if (lastSpawnedBlock) {
             blocks = [lastSpawnedBlock, ...blocks];
@@ -121,7 +111,7 @@ const SystemManager = () => {
 
     function _calculatePaths() {
         if (lastSpawnedBlock?.hasBeenSpawned) {
-            lastSpawnedBlock.moveToNextTile(isFree, 0);
+            lastSpawnedBlock.moveToNextTile(managerStore.getState().flags.isFree, 0);
         }
 
         const _isFree = cycleIndex % 2 === 0 ? true : properties.activeBlocksCount < properties.maxFreeBlocksCount - 1;
@@ -171,10 +161,9 @@ const SystemManager = () => {
     }
 
     function _updateAnimationRatios(dt: number) {
-        const _isResult = isResult;
         firstStartAnimationRatio = math.saturate(firstStartAnimationRatio + dt * (properties.showVisual ? 1 : 0));
 
-        animationSpeedRatio = Math.min(1, animationSpeedRatio + dt * (_isResult ? 1 : 0));
+        animationSpeedRatio = Math.min(1, animationSpeedRatio + dt * (managerStore.getState().flags.isResult ? 1 : 0));
         previousSuccessBlocksAnimationRatio = math.saturate(previousSuccessBlocksAnimationRatio - dt / 1.5);
     }
 
@@ -192,6 +181,8 @@ const SystemManager = () => {
             }
         });
 
+        const flags = managerStore.getState().flags;
+        const { isStopped, isFailResult, isResultAnimation } = flags;
         return isCycleComplete || isResultAnimation || isFailResult || isStopped;
     }
 
@@ -202,18 +193,23 @@ const SystemManager = () => {
         stopAnimationManager.update(dt);
         errorAnimationManager.update(dt);
 
-        if (hasNotStarted) {
-            _startNewCycle();
-            return;
-        }
+        managerStore.subscribe((state) => {
+            const { flags } = state;
+            const { hasNotStarted, isRestart, isResultAnimation } = flags;
 
-        if (isRestart) {
-            reset();
-            return;
-        }
-        if (isResultAnimation) {
-            sM.setRestartAnimation();
-        }
+            if (hasNotStarted) {
+                _startNewCycle();
+                return;
+            }
+
+            if (isRestart) {
+                reset();
+                return;
+            }
+            if (isResultAnimation) {
+                sM.setRestartAnimation();
+            }
+        });
 
         board.preUpdate(dt);
         if (lastSpawnedBlock) {
@@ -254,7 +250,6 @@ const SystemManager = () => {
                         break;
                     }
                 }
-
                 state.setAnimationTypeEnded(null);
             }
         });
