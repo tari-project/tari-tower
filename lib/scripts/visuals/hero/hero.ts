@@ -11,7 +11,7 @@ import {
     lastSpawnedBlock,
     previousSuccessBlocksAnimationRatio,
 } from '../../logic/systemManager';
-import { result as stateResult } from '../../logic/stateManager';
+
 import {
     HALF_SIZE,
     SIZE,
@@ -46,6 +46,7 @@ import { InstancedBufferAttribute } from 'three';
 import { HeroSharedUniforms, HeroType } from '../../../types/hero';
 import { AnimationResult } from '../../../types';
 import { ASSETS_PATH } from '../../core/settings';
+import { managerStore } from '../../../store/store.ts';
 
 const TOTAL_BLOCKS = 2 * TOTAL_TILES;
 const _v2_0 = new THREE.Vector2();
@@ -311,18 +312,20 @@ const Hero = () => {
 
         _c.copy(MAIN_COLOR);
 
-        if (stateResult === AnimationResult.FAILED && failFloatingCubesRatio > 0) {
-            _c.copy(ERROR_COLOR);
-        }
+        managerStore.subscribe((state) => {
+            if (state.result === AnimationResult.FAILED && failFloatingCubesRatio > 0) {
+                _c.copy(ERROR_COLOR);
+            }
 
-        if (stateResult === AnimationResult.COMPLETED || stateResult === AnimationResult.REPLAY) {
-            heroState.successColorRatio = Math.min(1, heroState.successColorRatio + 0.5 * dt);
-            _c.lerp(SUCCESS_COLOR, heroState.successColorRatio);
-        }
+            if (state.result === AnimationResult.COMPLETED || state.result === AnimationResult.REPLAY) {
+                heroState.successColorRatio = Math.min(1, heroState.successColorRatio + 0.5 * dt);
+                _c.lerp(SUCCESS_COLOR, heroState.successColorRatio);
+            }
 
-        if (stateResult !== AnimationResult.REPLAY && stateResult !== AnimationResult.COMPLETED) {
-            _c.lerp(DEFAULT_COLOR, math.saturate(stopPushDownRatio + failPushDownRatio));
-        }
+            if (state.result !== AnimationResult.REPLAY && state.result !== AnimationResult.COMPLETED) {
+                _c.lerp(DEFAULT_COLOR, math.saturate(stopPushDownRatio + failPushDownRatio));
+            }
+        });
 
         _c.convertSRGBToLinear();
         DEFAULT_COLOR.convertSRGBToLinear();
@@ -447,18 +450,16 @@ const Hero = () => {
     }
 
     function _updateStopAnimation(block, i) {
-        if (stateResult === AnimationResult.STOP) {
-            if (i >= TOTAL_TILES) {
-                const _i = i - TOTAL_TILES;
-                const col = (_i % SIZE) - HALF_SIZE;
-                const row = Math.floor(_i / SIZE) - HALF_SIZE;
-                const tile = board.getTile(row, col);
-                if (!tile.isOccupied) {
-                    const ratio = math.saturate(stopSpawnRatio - tile.randomDelay);
-                    tile.activeRatio = ratio;
-                    block.showRatio = customEasing(ratio);
-                    block.boardPos.set(row, col);
-                }
+        if (i >= TOTAL_TILES) {
+            const _i = i - TOTAL_TILES;
+            const col = (_i % SIZE) - HALF_SIZE;
+            const row = Math.floor(_i / SIZE) - HALF_SIZE;
+            const tile = board.getTile(row, col);
+            if (!tile.isOccupied) {
+                const ratio = math.saturate(stopSpawnRatio - tile.randomDelay);
+                tile.activeRatio = ratio;
+                block.showRatio = customEasing(ratio);
+                block.boardPos.set(row, col);
             }
         }
     }
@@ -487,84 +488,82 @@ const Hero = () => {
         }
     }
     function _updateFailAnimation(logicBlock, block, i) {
-        if (stateResult === AnimationResult.FAILED) {
-            if (logicBlock) {
-                const tile = logicBlock.currentTile;
+        if (logicBlock) {
+            const tile = logicBlock.currentTile;
 
-                if (failFloatingCubesRatio > 0) {
-                    const frameStart = Math.floor(failFloatingCubesRatio * heroState.animationTotalFrames);
-                    const frameEnd = Math.min(frameStart + 1, heroState.animationTotalFrames - 1);
-                    const frameRatio = failFloatingCubesRatio * heroState.animationTotalFrames - frameStart;
+            if (failFloatingCubesRatio > 0) {
+                const frameStart = Math.floor(failFloatingCubesRatio * heroState.animationTotalFrames);
+                const frameEnd = Math.min(frameStart + 1, heroState.animationTotalFrames - 1);
+                const frameRatio = failFloatingCubesRatio * heroState.animationTotalFrames - frameStart;
 
-                    _v3_0.fromArray(tile.loseAnimationPositionArray, frameStart * 3);
-                    _v3_1.fromArray(tile.loseAnimationPositionArray, frameEnd * 3);
-                    _v3_0.lerp(_v3_1, frameRatio);
-                    _v3_0.y *= 0.5;
-                    block.pos.set(_v3_0.z, _v3_0.y, -_v3_0.x);
+                _v3_0.fromArray(tile.loseAnimationPositionArray, frameStart * 3);
+                _v3_1.fromArray(tile.loseAnimationPositionArray, frameEnd * 3);
+                _v3_0.lerp(_v3_1, frameRatio);
+                _v3_0.y *= 0.5;
+                block.pos.set(_v3_0.z, _v3_0.y, -_v3_0.x);
 
-                    _q_0.fromArray(tile.loseAnimationOrientArray, frameStart * 4);
-                    _q_1.fromArray(tile.loseAnimationOrientArray, frameEnd * 4);
-                    _q_0.slerp(_q_1, frameRatio);
-                    block.orient.copy(_q_0);
-                }
+                _q_0.fromArray(tile.loseAnimationOrientArray, frameStart * 4);
+                _q_1.fromArray(tile.loseAnimationOrientArray, frameEnd * 4);
+                _q_0.slerp(_q_1, frameRatio);
+                block.orient.copy(_q_0);
+            }
 
-                if (failShakeRatio > 0) {
-                    const push = math.fit(failShakeRatio, 0, 1, 0, 1, ease.sineOut);
-                    _v2_0.set(tile.row, tile.col);
+            if (failShakeRatio > 0) {
+                const push = math.fit(failShakeRatio, 0, 1, 0, 1, ease.sineOut);
+                _v2_0.set(tile.row, tile.col);
+                _v2_0.normalize();
+                _v2_0.multiplyScalar(0.1 * push);
+
+                block.pos.x += _v2_0.x;
+                block.pos.z -= _v2_0.y;
+
+                if (failShakeRatio < 1) {
+                    const shake = push * math.fit(failShakeRatio, 0.5, 0.8, 1, 0);
+                    _v2_0.set(logicBlock.randomVector.x, logicBlock.randomVector.y);
                     _v2_0.normalize();
-                    _v2_0.multiplyScalar(0.1 * push);
+                    _v2_0.multiplyScalar(shake);
+                    _v2_1.set(0, 0);
+                    _v2_1.addScaledVector(_v2_0, 0.08 * shake * Math.sin(shake * 80));
 
-                    block.pos.x += _v2_0.x;
-                    block.pos.z -= _v2_0.y;
-
-                    if (failShakeRatio < 1) {
-                        const shake = push * math.fit(failShakeRatio, 0.5, 0.8, 1, 0);
-                        _v2_0.set(logicBlock.randomVector.x, logicBlock.randomVector.y);
-                        _v2_0.normalize();
-                        _v2_0.multiplyScalar(shake);
-                        _v2_1.set(0, 0);
-                        _v2_1.addScaledVector(_v2_0, 0.08 * shake * Math.sin(shake * 80));
-
-                        block.pos.x += _v2_1.x;
-                        block.pos.z += _v2_1.y;
-                    }
+                    block.pos.x += _v2_1.x;
+                    block.pos.z += _v2_1.y;
                 }
             }
+        }
 
-            if (i >= TOTAL_TILES) {
-                const _i = i - TOTAL_TILES;
-                const col = (_i % SIZE) - HALF_SIZE;
-                const row = Math.floor(_i / SIZE) - HALF_SIZE;
-                const tile = board.getTile(row, col);
-                const ratio = math.saturate(failSpawnRatio - tile.randomDelay);
+        if (i >= TOTAL_TILES) {
+            const _i = i - TOTAL_TILES;
+            const col = (_i % SIZE) - HALF_SIZE;
+            const row = Math.floor(_i / SIZE) - HALF_SIZE;
+            const tile = board.getTile(row, col);
+            const ratio = math.saturate(failSpawnRatio - tile.randomDelay);
 
-                if (!tile.isOccupied) {
-                    tile.activeRatio = ratio;
-                }
-                block.showRatio = customEasing(ratio);
-                block.boardPos.set(row, col);
+            if (!tile.isOccupied) {
+                tile.activeRatio = ratio;
             }
+            block.showRatio = customEasing(ratio);
+            block.boardPos.set(row, col);
         }
     }
 
     function _updateFloatAnimation(logicBlock, block) {
-        if (stateResult === AnimationResult.COMPLETED || stateResult === AnimationResult.REPLAY) {
-            if (logicBlock) {
-                const tile = logicBlock.currentTile;
-                const delay = 0.1 * tile.randomDelay;
-                const ratio = floatingCubesRatio - delay;
+        if (logicBlock) {
+            const tile = logicBlock.currentTile;
+            const delay = 0.1 * tile.randomDelay;
+            const ratio = floatingCubesRatio - delay;
 
-                let y = math.fit(ratio, 0, 0.5, 0, 1, (x) => 1 - Math.pow(1 - x, 5));
-                y = math.fit(ratio, 0.7, 1, y, 0, (x) => Math.pow(x, 5));
+            let y = math.fit(ratio, 0, 0.5, 0, 1, (x) => 1 - Math.pow(1 - x, 5));
+            y = math.fit(ratio, 0.7, 1, y, 0, (x) => Math.pow(x, 5));
 
-                block.pos.y += floatingCubesDisplacement * y;
-            }
+            block.pos.y += floatingCubesDisplacement * y;
         }
     }
 
     function update(dt: number) {
         _updateFreeBlocks();
         _updateColors(dt);
+
+        const result = managerStore.getState().result;
         // update blocks;
         let renderCount = 0;
         for (let i = 0; i < TOTAL_BLOCKS; i++) {
@@ -576,11 +575,16 @@ const Hero = () => {
             if (block.showRatio > 0) {
                 heroState._blockRenderList[renderCount++] = block;
             }
-
-            _updateFailAnimation(logicBlock, block, i);
             _updateLongBlockAnimation(logicBlock, block);
-            _updateStopAnimation(block, i);
-            _updateFloatAnimation(logicBlock, block);
+            if (result === AnimationResult.COMPLETED || result === AnimationResult.REPLAY) {
+                _updateFloatAnimation(logicBlock, block);
+            }
+            if (result === AnimationResult.FAILED) {
+                _updateFailAnimation(logicBlock, block, i);
+            }
+            if (result === AnimationResult.STOP) {
+                _updateStopAnimation(block, i);
+            }
         }
 
         _updateInfoTexture();

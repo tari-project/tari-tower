@@ -1,7 +1,7 @@
 import { properties } from '../core/properties';
 import settings from '../core/settings';
 import { AnimationResult, AnimationStatus, StatusManagerState, SuccessLevel } from '../../types/stateManager';
-import { managerStore } from '../../store/store.ts';
+import { managerStore, setStart, setStop } from '../../store/store.ts';
 
 export const PREVENT_CYCLE_STATES = [
     AnimationStatus.NOT_STARTED,
@@ -35,24 +35,6 @@ const StateManager = () => {
     let statusIndex = 0;
 
     const statusUpdateQueue: StatusManagerState['statusUpdateQueue'] = [];
-    function updateAfterCycle() {
-        if (properties.errorBlock) {
-            if (
-                properties.errorBlock.isErrorBlockFalling ||
-                properties.errorBlock.errorLifeCycle < properties.errorBlockMaxLifeCycle
-            ) {
-                return;
-            }
-        }
-        if (isStart) {
-            setFree();
-        } else if (isResult) {
-            setResultAnimation();
-        }
-
-        const callback = statusUpdateQueue.shift();
-        callback?.();
-    }
 
     function updateFlags() {
         hasNotStarted = status === AnimationStatus.NOT_STARTED;
@@ -97,6 +79,7 @@ const StateManager = () => {
     }
 
     function _updateStatusAndResult({ status: newStatus, result: newResult, animationStyle }: QueueArgs) {
+        console.debug(`newStatus= ${newStatus}`);
         if (_canUpdateStatus(newStatus, newResult)) {
             if (properties.errorBlock && !properties.errorBlock.isErrorBlockFalling) {
                 properties.errorBlock.preventErrorBlockFallAnimation();
@@ -107,6 +90,7 @@ const StateManager = () => {
             }
 
             updateFlags();
+            console.debug(`status= ${status}`);
             managerStore.getState().addState({ status, result, completeAnimationLevel: animationStyle });
         }
     }
@@ -138,19 +122,6 @@ const StateManager = () => {
 
     function reset() {
         _queueStatusUpdate({ status: AnimationStatus.NOT_STARTED, result: AnimationResult.NONE });
-    }
-
-    function setStart() {
-        status = AnimationStatus.NOT_STARTED;
-        _queueStatusUpdate({ status: AnimationStatus.STARTED });
-    }
-
-    function setFree() {
-        _queueStatusUpdate({ status: AnimationStatus.FREE });
-    }
-
-    function setStop() {
-        _queueStatusUpdate({ status: AnimationStatus.RESULT, result: AnimationResult.STOP });
     }
 
     function setComplete(isReplay = false) {
@@ -190,7 +161,6 @@ const StateManager = () => {
 
     return {
         init,
-        updateAfterCycle,
         set,
         showVisual,
         reset,
@@ -203,8 +173,6 @@ const StateManager = () => {
 const stateManager = StateManager();
 export {
     stateManager,
-    status,
-    result,
     hasNotStarted,
     isStart,
     isFree,

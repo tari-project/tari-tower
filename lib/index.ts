@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { properties } from './scripts/core/properties';
-import { stateManager, status as animationStatus } from './scripts/logic/stateManager';
+import { stateManager } from './scripts/logic/stateManager';
 import { loadTowerAnimation, removeTowerAnimation } from './scripts/index';
 
 interface Property {
@@ -25,4 +25,4 @@ function setAnimationProperties(newProps: Property[]) {
     }
 }
 
-export { animationStatus, loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState };
+export { loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState };

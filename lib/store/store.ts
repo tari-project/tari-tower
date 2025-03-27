@@ -39,3 +39,6 @@ export const managerStore = createStore<ManagerState>()((set) => ({
     setDestroyCanvas: (destroyCanvas: boolean) => set({ destroyCanvas }),
     setAnimationTypeEnded: (animationTypeEnded) => set({ animationTypeEnded }),
 }));
+
+export const setStart = () => managerStore.setState({ status: AnimationStatus.FREE });
+export const setStop = () => managerStore.setState({ status: AnimationStatus.RESULT, result: AnimationResult.STOP });

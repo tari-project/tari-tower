@@ -5,8 +5,6 @@ import {
     PREVENT_CYCLE_STATES,
     resetCycleResults,
     stateManager as sM,
-    status as stateStatus,
-    result as stateResult,
     isSuccessResult,
     isReplayResult,
     isFree,
@@ -77,6 +75,7 @@ const SystemManager = () => {
 
     function _spawnSingleBlock() {
         let block: Block | null | undefined = null;
+        const stateStatus = managerStore.getState().status;
         const needsErrorBlockReplacement = Boolean(
             properties.errorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle
         );
@@ -103,7 +102,7 @@ const SystemManager = () => {
     }
 
     function _startNewCycle() {
-        sM.updateAfterCycle();
+        const stateStatus = managerStore.getState().status;
         if (PREVENT_CYCLE_STATES.includes(stateStatus)) return;
         if (lastSpawnedBlock) {
             blocks = [lastSpawnedBlock, ...blocks];
@@ -156,7 +155,9 @@ const SystemManager = () => {
         cycleIndex = 0;
         animationSpeedRatio = 0;
 
-        const needsRestart = resetCycleResults.includes(stateResult);
+        const stateResult = managerStore.getState().result;
+        const preventRestartCycle = managerStore.getState().preventRestartCycle;
+        const needsRestart = !preventRestartCycle && resetCycleResults.includes(stateResult);
         sM.reset();
         _startNewCycle();
 
