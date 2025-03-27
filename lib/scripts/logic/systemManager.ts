@@ -138,21 +138,15 @@ const SystemManager = () => {
         blocks.forEach((block) => block.reset());
         blocksVisual.reset();
         board.reset();
-        stateManagerStore.getState().setAnimationTypeEnded(null);
         animationCycleStore.getState().reset();
 
         const stateResult = stateManagerStore.getState().result;
-        const preventRestartCycle = stateManagerStore.getState().preventRestartCycle;
-        const needsRestart = !preventRestartCycle && resetCycleResults.includes(stateResult);
+        const needsRestart = resetCycleResults.includes(stateResult);
         stateManagerStore.getState().reset();
         _startNewCycle();
 
         if (needsRestart) {
             setStart();
-        }
-
-        if (stateManagerStore.getState().destroyCanvas) {
-            setAnimationRatios({ firstStartAnimationRatio: 0 });
         }
     }
 
@@ -229,6 +223,7 @@ const SystemManager = () => {
         board.update(dt);
 
         const isCycleComplete = _checkCycleCompletion();
+
         if (isCycleComplete) {
             _startNewCycle();
         }

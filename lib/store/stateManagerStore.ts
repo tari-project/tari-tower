@@ -20,7 +20,7 @@ interface State {
 interface Actions {
     setPreventRestartCycle: (preventRestartCycle: boolean) => void;
     setDestroyCanvas: (destroyCanvas: boolean) => void;
-    setAnimationTypeEnded: (animationTypeEnded?: 'stop' | 'win' | 'lose' | null) => void;
+    setAnimationTypeEnded: (animationTypeEnded: 'stop' | 'win' | 'lose' | null) => void;
     reset: () => void;
 }
 export type ManagerState = State & Actions;
@@ -52,7 +52,6 @@ export const stateManagerStore = createStore<ManagerState>()(
         setPreventRestartCycle: (preventRestartCycle) => set({ preventRestartCycle }),
         setDestroyCanvas: (destroyCanvas: boolean) => set({ destroyCanvas }),
         setAnimationTypeEnded: (animationTypeEnded) => set({ animationTypeEnded }),
-
         reset: () => set(initialState),
     }))
 );
