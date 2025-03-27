@@ -11,14 +11,14 @@ const DEFAULT_LOOKAT_POSITION = [0, 0, 0];
 export const WEBGL_OPTS = { antialias: true, alpha: false, powerPreference: 'low-power' as WebGLPowerPreference };
 
 const settings = {
-	DPR,
-	USE_PIXEL_LIMIT,
-	MAX_PIXEL_COUNT,
-	DEFAULT_POSITION,
-	DEFAULT_LOOKAT_POSITION,
-	FREE_BLOCKS_COUNT,
-	AUTO_RESTART,
-	AUTO_START,
-	SHOW_BLOCK,
+    DPR,
+    USE_PIXEL_LIMIT,
+    MAX_PIXEL_COUNT,
+    DEFAULT_POSITION,
+    DEFAULT_LOOKAT_POSITION,
+    FREE_BLOCKS_COUNT,
+    AUTO_RESTART,
+    AUTO_START,
+    SHOW_BLOCK,
 };
 export default settings;
