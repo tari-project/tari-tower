@@ -34,46 +34,58 @@ const Loader = () => {
 	function loadBuf(file, cb) {
 		const url = assets[file];
 		list.push(async () => {
-			try {
-				const response = await fetch(url);
-				const buffer = await response.arrayBuffer();
-				const schematicJsonSize = new Uint32Array(buffer, 0, 1)[0];
-				const schematic = JSON.parse(new TextDecoder().decode(new Uint8Array(buffer, 4, schematicJsonSize)));
+			let attempts = 0;
+			const maxAttempts = 3;
 
-				const { vertexCount, indexCount, attributes: schematicAttributeList } = schematic;
-				let offset = 4 + schematicJsonSize;
+			while (attempts < maxAttempts) {
+				try {
+					const response = await fetch(url);
+					const buffer = await response.arrayBuffer();
+					const schematicJsonSize = new Uint32Array(buffer, 0, 1)[0];
+					const schematic = JSON.parse(new TextDecoder().decode(new Uint8Array(buffer, 4, schematicJsonSize)));
 
-				const geometry = new THREE.BufferGeometry();
-				const offsetMap = {};
+					const { vertexCount, indexCount, attributes: schematicAttributeList } = schematic;
+					let offset = 4 + schematicJsonSize;
 
-				schematicAttributeList.forEach((schematicAttribute) => {
-					const { id, componentSize, storageType, needsPack, packedComponents } = schematicAttribute;
-					const dataLength = id === 'indices' ? indexCount : vertexCount;
-					const StorageType = window[storageType as string];
-					const tmpArr = new StorageType(buffer, offset, dataLength * componentSize);
-					const byteSize = StorageType.BYTES_PER_ELEMENT;
+					const geometry = new THREE.BufferGeometry();
+					const offsetMap = {};
 
-					let outArr;
-					if (needsPack) {
-						outArr = _packAttribute(tmpArr, dataLength, componentSize, packedComponents, storageType);
+					schematicAttributeList.forEach((schematicAttribute) => {
+						const { id, componentSize, storageType, needsPack, packedComponents } = schematicAttribute;
+						const dataLength = id === 'indices' ? indexCount : vertexCount;
+						const StorageType = window[storageType as string];
+						const tmpArr = new StorageType(buffer, offset, dataLength * componentSize);
+						const byteSize = StorageType.BYTES_PER_ELEMENT;
+
+						let outArr;
+						if (needsPack) {
+							outArr = _packAttribute(tmpArr, dataLength, componentSize, packedComponents, storageType);
+						} else {
+							offsetMap[id] = offset;
+							outArr = tmpArr;
+						}
+
+						if (id === 'indices') {
+							geometry.setIndex(new THREE.BufferAttribute(outArr, 1));
+						} else {
+							geometry.setAttribute(id, new THREE.BufferAttribute(outArr, componentSize));
+						}
+
+						offset += dataLength * componentSize * byteSize;
+					});
+
+					if (cb) cb(geometry);
+					_onLoad();
+					break;
+				} catch (error) {
+					attempts++;
+					if (attempts >= maxAttempts) {
+						console.error(`Tower animation | error loading buffer: ${file} after ${maxAttempts} attempts`, error);
 					} else {
-						offsetMap[id] = offset;
-						outArr = tmpArr;
+						console.warn(`Tower animation | error loading buffer: ${file}, attempt ${attempts}/${maxAttempts}, retrying...`, error);
+						await new Promise((resolve) => setTimeout(resolve, 100));
 					}
-
-					if (id === 'indices') {
-						geometry.setIndex(new THREE.BufferAttribute(outArr, 1));
-					} else {
-						geometry.setAttribute(id, new THREE.BufferAttribute(outArr, componentSize));
-					}
-
-					offset += dataLength * componentSize * byteSize;
-				});
-
-				if (cb) cb(geometry);
-				_onLoad();
-			} catch (error) {
-				console.error(`Tower animation | error loading buffer: ${file}`, error);
+				}
 			}
 		});
 	}
