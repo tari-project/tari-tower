@@ -89,15 +89,6 @@ const TariTower = () => {
     }
 
     async function preload({ canvasId, initCallback }: { canvasId: string; initCallback: () => void }) {
-        stateManagerStore.subscribe(
-            (state) => state.destroyCanvas,
-            (destroyCanvas) => {
-                if (destroyCanvas) {
-                    destroy();
-                }
-            }
-        );
-
         _canvasId = canvasId;
         await _handleRenderer();
 
@@ -119,6 +110,16 @@ const TariTower = () => {
     }
     async function init() {
         await _initScene();
+
+        stateManagerStore.subscribe(
+            (state) => state.destroyCanvas,
+            (destroyCanvas) => {
+                if (destroyCanvas) {
+                    destroy();
+                }
+            },
+            { fireImmediately: true }
+        );
 
         try {
             // first the logic
@@ -184,15 +185,13 @@ const TariTower = () => {
         renderer.render(properties.scene, camera);
     }
     function destroy() {
+        stateManagerStore.getState().reset();
         canvas.remove();
         renderer.state.reset();
     }
     return {
         preload,
-        renderer,
         init,
-        coins,
-        blueNoise,
         onResize,
         render,
     };

@@ -50,13 +50,8 @@ const SystemManager = () => {
 
     function _spawnMultipleBlocks() {
         const activeBlocksCount = blocks?.length;
-        let blocksToSpawn = TOTAL_TILES - activeBlocksCount;
-        if (properties.errorBlock) {
-            if (properties.errorBlock.currentTile) {
-                properties.errorBlock.currentTile.isOccupied = false;
-            }
-            blocksToSpawn += 1;
-        }
+        const blocksToSpawn = TOTAL_TILES - activeBlocksCount;
+
         for (let i = 0; i < blocksToSpawn; i++) {
             const newTile = board.getRandomFreeTile();
             if (newTile) {
@@ -72,21 +67,12 @@ const SystemManager = () => {
     function _spawnSingleBlock() {
         let block: Block | null | undefined = null;
         const isFree = flags.isFree;
-        const needsErrorBlockReplacement = Boolean(
-            properties.errorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle
-        );
         const canAddNewBlock = Boolean(blocks.length < properties.maxFreeBlocksCount && isFree);
-        if (!needsErrorBlockReplacement) {
-            if (canAddNewBlock) {
-                block = new Block(blocks.length);
-                setLastSpawnedBlock(block);
-            }
-        } else {
-            properties.errorBlock?.reset(true);
-            blocksVisual.resetBlockFromLogicBlock(properties.errorBlock);
-            block = properties.errorBlock;
-            properties.errorBlock = null;
+        if (canAddNewBlock) {
+            block = new Block(blocks.length);
+            setLastSpawnedBlock(block);
         }
+
         if (block) {
             block.currentTile = mainTile;
             block.init();
@@ -118,12 +104,12 @@ const SystemManager = () => {
     function _calculatePaths() {
         const cycleIndex = animationCycleStore.getState().cycleIndex;
         const activeBlocksCount = animationCycleStore.getState().blocks?.length;
-        const isFree = flags.isFree;
-        if (lastSpawnedBlock?.hasBeenSpawned) {
-            lastSpawnedBlock.moveToNextTile(isFree, 0);
-        }
 
         const _isFree = cycleIndex % 2 === 0 ? true : activeBlocksCount < properties.maxFreeBlocksCount - 1;
+        console.debug(cycleIndex, activeBlocksCount, _isFree);
+        if (lastSpawnedBlock?.hasBeenSpawned) {
+            lastSpawnedBlock.moveToNextTile(_isFree, 0);
+        }
 
         blocks.forEach((block, index) => {
             if (!block.hasBeenEvaluated && block.hasBeenSpawned) {
@@ -180,8 +166,8 @@ const SystemManager = () => {
             }
         });
 
-        const { isStopped, isFailResult, isResultAnimation } = flags;
-        return isCycleComplete || isResultAnimation || isFailResult || isStopped;
+        const { isStopped, isFailResult, isResult } = flags;
+        return isCycleComplete || isResult || isFailResult || isStopped;
     }
 
     function update(dt: number) {
@@ -194,7 +180,7 @@ const SystemManager = () => {
         stateManagerStore.subscribe(
             (state) => state.flags,
             (flags) => {
-                const { hasNotStarted, isRestart, isResultAnimation } = flags;
+                const { hasNotStarted, isRestart, isResult } = flags;
 
                 if (hasNotStarted) {
                     _startNewCycle();
@@ -204,7 +190,7 @@ const SystemManager = () => {
                     reset();
                     return;
                 }
-                if (isResultAnimation) {
+                if (isResult) {
                     setStart();
                 }
             },

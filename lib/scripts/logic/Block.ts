@@ -62,7 +62,7 @@ export default class Block {
         });
     }
 
-    moveToNextTile(isFree = false, animationDelay = 0) {
+    moveToNextTile(nextFree = false, animationDelay = 0) {
         this.hasBeenEvaluated = true;
         this.moveAnimationRatio = -animationDelay * (this.isErrorBlock ? 0 : 1);
 
@@ -74,11 +74,11 @@ export default class Block {
         }
 
         this.currentTile.shuffleReachableNeighbours();
-        const neighbours = isFree
+        const neighbours = nextFree
             ? this.currentTile.reachableNeighbours
             : this.currentTile.prioritySortedReachableNeighbours;
 
-        const bestTile = this._findBestTile(neighbours, isFree);
+        const bestTile = this._findBestTile(neighbours, nextFree);
 
         if (bestTile && (!this.currentTile.isMain || Math.random() <= 0.8)) {
             this.targetTile = bestTile;
@@ -156,9 +156,7 @@ export default class Block {
         this.easedAnimationRatio = 0;
         this.lifeCycle = 0;
     }
-    preventErrorBlockFallAnimation() {
-        this.skipFallAnimation = true;
-    }
+
     _onMovementEnd() {
         this.moveAnimationRatio = 1;
 
@@ -186,9 +184,9 @@ export default class Block {
         stateManagerStore.subscribe(
             (state) => state.flags,
             (flags) => {
-                const { isResultAnimation, isFree, isResult } = flags;
+                const { isFree, isResult } = flags;
 
-                if ((this.isMoving && !this.hasAnimationEnded) || isResultAnimation) {
+                if ((this.isMoving && !this.hasAnimationEnded) || isResult) {
                     this.moveAnimationRatio = Math.min(
                         1,
                         this.moveAnimationRatio + properties.animationSpeed * dt * (this.isErrorBlock ? 0.7 : 1)

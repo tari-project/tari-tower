@@ -216,12 +216,19 @@ const Hero = () => {
 
     function init() {
         animationCycleStore.subscribe(
-            (state) => state,
-            (state) => {
-                blocks = state.blocks;
-                lastSpawnedBlock = state.lastSpawnedBlock;
-                previousSuccessBlocksAnimationRatio = state.previousSuccessBlocksAnimationRatio;
-            },
+            (state) => state.blocks,
+            (_blocks) => (blocks = _blocks),
+            { fireImmediately: true }
+        );
+        animationCycleStore.subscribe(
+            (state) => state.lastSpawnedBlock,
+            (_lastSpawnedBlock) => (lastSpawnedBlock = _lastSpawnedBlock),
+            { fireImmediately: true }
+        );
+        animationCycleStore.subscribe(
+            (state) => state.previousSuccessBlocksAnimationRatio,
+            (_previousSuccessBlocksAnimationRatio) =>
+                (previousSuccessBlocksAnimationRatio = _previousSuccessBlocksAnimationRatio),
             { fireImmediately: true }
         );
 
@@ -419,12 +426,12 @@ const Hero = () => {
             block.showRatio = customEasing(math.saturate(lastSpawnedBlock.spawnAnimationRatioUnclamped));
         }
 
-        blocks.forEach((logicBlock) => {
+        blocks?.forEach((logicBlock) => {
             const block = heroState._blockList[logicBlock.id];
 
             if (block) {
                 block.showRatio = customEasing(math.saturate(logicBlock.spawnAnimationRatioUnclamped));
-                if (logicBlock.currentTile) {
+                if (logicBlock?.currentTile) {
                     block.boardPos.set(logicBlock.currentTile?.row, logicBlock.currentTile?.col);
                 }
 
@@ -510,6 +517,8 @@ const Hero = () => {
             if (logicBlock) {
                 const tile = logicBlock.currentTile;
 
+                console.debug(blocks);
+
                 if (failFloatingCubesRatio > 0) {
                     const frameStart = Math.floor(failFloatingCubesRatio * heroState.animationTotalFrames);
                     const frameEnd = Math.min(frameStart + 1, heroState.animationTotalFrames - 1);
@@ -569,7 +578,7 @@ const Hero = () => {
         if (result === AnimationResult.COMPLETED || result === AnimationResult.REPLAY) {
             if (logicBlock) {
                 const tile = logicBlock.currentTile;
-                const delay = 0.1 * tile.randomDelay;
+                const delay = 0.1 * tile?.randomDelay;
                 const ratio = floatingCubesRatio - delay;
 
                 let y = math.fit(ratio, 0, 0.5, 0, 1, (x) => 1 - Math.pow(1 - x, 5));
@@ -590,15 +599,15 @@ const Hero = () => {
             const block = heroState._blockList[i];
             block.update(dt);
 
-            const logicBlock = blocks.filter((block) => block.id === i)[0];
+            const logicBlock = blocks.find((block) => block.id === i);
 
             if (block.showRatio > 0) {
                 heroState._blockRenderList[renderCount++] = block;
             }
             _updateFailAnimation(logicBlock, block, i);
             _updateLongBlockAnimation(logicBlock, block);
-            _updateStopAnimation(block, i);
             _updateFloatAnimation(logicBlock, block);
+            _updateStopAnimation(block, i);
         }
         _updateInfoTexture();
         _updateAttributes(renderCount);
