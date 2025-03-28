@@ -1,37 +1,41 @@
 import globals from 'globals';
-import pluginJs from '@eslint/js';
+import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import eslintConfigPrettier from 'eslint-config-prettier';
+import prettierConfig from 'eslint-config-prettier';
+import prettierPluginConfig from 'eslint-plugin-prettier/recommended';
 import tsParser from '@typescript-eslint/parser';
+
 export default [
-	pluginJs.configs.recommended,
-	...tseslint.configs.recommended,
-	...tseslint.configs.stylistic,
-	{
-		ignores: ['node_modules', '/dist/', './public/assets/**/*.js'],
-		languageOptions: {
-			globals: globals.browser,
-			parser: tsParser,
-			parserOptions: {
-				projectService: true,
-				tsconfigRootDir: import.meta.dirname,
-			},
-		},
-		rules: {
-			'no-unused-vars': 'off', // base rule must be disabled
-			'@typescript-eslint/no-unused-vars': [
-				'warn',
-				{
-					args: 'none',
-					caughtErrors: 'all',
-					ignoreRestSiblings: false,
-					reportUsedIgnorePattern: false,
-					argsIgnorePattern: '^_',
-					varsIgnorePattern: '^_',
-					caughtErrorsIgnorePattern: '^_',
-				},
-			],
-		},
-	},
-	eslintConfigPrettier,
+    eslint.configs.recommended,
+    eslint.configs.recommended,
+    ...tseslint.configs.recommended,
+    ...tseslint.configs.stylistic,
+    prettierConfig,
+    prettierPluginConfig,
+    {
+        ignores: ['node_modules', '/dist/', './public/assets/**/*.js'],
+        languageOptions: {
+            globals: globals.browser,
+            parser: tsParser,
+            parserOptions: {
+                projectService: true,
+                tsconfigRootDir: import.meta.dirname,
+            },
+        },
+        rules: {
+            'no-unused-vars': 'off', // base rule must be disabled
+            '@typescript-eslint/no-unused-vars': [
+                'warn',
+                {
+                    args: 'none',
+                    caughtErrors: 'all',
+                    ignoreRestSiblings: false,
+                    reportUsedIgnorePattern: false,
+                    argsIgnorePattern: '^_',
+                    varsIgnorePattern: '^_',
+                    caughtErrorsIgnorePattern: '^_',
+                },
+            ],
+        },
+    },
 ];
