@@ -9,7 +9,7 @@ import { errorAnimationManager } from './errorAnimationManager';
 import { successAnimationManager } from '../logic/successAnimationManager';
 
 import { PREVENT_CYCLE_STATES, resetCycleResults } from '../../types/stateManager';
-import { setRestart, setStart, stateManagerStore, updateFlags } from '../../store/stateManagerStore';
+import { setStart, stateManagerStore } from '../../store/stateManagerStore';
 
 import {
     addBlock,
@@ -21,10 +21,15 @@ import {
 const SystemManager = () => {
     let lastSpawnedBlock = animationCycleStore.getState().lastSpawnedBlock;
     let blocks = animationCycleStore.getState().blocks;
+    let flags = stateManagerStore.getState().flags;
+    stateManagerStore.subscribe(
+        (state) => state.flags,
+        (_flags) => {
+            flags = _flags;
+        }
+    );
 
     function _spawnBlock() {
-        const flags = stateManagerStore.getState().flags;
-
         const { isFailResult, isStopped, isSuccessResult, isReplayResult, isFree } = flags;
 
         const preventSpawn =
@@ -66,7 +71,7 @@ const SystemManager = () => {
 
     function _spawnSingleBlock() {
         let block: Block | null | undefined = null;
-        const isFree = stateManagerStore.getState().flags.isFree;
+        const isFree = flags.isFree;
         const needsErrorBlockReplacement = Boolean(
             properties.errorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle
         );
@@ -91,8 +96,8 @@ const SystemManager = () => {
 
     function _startNewCycle() {
         const stateStatus = stateManagerStore.getState().status;
-        const isFailResult = stateManagerStore.getState().flags.isFailResult;
-        const isStopped = stateManagerStore.getState().flags.isStopped;
+        const isFailResult = flags.isFailResult;
+        const isStopped = flags.isStopped;
 
         if (PREVENT_CYCLE_STATES.includes(stateStatus)) return;
         if (lastSpawnedBlock) {
@@ -113,7 +118,7 @@ const SystemManager = () => {
     function _calculatePaths() {
         const cycleIndex = animationCycleStore.getState().cycleIndex;
         const activeBlocksCount = animationCycleStore.getState().blocks?.length;
-        const isFree = stateManagerStore.getState().flags.isFree;
+        const isFree = flags.isFree;
         if (lastSpawnedBlock?.hasBeenSpawned) {
             lastSpawnedBlock.moveToNextTile(isFree, 0);
         }
@@ -144,7 +149,7 @@ const SystemManager = () => {
     }
 
     function _updateAnimationRatios(dt: number) {
-        const isResult = stateManagerStore.getState().flags.isResult;
+        const isResult = flags.isResult;
         const speedRatio = animationCycleStore.getState().animationSpeedRatio;
         const firstStartRatio = animationCycleStore.getState().firstStartAnimationRatio;
         const prevSuccessRatio = animationCycleStore.getState().previousSuccessBlocksAnimationRatio;
@@ -175,7 +180,6 @@ const SystemManager = () => {
             }
         });
 
-        const flags = stateManagerStore.getState().flags;
         const { isStopped, isFailResult, isResultAnimation } = flags;
         return isCycleComplete || isResultAnimation || isFailResult || isStopped;
     }
@@ -196,13 +200,12 @@ const SystemManager = () => {
                     _startNewCycle();
                     return;
                 }
-
                 if (isRestart) {
                     reset();
                     return;
                 }
                 if (isResultAnimation) {
-                    setRestart();
+                    setStart();
                 }
             },
             { fireImmediately: true }
@@ -234,21 +237,6 @@ const SystemManager = () => {
             { fireImmediately: true }
         );
         stateManagerStore.subscribe(
-            (state) => state.status,
-            (status, prevStatus) => {
-                if (status !== prevStatus) {
-                    updateFlags();
-                }
-            },
-            { fireImmediately: true }
-        );
-
-        successAnimationManager.init();
-        stopAnimationManager.init();
-        errorAnimationManager.init();
-        board.init();
-
-        stateManagerStore.subscribe(
             (state) => state.animationTypeEnded,
             (animationTypeEnded) => {
                 if (animationTypeEnded) {
@@ -273,6 +261,11 @@ const SystemManager = () => {
             },
             { fireImmediately: true }
         );
+
+        successAnimationManager.init();
+        stopAnimationManager.init();
+        errorAnimationManager.init();
+        board.init();
     }
 
     return {

@@ -56,16 +56,23 @@ export const stateManagerStore = createStore<ManagerState>()(
     }))
 );
 
-export const setStart = () => stateManagerStore.setState({ status: AnimationStatus.FREE });
-export const setRestart = () => stateManagerStore.setState({ status: AnimationStatus.RESTART });
-export const setLose = () =>
+export const setStart = () => {
+    stateManagerStore.setState({ status: AnimationStatus.FREE });
+    updateFlags();
+};
+export const setLose = () => {
     stateManagerStore.setState({ status: AnimationStatus.RESULT, result: AnimationResult.FAILED });
-export const setStop = () =>
+    updateFlags();
+};
+export const setStop = () => {
     stateManagerStore.setState({ status: AnimationStatus.RESULT, result: AnimationResult.STOP });
+    updateFlags();
+};
 export const setWin = ({ isReplay, completeAnimationLevel }: SetWinArgs) => {
     const notStarted = stateManagerStore.getState().flags.hasNotStarted;
     const result = isReplay && notStarted ? AnimationResult.REPLAY : AnimationResult.COMPLETED;
     stateManagerStore.setState({ status: AnimationStatus.RESULT, result, completeAnimationLevel });
+    updateFlags();
 };
 export function showVisual() {
     properties.showVisual = true;
@@ -91,12 +98,7 @@ export const updateFlags = () =>
             isFailResult: isAnyResult && result === AnimationResult.FAILED,
             isStopped: isAnyResult && result === AnimationResult.STOP,
         };
-
         return {
-            ...state,
-            flags: {
-                ...state.flags,
-                ...newFlags,
-            },
+            flags: { ...state.flags, ...newFlags },
         };
     });

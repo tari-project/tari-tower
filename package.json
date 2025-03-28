@@ -18,6 +18,13 @@
         "lint": "eslint lib src",
         "knip": "knip"
     },
+    "exports": {
+        ".": {
+            "assets": "./public/assets/",
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
+        }
+    },
     "dependencies": {
         "three": "^0.174.0",
         "zustand": "^5.0.3"
