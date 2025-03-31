@@ -1,5 +1,4 @@
 import math from '../utils/math';
-import { properties } from '../core/properties';
 import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
 import { board, mainTile, TOTAL_TILES } from './board';
 import Block from './Block';
@@ -17,6 +16,8 @@ import {
     setAnimationRatios,
     setLastSpawnedBlock,
 } from '../../store/animationCycleStore.ts';
+import { MAX_FREE_BLOCKS_COUNT } from '../core/settings.ts';
+import { propertiesStore } from '../../store/propertiesStore.ts';
 
 const SystemManager = () => {
     let lastSpawnedBlock = animationCycleStore.getState().lastSpawnedBlock;
@@ -45,7 +46,7 @@ const SystemManager = () => {
             _spawnSingleBlock();
         }
 
-        if (blocks.length === properties.maxFreeBlocksCount && isFree) return;
+        if (blocks.length === MAX_FREE_BLOCKS_COUNT && isFree) return;
     }
 
     function _spawnMultipleBlocks() {
@@ -67,7 +68,7 @@ const SystemManager = () => {
     function _spawnSingleBlock() {
         let block: Block | null | undefined = null;
         const isFree = flags.isFree;
-        const canAddNewBlock = Boolean(blocks.length < properties.maxFreeBlocksCount && isFree);
+        const canAddNewBlock = Boolean(blocks.length < MAX_FREE_BLOCKS_COUNT && isFree);
         if (canAddNewBlock) {
             block = new Block(blocks.length);
             setLastSpawnedBlock(block);
@@ -105,7 +106,7 @@ const SystemManager = () => {
         const cycleIndex = animationCycleStore.getState().cycleIndex;
         const activeBlocksCount = animationCycleStore.getState().blocks?.length;
 
-        const _isFree = cycleIndex % 2 === 0 ? true : activeBlocksCount < properties.maxFreeBlocksCount - 1;
+        const _isFree = cycleIndex % 2 === 0 ? true : activeBlocksCount < MAX_FREE_BLOCKS_COUNT - 1;
 
         if (lastSpawnedBlock?.hasBeenSpawned) {
             lastSpawnedBlock.moveToNextTile(_isFree, 0);
@@ -143,7 +144,9 @@ const SystemManager = () => {
         const animationSpeedRatio = Math.min(1, speedRatio + dt * (isResult ? 1 : 0));
 
         const previousSuccessBlocksAnimationRatio = math.saturate(prevSuccessRatio - dt / 1.5);
-        const firstStartAnimationRatio = math.saturate(firstStartRatio + dt * (properties.showVisual ? 1 : 0));
+        const firstStartAnimationRatio = math.saturate(
+            firstStartRatio + dt * (propertiesStore.getState().showVisual ? 1 : 0)
+        );
 
         setAnimationRatios({
             animationSpeedRatio,

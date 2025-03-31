@@ -1,7 +1,5 @@
 import * as THREE from 'three';
-
 import loader from '../../core/loader';
-import { properties } from '../../core/properties';
 import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
 import { heroSharedUniforms } from '../hero/hero';
 
@@ -11,6 +9,7 @@ import fragDepth from './coinsDepth.frag?raw';
 import { floatingCoinsRatio, vortexCoinsRatio } from '../../logic/successAnimationManager';
 import { BufferGeometry, InstancedBufferGeometry, Mesh, ShaderMaterial } from 'three';
 import { ASSETS_PATH } from '../../core/settings';
+import { uniformsStore } from '../../../store/uniformsStore.ts';
 const coinContainer = new THREE.Object3D();
 
 const Coins = () => {
@@ -95,7 +94,7 @@ const Coins = () => {
         coinMaterial = new THREE.ShaderMaterial({
             uniforms: {
                 ...heroSharedUniforms,
-                ...properties.sharedUniforms,
+                ...uniformsStore.getInitialState(),
                 ...coinsSharedUniforms,
                 ...bn_sharedUniforms,
                 ...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),

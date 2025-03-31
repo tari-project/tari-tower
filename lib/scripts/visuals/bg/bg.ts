@@ -1,24 +1,32 @@
 import * as THREE from 'three';
 import { Mesh, ShaderMaterial } from 'three';
-import { properties } from '../../core/properties';
+
 import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
 
 import vert from './bg.vert?raw';
 import frag from './bg.frag?raw';
 import particlesVert from './particles.vert?raw';
 import particlesFrag from './particles.frag?raw';
+import { TSharedUniforms, uniformsStore } from '../../../store/uniformsStore.ts';
+import { propertiesStore } from '../../../store/propertiesStore.ts';
 
 const container = new THREE.Object3D();
 const Background = () => {
     const particles: Mesh & { material: ShaderMaterial } = new THREE.Mesh();
     const mesh: Mesh & { material: ShaderMaterial } = new THREE.Mesh(new THREE.PlaneGeometry(2, 2));
+    let sharedUniforms: TSharedUniforms;
+
+    uniformsStore.subscribe((state) => {
+        sharedUniforms = state;
+    });
     function init() {
         const uniforms = {
-            u_resolution: properties.sharedUniforms?.u_resolution,
-            u_bgColor1: properties.sharedUniforms?.u_bgColor1,
-            u_bgColor2: properties.sharedUniforms?.u_bgColor2,
+            u_resolution: sharedUniforms.u_resolution,
+            u_bgColor1: sharedUniforms.u_bgColor1,
+            u_bgColor2: sharedUniforms.u_bgColor2,
             ...bn_sharedUniforms,
         } as unknown as ShaderMaterial['uniforms'];
+
         mesh.material = new THREE.ShaderMaterial({
             uniforms,
             vertexShader: vert,
@@ -56,8 +64,8 @@ const Background = () => {
         geometry.setAttribute('a_instancePosition', new THREE.InstancedBufferAttribute(positionArray, 3));
         geometry.setAttribute('a_instanceRandom', new THREE.InstancedBufferAttribute(randomArray, 3));
         const uniforms = {
-            u_time: properties.sharedUniforms?.u_time || { value: properties.time },
-            u_resolution: properties.sharedUniforms?.u_resolution || { value: properties.resolution },
+            u_time: sharedUniforms?.u_time || { value: propertiesStore.getState().time },
+            u_resolution: sharedUniforms.u_resolution,
             u_size: { value: 0.01 },
             u_color: { value: new THREE.Color() },
             u_opacity: { value: 0 },
@@ -74,9 +82,9 @@ const Background = () => {
     }
 
     function update(_dt: number) {
-        particles.material.uniforms.u_size.value = properties.particlesSize;
-        particles.material.uniforms.u_color.value.set(properties.particlesColor);
-        particles.material.uniforms.u_opacity.value = properties.particlesOpacity;
+        particles.material.uniforms.u_size.value = propertiesStore.getState().particlesSize;
+        particles.material.uniforms.u_color.value.set(propertiesStore.getState().particlesColor);
+        particles.material.uniforms.u_opacity.value = propertiesStore.getState().particlesOpacity;
     }
 
     return { init, update };

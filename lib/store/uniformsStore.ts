@@ -1,7 +1,6 @@
 import { Color, Vector2 } from 'three';
 import { createStore } from 'zustand/vanilla';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { SharedUniforms } from '../types/properties.ts';
 
 const initialState = {
     u_time: { value: 0 },
@@ -11,7 +10,9 @@ const initialState = {
     u_bgColor1: { value: new Color() },
     u_bgColor2: { value: new Color() },
 };
-const uniformsStore = createStore<SharedUniforms>()(
+export type TSharedUniforms = typeof initialState;
+
+export const uniformsStore = createStore<TSharedUniforms>()(
     subscribeWithSelector((set) => ({
         ...initialState,
     }))

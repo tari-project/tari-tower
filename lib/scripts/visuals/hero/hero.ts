@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 import loader from '../../core/loader';
-import { properties } from '../../core/properties';
+
 import math from '../../utils/math';
 import ease, { customEasing } from '../../utils/ease';
 import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
@@ -42,6 +42,10 @@ import { AnimationResult } from '../../../types/stateManager';
 import { ASSETS_PATH, ERROR_BLOCK_MAX_LIFE_CYCLE } from '../../core/settings';
 import { stateManagerStore } from '../../../store/stateManagerStore';
 import { animationCycleStore } from '../../../store/animationCycleStore.ts';
+
+import { uniformsStore } from '../../../store/uniformsStore.ts';
+import { propertiesStore } from '../../../store/propertiesStore.ts';
+import { sceneStore } from '../../../store/sceneStore.ts';
 
 const TOTAL_BLOCKS = 2 * TOTAL_TILES;
 const _v2_0 = new THREE.Vector2();
@@ -99,6 +103,12 @@ const Hero = () => {
     let lastSpawnedBlock = animationCycleState.lastSpawnedBlock;
     let blocks = animationCycleState.blocks;
 
+    let sharedUniforms = uniformsStore.getState();
+
+    uniformsStore.subscribe((state) => {
+        sharedUniforms = state;
+    });
+
     async function preload() {
         const arr = Array.from({ length: TOTAL_BLOCKS });
         heroState._blockList = arr.map((_) => new HeroBlockCoordinates());
@@ -130,15 +140,17 @@ const Hero = () => {
 
     function _onBaseBlocksLoaded(geometry) {
         const uniforms = {
-            ...properties.sharedUniforms,
+            ...sharedUniforms,
             ...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
             ...heroSharedUniforms,
             ...bn_sharedUniforms,
-            u_color: { value: new THREE.Color(properties.neutralColor) },
+            u_color: { value: new THREE.Color(propertiesStore.getState().neutralColor) },
             u_blocksColor: { value: new THREE.Color() },
             u_yDisplacement: { value: 0 },
-            u_prevSuccessColor: { value: new THREE.Color(properties.neutralColor).convertSRGBToLinear() },
-            u_successColor: { value: new THREE.Color(properties.successColor).convertSRGBToLinear() },
+            u_prevSuccessColor: {
+                value: new THREE.Color(propertiesStore.getState().neutralColor).convertSRGBToLinear(),
+            },
+            u_successColor: { value: new THREE.Color(propertiesStore.getState().successColor).convertSRGBToLinear() },
             u_successAnimationRatio: { value: 0 },
         };
 
@@ -191,7 +203,7 @@ const Hero = () => {
         const material = new THREE.ShaderMaterial({
             uniforms: {
                 ...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
-                ...properties.sharedUniforms,
+                ...uniformsStore.getState(),
                 ...heroSharedUniforms,
                 ...bn_sharedUniforms,
             },
@@ -239,19 +251,21 @@ const Hero = () => {
             },
             { fireImmediately: true }
         );
+
+        const sceneState = sceneStore.getState();
         heroState.directLight = new THREE.DirectionalLight(0xffffff, 1);
         heroState.directLight.castShadow = true;
-        heroState.directLight.shadow.camera.near = properties.lightCameraNear;
-        heroState.directLight.shadow.camera.far = properties.lightCameraFar;
-        heroState.directLight.shadow.camera.right = properties.lightCameraSize;
-        heroState.directLight.shadow.camera.left = -properties.lightCameraSize;
-        heroState.directLight.shadow.camera.top = properties.lightCameraSize;
-        heroState.directLight.shadow.camera.bottom = -properties.lightCameraSize;
-        heroState.directLight.shadow.bias = properties.lightCameraBias;
+        heroState.directLight.shadow.camera.near = sceneState.lightCameraNear;
+        heroState.directLight.shadow.camera.far = sceneState.lightCameraFar;
+        heroState.directLight.shadow.camera.right = sceneState.lightCameraSize;
+        heroState.directLight.shadow.camera.left = -sceneState.lightCameraSize;
+        heroState.directLight.shadow.camera.top = sceneState.lightCameraSize;
+        heroState.directLight.shadow.camera.bottom = -sceneState.lightCameraSize;
+        heroState.directLight.shadow.bias = sceneState.lightCameraBias;
         heroState.directLight.shadow.mapSize.width = 768;
         heroState.directLight.shadow.mapSize.height = 768;
-        properties.scene?.add(heroState.directLight);
-        properties.scene?.add(heroState.directLight.target);
+        sceneState.scene?.add(heroState.directLight);
+        sceneState.scene?.add(heroState.directLight.target);
 
         heroState.isShadowCameraHelperVisible = true;
         heroState.shadowCameraHelper = new THREE.CameraHelper(heroState.directLight.shadow.camera);
@@ -330,10 +344,11 @@ const Hero = () => {
     }
 
     function _updateColors(dt: number) {
-        MAIN_COLOR.set(properties.mainColor);
-        SUCCESS_COLOR.set(properties.successColor);
-        ERROR_COLOR.set(properties.failColor);
-        DEFAULT_COLOR.set(properties.neutralColor).convertSRGBToLinear();
+        const propertiesState = propertiesStore.getState();
+        MAIN_COLOR.set(propertiesState.mainColor);
+        SUCCESS_COLOR.set(propertiesState.successColor);
+        ERROR_COLOR.set(propertiesState.failColor);
+        DEFAULT_COLOR.set(propertiesState.neutralColor).convertSRGBToLinear();
 
         _c.copy(MAIN_COLOR);
 
@@ -385,7 +400,7 @@ const Hero = () => {
             heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.set(DEFAULT_COLOR).convertSRGBToLinear();
 
             heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(
-                _c.set(properties.successColor),
+                _c.set(propertiesState.successColor),
                 previousSuccessBlocksAnimationRatio
             );
             heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.convertSRGBToLinear();
@@ -504,7 +519,7 @@ const Hero = () => {
             block.boardDir.set(_v2_0.x, _v2_0.y);
             block.animation = math.fit(animationRatio, 0, 1, 0, 1, ease.sineOut);
             block.animation += Math.max(0, animationRatio - 0.8);
-            block.update(properties.deltaTime);
+            block.update(propertiesStore.getState().deltaTime);
             block.addsFallAnimation(Math.max(0, animationRatio - 0.8));
         }
     }
@@ -618,6 +633,7 @@ const Hero = () => {
                 -easedRestartAnimationRatio - 5 * easedFirstStartAnimationRatio;
             heroState._baseMesh.material.uniforms.u_successAnimationRatio.value = successColorTowerRatio;
         }
+        const sceneState = sceneStore.getState();
         if (heroSharedUniforms) {
             heroSharedUniforms.u_endAnimationRatio.value = Math.min(
                 1,
@@ -625,18 +641,18 @@ const Hero = () => {
                     math.fit(failSpawnRatio, 0.5, 2, 0, 1) +
                     math.fit(successRatio, 0, 0.2, 0, 1)
             );
-            heroSharedUniforms.u_goboIntensity.value = properties.goboIntensity;
+            heroSharedUniforms.u_goboIntensity.value = propertiesStore.getState().goboIntensity;
             heroSharedUniforms.u_lightPosition.value.set(
-                properties.lightPositionX,
-                properties.lightPositionY,
-                properties.lightPositionZ
+                sceneState.lightPositionX,
+                sceneState.lightPositionY,
+                sceneState.lightPositionZ
             );
         }
         if (heroState.directLight) {
             heroState.directLight.position.copy(heroSharedUniforms?.u_lightPosition.value);
-            heroState.directLight.shadow.camera.top = properties.lightCameraSize;
-            heroState.directLight.shadow.camera.bottom = -properties.lightCameraSize;
-            heroState.directLight.shadow.bias = properties.lightCameraBias;
+            heroState.directLight.shadow.camera.top = sceneState.lightCameraSize;
+            heroState.directLight.shadow.camera.bottom = -sceneState.lightCameraSize;
+            heroState.directLight.shadow.bias = sceneState.lightCameraBias;
         }
     }
 

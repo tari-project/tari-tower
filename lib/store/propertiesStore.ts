@@ -2,9 +2,12 @@ import { createStore } from 'zustand/vanilla';
 import { subscribeWithSelector } from 'zustand/middleware';
 
 import { IProperties } from '../types/properties.ts';
+import Block from '../scripts/logic/Block.ts';
 
 const initialState: IProperties = {
+    time: 0,
     deltaTime: 0,
+    showVisual: true,
     offsetX: 0,
     cameraOffsetX: 0,
     width: 0,
@@ -40,3 +43,7 @@ export const propertiesStore = createStore<IPropertiesStoreState>()(
         setProperty: (property: TPropertyPair) => set((c) => ({ ...c, property })),
     }))
 );
+
+export const setErrorBlock = (errorBlock?: Block | null): void => {
+    propertiesStore.setState({ errorBlock });
+};

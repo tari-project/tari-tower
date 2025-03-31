@@ -32,6 +32,7 @@ const _FLAG_TYPES = [
     'isFailResult',
     'isStopped',
 ] as const;
+
 type FlagTypeTuple = typeof _FLAG_TYPES;
-export type FlagType = FlagTypeTuple[number];
+type FlagType = FlagTypeTuple[number];
 export type Flags = Record<FlagType, boolean>;

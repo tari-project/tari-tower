@@ -1,7 +1,7 @@
 import { createStore } from 'zustand/vanilla';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { properties } from '../scripts/core/properties.ts';
 import { AnimationResult, AnimationStatus, Flags, SuccessLevel } from '../types/stateManager.ts';
+import { propertiesStore } from './propertiesStore.ts';
 
 interface SetWinArgs {
     isReplay?: boolean;
@@ -21,7 +21,7 @@ interface Actions {
     setAnimationTypeEnded: (animationTypeEnded: 'stop' | 'win' | 'lose' | null) => void;
     reset: () => void;
 }
-export type ManagerState = State & Actions;
+type ManagerState = State & Actions;
 
 const initialFlags: Flags = {
     hasNotStarted: true,
@@ -68,7 +68,7 @@ export const setWin = ({ isReplay, completeAnimationLevel }: SetWinArgs) => {
     updateFlags();
 };
 export function showVisual() {
-    properties.showVisual = true;
+    propertiesStore.getState().setProperty({ propertyName: 'showVisual', value: true });
 }
 
 export const updateFlags = () =>

@@ -1,10 +1,10 @@
-import { properties } from '../core/properties';
 import math from '../utils/math';
 import { customEasing } from '../utils/ease';
 import { BlockType } from '../../types/block';
 import { stateManagerStore } from '../../store/stateManagerStore';
 import { animationCycleStore } from '../../store/animationCycleStore.ts';
 import { ANIMATION_SPEED, ERROR_BLOCK_MAX_LIFE_CYCLE, MIN_SPAWN_COUNT_FOR_ERROR } from '../core/settings.ts';
+import { propertiesStore, setErrorBlock } from '../../store/propertiesStore.ts';
 
 export default class Block {
     id: BlockType['id'] = -1;
@@ -117,12 +117,12 @@ export default class Block {
 
         if (
             this.currentTile?.isBorder &&
-            !properties.errorBlock &&
+            !propertiesStore.getState().errorBlock &&
             Math.random() < 0.5 &&
             activeBlocksCount >= MIN_SPAWN_COUNT_FOR_ERROR &&
             isFree
         ) {
-            properties.errorBlock = this;
+            setErrorBlock(this);
             this.isErrorBlock = true;
         }
 

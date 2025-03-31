@@ -14,7 +14,7 @@ const initialState = {
     lightCameraNear: 3,
     lightCameraFar: 16,
 };
-const sceneStore = createStore<IScene>()(
+export const sceneStore = createStore<IScene>()(
     subscribeWithSelector((set) => ({
         ...initialState,
     }))

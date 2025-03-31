@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import settings, { WEBGL_OPTS } from './core/settings.ts';
-import { properties } from './core/properties.ts';
 import { heroBlocks, heroContainer } from './visuals/hero/hero.ts';
 import { coinContainer, Coins } from './visuals/coins/coins.ts';
 import BlueNoise from './utils/blueNoise/blueNoise.ts';
@@ -10,10 +9,15 @@ import { Background, bgContainer } from './visuals/bg/bg.ts';
 import loader from './core/loader.ts';
 import { OrthographicCamera } from 'three';
 import { stateManagerStore } from '../store/stateManagerStore';
+import { propertiesStore } from '../store/propertiesStore.ts';
+import { uniformsStore } from '../store/uniformsStore.ts';
+import { sceneStore } from '../store/sceneStore.ts';
 
 THREE.ColorManagement.enabled = false;
 
 const TariTower = () => {
+    const scene = sceneStore.getState().scene;
+    const setProperty = propertiesStore.getState().setProperty;
     const renderer = new THREE.WebGLRenderer(WEBGL_OPTS);
     const background = Background();
     const blueNoise = BlueNoise();
@@ -47,21 +51,26 @@ const TariTower = () => {
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFShadowMap;
 
-            if (properties.sharedUniforms) {
-                const bgColor1 = properties.sharedUniforms.u_bgColor1.value;
-                const bgColor2 = properties.sharedUniforms.u_bgColor2.value;
-                bgColor1.set(properties.bgColor1).convertSRGBToLinear();
-                bgColor2.set(properties.bgColor2).convertSRGBToLinear();
-            }
-            renderer.setClearColor(properties.bgColor1, 1);
+            const bgColor1 = propertiesStore.getState().bgColor1;
+            const bgColor2 = propertiesStore.getState().bgColor2;
+
+            uniformsStore.setState((c) => ({
+                u_bgColor1: { value: c.u_bgColor1.value.clone().set(bgColor1).convertSRGBToLinear() },
+                u_bgColor2: { value: c.u_bgColor2.value.clone().set(bgColor2).convertSRGBToLinear() },
+            }));
+
+            renderer.setClearColor(bgColor1, 1);
         }
     }
 
     function _handleResize(viewportWidth: number, viewportHeight: number) {
-        properties.viewportWidth = viewportWidth;
-        properties.viewportHeight = viewportHeight;
-        properties.viewportResolution.set(viewportWidth, window.innerHeight);
-        properties.sharedUniforms.u_viewportResolution.value = properties.viewportResolution;
+        setProperty({ propertyName: 'viewportWidth', value: viewportWidth });
+        setProperty({ propertyName: 'viewportHeight', value: viewportHeight });
+        uniformsStore.setState((c) => ({
+            u_viewportResolution: {
+                value: c.u_viewportResolution.value.clone().set(viewportWidth, window.innerHeight),
+            },
+        }));
 
         let dprWidth = viewportWidth * settings.DPR;
         let dprHeight = viewportHeight * settings.DPR;
@@ -74,9 +83,9 @@ const TariTower = () => {
             dprHeight = Math.ceil(dprHeight);
         }
 
-        properties.width = dprWidth;
-        properties.height = dprHeight;
-        properties.resolution.set(dprWidth, dprHeight);
+        setProperty({ propertyName: 'width', value: dprWidth });
+        setProperty({ propertyName: 'height', value: dprHeight });
+
         camera.updateProjectionMatrix();
 
         renderer.setSize(dprWidth, dprHeight);
@@ -100,7 +109,7 @@ const TariTower = () => {
     }
 
     async function _initScene() {
-        properties.scene.add(camera);
+        scene.add(camera);
         camera.position.fromArray(settings.DEFAULT_POSITION);
         camera.updateProjectionMatrix();
         orbitCamera = camera.clone();
@@ -130,9 +139,9 @@ const TariTower = () => {
             coins.init();
             background.init();
 
-            properties.scene.add(coinContainer);
-            properties.scene.add(bgContainer);
-            properties.scene.add(heroContainer);
+            scene.add(coinContainer);
+            scene.add(bgContainer);
+            scene.add(heroContainer);
         } catch (error) {
             console.error('init tower error: ', error);
         }
@@ -145,21 +154,26 @@ const TariTower = () => {
 
         dt = Math.min(dt, 1 / 15);
 
-        properties.time += dt;
-        properties.deltaTime = dt;
-        if (properties.sharedUniforms) {
-            properties.sharedUniforms.u_time.value = properties.time;
-            properties.sharedUniforms.u_deltaTime.value = dt;
-        }
+        let time = propertiesStore.getState().time;
+        const cameraOffsetX = propertiesStore.getState().cameraOffsetX;
+        let offsetX = propertiesStore.getState().offsetX;
 
-        const aspect = (window.innerWidth - properties.cameraOffsetX) / window.innerHeight;
+        time += dt;
+
+        setProperty({ propertyName: 'time', value: time });
+        setProperty({ propertyName: 'deltaTime', value: dt });
+
+        uniformsStore.setState({
+            u_time: { value: time },
+            u_deltaTime: { value: dt },
+        });
+
+        const aspect = (window.innerWidth - cameraOffsetX) / window.innerHeight;
         const viewHeight = 10;
         const viewWidth = viewHeight * aspect;
 
-        let offsetX = 0;
-
-        if (properties.offsetX) {
-            const offP = (properties.offsetX / window.innerWidth) * 100;
+        if (offsetX) {
+            const offP = (offsetX / window.innerWidth) * 100;
             offsetX = (viewWidth * offP) / 100;
         }
 
@@ -182,7 +196,7 @@ const TariTower = () => {
         heroBlocks.update(dt);
         coins.update(dt);
         background.update(dt);
-        renderer.render(properties.scene, camera);
+        renderer.render(scene, camera);
     }
     function destroy() {
         stateManagerStore.getState().reset();
