@@ -6,15 +6,6 @@ import { animationCycleStore } from '../../store/animationCycleStore.ts';
 import { ANIMATION_SPEED, ERROR_BLOCK_MAX_LIFE_CYCLE, MIN_SPAWN_COUNT_FOR_ERROR } from '../core/settings.ts';
 import { propertiesStore, setErrorBlock } from '../../store/propertiesStore.ts';
 
-let flags = stateManagerStore.getState().flags;
-
-stateManagerStore.subscribe(
-    (state) => state.flags,
-    (_flags) => {
-        flags = _flags;
-    },
-    { fireImmediately: true }
-);
 export default class Block {
     id: BlockType['id'] = -1;
     isMoving: BlockType['isMoving'] = false;
@@ -102,6 +93,7 @@ export default class Block {
     }
 
     resetAfterCycle() {
+
         this.hasBeenEvaluated = false;
         this.hasAnimationEnded = false;
         this.moveAnimationRatio = 0;
@@ -115,18 +107,13 @@ export default class Block {
             this.isErrorBlockFalling = this.errorLifeCycle >= ERROR_BLOCK_MAX_LIFE_CYCLE - 1;
         }
 
-        let isFree = false;
-        stateManagerStore.subscribe(
-            (s) => s.flags.isFree,
-            (free) => (isFree = free),
-            { fireImmediately: true }
-        );
-
         const activeBlocksCount = animationCycleStore.getState().blocks?.length;
 
+        const isFree = stateManagerStore.getState().flags.isFree;
+        const errorBlock = propertiesStore.getState().errorBlock;
         if (
             this.currentTile?.isBorder &&
-            !propertiesStore.getState().errorBlock &&
+            !errorBlock &&
             Math.random() < 0.5 &&
             activeBlocksCount >= MIN_SPAWN_COUNT_FOR_ERROR &&
             isFree
@@ -191,9 +178,8 @@ export default class Block {
     }
 
     _updateMovement(dt: number) {
-        const isFree = flags.isFree;
-        const isResult = flags.isResult;
-
+        const isResult = stateManagerStore.getState().flags.isResult;
+        const isFree = stateManagerStore.getState().flags.isFree;
         if ((this.isMoving && !this.hasAnimationEnded) || isResult) {
             this.moveAnimationRatio = Math.min(
                 1,

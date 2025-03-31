@@ -51,12 +51,18 @@ export const stateManagerStore = createStore<ManagerState>()(
                 const notStarted = currentState.status === AnimationStatus.NOT_STARTED;
                 const result = isReplay && notStarted ? AnimationResult.REPLAY : AnimationResult.COMPLETED;
 
-                return { status: AnimationStatus.RESULT, result, completeAnimationLevel };
+                const flags = {
+                    ...currentState.flags,
+                    isReplayResult: result === AnimationResult.REPLAY,
+                    isSuccessResult: true,
+                };
+                return { ...currentState, status: AnimationStatus.RESULT, result, completeAnimationLevel, flags };
             }),
         setAnimationState: (animationType: AnimationType) =>
             set((currentState) => {
                 let animationStatus: AnimationStatus;
                 let animationResult = currentState.result;
+
                 switch (animationType) {
                     case 'start': {
                         animationStatus = AnimationStatus.FREE;
@@ -76,6 +82,7 @@ export const stateManagerStore = createStore<ManagerState>()(
                         animationStatus = AnimationStatus.NOT_STARTED;
                     }
                 }
+
                 const isResult = animationStatus === AnimationStatus.RESULT;
 
                 const newFlags = {
@@ -92,15 +99,21 @@ export const stateManagerStore = createStore<ManagerState>()(
                     ...currentState,
                     status: animationStatus,
                     result: animationResult,
-                    flags: newFlags,
+                    flags: { ...currentState.flags, ...newFlags },
                 };
             }),
-        reset: () => set(initialState),
+        reset: () => set((c) => ({ ...initialState, status: c.status })),
     }))
 );
 
-export const setStart = () => stateManagerStore.getState().setAnimationState('start');
-export const setStop = () => stateManagerStore.getState().setAnimationState('stop');
-export const setLose = () => stateManagerStore.getState().setAnimationState('lose');
+export const setStart = () => {
+    stateManagerStore.getState().setAnimationState('start');
+};
+export const setStop = () => {
+    stateManagerStore.getState().setAnimationState('stop');
+};
+export const setLose = () => {
+    stateManagerStore.getState().setAnimationState('lose');
+};
 export const setWin = ({ isReplay, completeAnimationLevel }: SetWinArgs) =>
     stateManagerStore.getState().setWinAnimation({ isReplay, completeAnimationLevel });

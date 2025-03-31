@@ -6,9 +6,11 @@ const tower = TariTower();
 
 let time = 0;
 let lastRender = 0;
-const targetFPS = 50;
+const targetFPS = 60;
 const frameInterval = 1 / targetFPS;
 let frame: number;
+
+const setProperty = propertiesStore.getState().setProperty;
 
 function animate() {
     const newTime = performance.now() / 1000;
@@ -40,7 +42,7 @@ function initCallback() {
 
 export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: string; offset?: number }) {
     if (document.getElementById(canvasId)) return;
-    const setProperty = propertiesStore.getState().setProperty;
+
     setProperty({ propertyName: 'offsetX', value: offset });
     setProperty({ propertyName: 'cameraOffsetX', value: offset / window.innerWidth });
     try {
@@ -53,6 +55,7 @@ export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: s
 export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
     if (!document.getElementById(canvasId)) return;
     const status = stateManagerStore.getState().status;
+
     if (status === 'not-started') {
         stateManagerStore.getState().setDestroyCanvas(true);
     } else {

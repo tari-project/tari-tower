@@ -76,9 +76,9 @@ const TariTower = () => {
 
         uniformsStore.setState((c) => ({
             u_viewportResolution: {
-                value: c.u_viewportResolution.value.clone().set(viewportWidth, window.innerHeight),
+                value: c.u_viewportResolution.value.set(viewportWidth, window.innerHeight),
             },
-            u_resolution: { value: c.u_resolution.value.clone().set(dprWidth, dprHeight) },
+            u_resolution: { value: c.u_resolution.value.set(dprWidth, dprHeight) },
         }));
 
         renderer.setSize(dprWidth, dprHeight);
