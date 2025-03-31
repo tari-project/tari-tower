@@ -1,7 +1,7 @@
 import { ColorRepresentation, Object3D } from 'three';
 import Block from '../scripts/logic/Block';
 
-export interface IProperties {
+export interface IPropertiesState {
     time: number;
     deltaTime: number;
     offsetX: number;
@@ -36,4 +36,11 @@ export interface IScene {
 
 export interface Uniform<T = unknown> {
     value: T;
+}
+
+type TPropertyName = keyof IPropertiesState;
+type TPropertyValue = IPropertiesState[TPropertyName];
+export interface IPropertyPair {
+    propertyName: TPropertyName;
+    value: TPropertyValue;
 }

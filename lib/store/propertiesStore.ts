@@ -1,10 +1,10 @@
 import { createStore } from 'zustand/vanilla';
 import { subscribeWithSelector } from 'zustand/middleware';
 
-import { IProperties } from '../types/properties.ts';
+import type { IPropertiesState, IPropertyPair } from '../types/properties.ts';
 import Block from '../scripts/logic/Block.ts';
 
-const initialState: IProperties = {
+const initialState: IPropertiesState = {
     time: 0,
     deltaTime: 0,
     showVisual: true,
@@ -27,14 +27,7 @@ const initialState: IProperties = {
     particlesSize: 0.01,
 };
 
-type TPropertyName = keyof IProperties;
-type TPropertyValue = IProperties[TPropertyName];
-export interface IPropertyPair {
-    propertyName: TPropertyName;
-    value: TPropertyValue;
-}
-
-interface IPropertiesStoreState extends IProperties {
+interface IPropertiesStoreState extends IPropertiesState {
     setProperty: (property: IPropertyPair) => void;
 }
 export const propertiesStore = createStore<IPropertiesStoreState>()(

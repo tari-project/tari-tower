@@ -1,7 +1,8 @@
-import { loadTowerAnimation, removeTowerAnimation } from './scripts/index';
-import { setStop, setLose, setStart, showVisual, setWin } from './store/stateManagerStore.ts';
 import { SuccessLevel } from './types/stateManager.ts';
-import { IPropertyPair, propertiesStore } from './store/propertiesStore.ts';
+import { IPropertyPair } from './types/properties.ts';
+import { propertiesStore } from './store/propertiesStore.ts';
+import { setStop, setLose, setStart, showVisual, setWin } from './store/stateManagerStore.ts';
+import { loadTowerAnimation, removeTowerAnimation } from './scripts/index';
 
 const setAnimationProperties = (properties: IPropertyPair[]) => {
     for (const property of properties) {

@@ -15,7 +15,7 @@ export default defineConfig({
             include: ['lib'],
             exclude: ['src'],
             rollupTypes: true,
-            tsconfigPath: path.resolve(__dirname, 'tsconfig.app.json'),
+            tsconfigPath: path.resolve(__dirname, 'tsconfig.lib.json'),
         }),
     ],
     build: {
