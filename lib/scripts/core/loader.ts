@@ -1,14 +1,4 @@
-import * as THREE from 'three';
-
-import BASE from 'public/assets/BASE.buf?url&inline';
-import BOX from 'public/assets/BOX.buf?url&inline';
-import COIN from 'public/assets/COIN.buf?url&inline';
-import COIN_PLACEMENT from 'public/assets/COIN_PLACEMENT.buf?url&inline';
-import LOSE_ANIMATION from 'public/assets/LOSE_ANIMATION.buf?url&inline';
-
-import gobo from 'public/assets/gobo.jpg';
-import LDR_RGB1_0 from 'public/assets/LDR_RGB1_0.png';
-import matcap_gold from 'public/assets/matcap_gold.jpg';
+import { BufferAttribute, BufferGeometry, LinearFilter, LinearMipMapLinearFilter, TextureLoader } from 'three';
 
 interface LoaderItems {
     list: (() => void | Promise<void>)[];
@@ -17,22 +7,11 @@ interface LoaderItems {
 }
 
 const Loader = () => {
-    const assets = {
-        'models/BASE.buf': BASE,
-        'models/BOX.buf': BOX,
-        'models/COIN.buf': COIN,
-        'models/COIN_PLACEMENT.buf': COIN_PLACEMENT,
-        'models/LOSE_ANIMATION.buf': LOSE_ANIMATION,
-        'textures/gobo.jpg': gobo,
-        'textures/LDR_RGB1_0.png': LDR_RGB1_0,
-        'textures/matcap_gold.jpg': matcap_gold,
-    };
     let list: LoaderItems['list'] = [];
     let loadedCount: LoaderItems['loadedCount'] = 0;
     let onLoadCallback: LoaderItems['onLoadCallback'] = null;
 
-    function loadBuf(file, cb) {
-        const url = assets[file];
+    function loadBuf(url, cb) {
         list.push(async () => {
             let attempts = 0;
             const maxAttempts = 3;
@@ -49,7 +28,7 @@ const Loader = () => {
                     const { vertexCount, indexCount, attributes: schematicAttributeList } = schematic;
                     let offset = 4 + schematicJsonSize;
 
-                    const geometry = new THREE.BufferGeometry();
+                    const geometry = new BufferGeometry();
                     const offsetMap = {};
 
                     schematicAttributeList.forEach((schematicAttribute) => {
@@ -68,9 +47,9 @@ const Loader = () => {
                         }
 
                         if (id === 'indices') {
-                            geometry.setIndex(new THREE.BufferAttribute(outArr, 1));
+                            geometry.setIndex(new BufferAttribute(outArr, 1));
                         } else {
-                            geometry.setAttribute(id, new THREE.BufferAttribute(outArr, componentSize));
+                            geometry.setAttribute(id, new BufferAttribute(outArr, componentSize));
                         }
 
                         offset += dataLength * componentSize * byteSize;
@@ -83,12 +62,12 @@ const Loader = () => {
                     attempts++;
                     if (attempts >= maxAttempts) {
                         console.error(
-                            `Tower animation | error loading buffer: ${file}after ${maxAttempts} attempts`,
+                            `Tower animation | error loading buffer: ${url}after ${maxAttempts} attempts`,
                             error
                         );
                     } else {
                         console.warn(
-                            `Tower animation | error loading buffer: ${file}, attempt ${attempts}/${maxAttempts}, retrying...`,
+                            `Tower animation | error loading buffer: ${url}, attempt ${attempts}/${maxAttempts}, retrying...`,
                             error
                         );
                         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -116,22 +95,23 @@ const Loader = () => {
         return outArr;
     }
 
-    function loadTexture(file, cb) {
-        const url = assets[file];
+    function loadTexture(url, cb) {
         list.push(() => {
-            new THREE.TextureLoader().load(
+            new TextureLoader().load(
                 url,
                 (texture) => {
-                    texture.minFilter = THREE.LinearMipMapLinearFilter;
-                    texture.magFilter = THREE.LinearFilter;
-                    texture.generateMipmaps = true;
-                    texture.anisotropy = 1;
-                    texture.flipY = true;
-                    if (cb) cb(texture);
-                    _onLoad();
+                    if (texture) {
+                        texture.minFilter = LinearMipMapLinearFilter;
+                        texture.magFilter = LinearFilter;
+                        texture.generateMipmaps = true;
+                        texture.anisotropy = 1;
+                        texture.flipY = true;
+                        cb?.(texture);
+                        _onLoad();
+                    }
                 },
                 undefined,
-                (error) => console.error(`Tower animation | error loading texture: ${file}`, error)
+                (error) => console.error(`Tower animation | error loading texture: ${url}`, error)
             );
         });
     }

@@ -1,6 +1,7 @@
 import type { KnipConfig } from 'knip';
 
 const config: KnipConfig = {
+    project: ['lib/**/*.{js,ts}'],
     rules: {
         files: 'error',
         dependencies: 'warn',

@@ -1,9 +1,7 @@
 export enum AnimationStatus {
     NOT_STARTED = 'not-started',
-    STARTED = 'started',
     FREE = 'free',
     RESULT = 'result',
-    RESTART = 'restart',
 }
 export enum AnimationResult {
     NONE = 'none',
@@ -19,14 +17,13 @@ export enum SuccessLevel {
     THREE = 3,
 }
 
-export const PREVENT_CYCLE_STATES = [AnimationStatus.NOT_STARTED, AnimationStatus.RESTART, AnimationStatus.STARTED];
+export const PREVENT_CYCLE_STATES = [AnimationStatus.NOT_STARTED];
 export const resetCycleResults = [AnimationResult.FAILED, AnimationResult.COMPLETED];
 
 const _FLAG_TYPES = [
     'hasNotStarted',
     'isFree',
     'isResult',
-    'isRestart',
     'isReplayResult',
     'isSuccessResult',
     'isFailResult',

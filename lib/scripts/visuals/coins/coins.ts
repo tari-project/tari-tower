@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { InstancedBufferAttribute, Object3D, UniformsLib, UniformsUtils } from 'three';
 import loader from '../../core/loader';
 
 import vert from './coins.vert?raw';
@@ -8,7 +8,8 @@ import { floatingCoinsRatio, vortexCoinsRatio } from '../../logic/successAnimati
 import { BufferGeometry, InstancedBufferGeometry, Mesh, ShaderMaterial } from 'three';
 import { ASSETS_PATH } from '../../core/settings';
 import { uniformsStore } from '../../../store/uniformsStore.ts';
-const coinContainer = new THREE.Object3D();
+
+const coinContainer = new Object3D();
 
 const Coins = () => {
     let refGeometry: BufferGeometry;
@@ -33,17 +34,14 @@ const Coins = () => {
     };
 
     async function preload() {
-        const modelPath = ASSETS_PATH + 'models';
-        const texturePath = ASSETS_PATH + 'textures';
-
-        loader.loadTexture(`${texturePath}/matcap_gold.jpg`, (texture) => {
+        loader.loadTexture(`${ASSETS_PATH}/matcap_gold.jpg`, (texture) => {
             matcapTexture = texture;
             matcapTexture.needsUpdate = true;
         });
-        loader.loadBuf(`${modelPath}/COIN.buf`, (geometry) => {
+        loader.loadBuf(`${ASSETS_PATH}/COIN.buf`, (geometry) => {
             refGeometry = geometry;
         });
-        loader.loadBuf(`${modelPath}/COIN_PLACEMENT.buf`, (geometry) => {
+        loader.loadBuf(`${ASSETS_PATH}/COIN_PLACEMENT.buf`, (geometry) => {
             const { position, aoN, aoP, curveu, orient } = geometry.attributes;
             positionsArray = position.array;
             aoNArray = aoN.array;
@@ -66,7 +64,7 @@ const Coins = () => {
 
     function _setupGeometry() {
         refGeometry.computeVertexNormals();
-        const geometry = new THREE.InstancedBufferGeometry();
+        const geometry = new InstancedBufferGeometry();
         geometry.index = refGeometry.index;
         Object.entries(refGeometry.attributes).forEach(([id, attr]) => geometry.setAttribute(id, attr));
 
@@ -82,7 +80,7 @@ const Coins = () => {
         ];
 
         instanceAttributes.forEach(([name, array, itemSize]) => {
-            geometry.setAttribute(name, new THREE.InstancedBufferAttribute(array, itemSize));
+            geometry.setAttribute(name, new InstancedBufferAttribute(array, itemSize));
         });
 
         coinGeometry = geometry;
@@ -90,11 +88,11 @@ const Coins = () => {
 
     function _setupMaterial() {
         const sharedUniforms = uniformsStore.getState();
-        coinMaterial = new THREE.ShaderMaterial({
+        coinMaterial = new ShaderMaterial({
             uniforms: {
                 ...sharedUniforms,
                 ...coinsSharedUniforms,
-                ...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
+                ...UniformsUtils.merge([UniformsLib.lights]),
                 u_matcapTexture: { value: matcapTexture },
             },
             vertexShader: vert,
@@ -105,12 +103,12 @@ const Coins = () => {
 
     function _setupMesh() {
         if (coinGeometry && coinMaterial) {
-            coinMesh = new THREE.Mesh(coinGeometry, coinMaterial);
+            coinMesh = new Mesh(coinGeometry, coinMaterial);
             coinMesh.frustumCulled = false;
             coinMesh.castShadow = true;
             coinMesh.receiveShadow = true;
 
-            coinMesh.customDepthMaterial = new THREE.ShaderMaterial({
+            coinMesh.customDepthMaterial = new ShaderMaterial({
                 uniforms: { ...coinsSharedUniforms },
                 vertexShader: vert,
                 fragmentShader: fragDepth,

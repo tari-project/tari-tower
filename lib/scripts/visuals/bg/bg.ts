@@ -37,7 +37,7 @@ const Background = () => {
             u_blueNoiseTexture: sharedUniforms.u_blueNoiseTexture,
             u_blueNoiseTexelSize: sharedUniforms.u_blueNoiseTexelSize,
             u_blueNoiseCoordOffset: sharedUniforms.u_blueNoiseCoordOffset,
-        } as unknown as ShaderMaterial['uniforms'];
+        };
 
         mesh.material = new ShaderMaterial({
             uniforms,
@@ -94,7 +94,6 @@ const Background = () => {
         particlesMesh.frustumCulled = false;
         container.add(particlesMesh);
     }
-
     function update(_dt: number) {
         particlesMesh.material.uniforms.u_size.value = propertiesStore.getState().particlesSize;
         particlesMesh.material.uniforms.u_color.value.set(propertiesStore.getState().particlesColor);

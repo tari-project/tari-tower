@@ -180,26 +180,6 @@ const SystemManager = () => {
         stopAnimationManager.update(dt);
         errorAnimationManager.update(dt);
 
-        stateManagerStore.subscribe(
-            (state) => state.flags,
-            (flags) => {
-                const { hasNotStarted, isRestart, isResult } = flags;
-
-                if (hasNotStarted) {
-                    _startNewCycle();
-                    return;
-                }
-                if (isRestart) {
-                    reset();
-                    return;
-                }
-                if (isResult) {
-                    setStart();
-                }
-            },
-            { fireImmediately: true }
-        );
-
         board.preUpdate(dt);
         if (lastSpawnedBlock) {
             lastSpawnedBlock.update(dt);
@@ -215,6 +195,23 @@ const SystemManager = () => {
     }
 
     async function init() {
+        stateManagerStore.subscribe(
+            (state) => state.flags,
+            (flags) => {
+                const { hasNotStarted, isResult } = flags;
+
+                if (hasNotStarted) {
+                    _startNewCycle();
+                    return;
+                }
+                if (isResult) {
+                    reset();
+                    setStart();
+                }
+            },
+            { fireImmediately: true }
+        );
+
         animationCycleStore.subscribe(
             (state) => state.lastSpawnedBlock,
             (_lastSpawnedBlock) => (lastSpawnedBlock = _lastSpawnedBlock),

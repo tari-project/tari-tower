@@ -17,15 +17,15 @@ const initialState: IPropertiesState = {
 
     bgColor1: '#ffffff',
     bgColor2: '#d0d0d0',
-    // neutralColor: '#ffffff',
-    neutralColor: '#e20093',
+    neutralColor: '#ffffff',
     mainColor: '#0096ff',
     successColor: '#00c881',
     failColor: '#ca0101',
     particlesColor: '#505050',
     goboIntensity: 0.45,
     particlesOpacity: 0.75,
-    particlesSize: 0.01,
+    particlesSize: 0.6,
+    // particlesSize: 0.01,
 };
 
 interface IPropertiesStoreState extends IPropertiesState {
@@ -41,3 +41,7 @@ export const propertiesStore = createStore<IPropertiesStoreState>()(
 export const setErrorBlock = (errorBlock?: Block | null): void => {
     propertiesStore.setState({ errorBlock });
 };
+
+export function showVisual() {
+    propertiesStore.getState().setProperty({ propertyName: 'showVisual', value: true });
+}

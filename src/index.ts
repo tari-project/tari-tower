@@ -8,10 +8,10 @@ import {
     setStart,
     setStop,
     setWin,
-    showVisual,
     SuccessLevel,
     type IPropertyPair,
 } from '../lib';
+import { showVisual } from '../lib/store/propertiesStore.ts';
 
 if (import.meta.env.MODE === 'development') {
     const gui = new GUI();
@@ -50,7 +50,7 @@ if (import.meta.env.MODE === 'development') {
     gui.add(actions, 'initCanvas');
 
     function handleLoad() {
-        loadTowerAnimation({ canvasId: 'canvas-id', offset: 0 });
+        void loadTowerAnimation({ canvasId: 'canvas-id', offset: 0 });
     }
 
     document.addEventListener('DOMContentLoaded', handleLoad);

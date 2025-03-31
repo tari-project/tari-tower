@@ -1,12 +1,12 @@
 import { createStore } from 'zustand/vanilla';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { AnimationResult, AnimationStatus, Flags, SuccessLevel } from '../types/stateManager.ts';
-import { propertiesStore } from './propertiesStore.ts';
 
 interface SetWinArgs {
     isReplay?: boolean;
     completeAnimationLevel?: SuccessLevel | null;
 }
+type AnimationType = 'start' | 'stop' | 'lose';
 
 interface State {
     status: AnimationStatus;
@@ -19,6 +19,8 @@ interface State {
 interface Actions {
     setDestroyCanvas: (destroyCanvas: boolean) => void;
     setAnimationTypeEnded: (animationTypeEnded: 'stop' | 'win' | 'lose' | null) => void;
+    setAnimationState: (animationType: AnimationType) => void;
+    setWinAnimation: ({ isReplay, completeAnimationLevel }: SetWinArgs) => void;
     reset: () => void;
 }
 type ManagerState = State & Actions;
@@ -27,7 +29,6 @@ const initialFlags: Flags = {
     hasNotStarted: true,
     isFree: false,
     isResult: false,
-    isRestart: false,
     isReplayResult: false,
     isSuccessResult: false,
     isFailResult: false,
@@ -45,48 +46,61 @@ export const stateManagerStore = createStore<ManagerState>()(
         ...initialState,
         setDestroyCanvas: (destroyCanvas: boolean) => set({ destroyCanvas }),
         setAnimationTypeEnded: (animationTypeEnded) => set({ animationTypeEnded }),
+        setWinAnimation: ({ isReplay, completeAnimationLevel }) =>
+            set((currentState) => {
+                const notStarted = currentState.status === AnimationStatus.NOT_STARTED;
+                const result = isReplay && notStarted ? AnimationResult.REPLAY : AnimationResult.COMPLETED;
+
+                return { status: AnimationStatus.RESULT, result, completeAnimationLevel };
+            }),
+        setAnimationState: (animationType: AnimationType) =>
+            set((currentState) => {
+                let animationStatus: AnimationStatus;
+                let animationResult = currentState.result;
+                switch (animationType) {
+                    case 'start': {
+                        animationStatus = AnimationStatus.FREE;
+                        break;
+                    }
+                    case 'stop': {
+                        animationStatus = AnimationStatus.RESULT;
+                        animationResult = AnimationResult.STOP;
+                        break;
+                    }
+                    case 'lose': {
+                        animationStatus = AnimationStatus.RESULT;
+                        animationResult = AnimationResult.FAILED;
+                        break;
+                    }
+                    default: {
+                        animationStatus = AnimationStatus.NOT_STARTED;
+                    }
+                }
+                const isResult = animationStatus === AnimationStatus.RESULT;
+
+                const newFlags = {
+                    isResult,
+                    hasNotStarted: animationStatus === AnimationStatus.NOT_STARTED,
+                    isFree: animationStatus === AnimationStatus.FREE,
+                    isReplayResult: isResult && animationResult === AnimationResult.REPLAY,
+                    isSuccessResult: isResult && animationResult === AnimationResult.COMPLETED,
+                    isFailResult: isResult && animationResult === AnimationResult.FAILED,
+                    isStopped: isResult && animationResult === AnimationResult.STOP,
+                };
+
+                return {
+                    ...currentState,
+                    status: animationStatus,
+                    result: animationResult,
+                    flags: newFlags,
+                };
+            }),
         reset: () => set(initialState),
     }))
 );
 
-export const setStart = () => {
-    stateManagerStore.setState({ status: AnimationStatus.FREE });
-    updateFlags();
-};
-export const setLose = () => {
-    stateManagerStore.setState({ status: AnimationStatus.RESULT, result: AnimationResult.FAILED });
-    updateFlags();
-};
-export const setStop = () => {
-    stateManagerStore.setState({ status: AnimationStatus.RESULT, result: AnimationResult.STOP });
-    updateFlags();
-};
-export const setWin = ({ isReplay, completeAnimationLevel }: SetWinArgs) => {
-    const notStarted = stateManagerStore.getState().flags.hasNotStarted;
-    const result = isReplay && notStarted ? AnimationResult.REPLAY : AnimationResult.COMPLETED;
-    stateManagerStore.setState({ status: AnimationStatus.RESULT, result, completeAnimationLevel });
-    updateFlags();
-};
-export function showVisual() {
-    propertiesStore.getState().setProperty({ propertyName: 'showVisual', value: true });
-}
-
-export const updateFlags = () =>
-    stateManagerStore.setState((state) => {
-        const { status, result } = state;
-        const isResult = status === AnimationStatus.RESULT;
-
-        const newFlags = {
-            isResult,
-            hasNotStarted: status === AnimationStatus.NOT_STARTED,
-            isFree: status === AnimationStatus.FREE,
-            isRestart: status === AnimationStatus.RESTART,
-            isReplayResult: isResult && result === AnimationResult.REPLAY,
-            isSuccessResult: isResult && result === AnimationResult.COMPLETED,
-            isFailResult: isResult && result === AnimationResult.FAILED,
-            isStopped: isResult && result === AnimationResult.STOP,
-        };
-        return {
-            flags: { ...state.flags, ...newFlags },
-        };
-    });
+export const setStart = () => stateManagerStore.getState().setAnimationState('start');
+export const setStop = () => stateManagerStore.getState().setAnimationState('stop');
+export const setLose = () => stateManagerStore.getState().setAnimationState('lose');
+export const setWin = ({ isReplay, completeAnimationLevel }: SetWinArgs) =>
+    stateManagerStore.getState().setWinAnimation({ isReplay, completeAnimationLevel });

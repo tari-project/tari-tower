@@ -1,4 +1,4 @@
-import { ColorRepresentation, Object3D } from 'three';
+import { ColorRepresentation } from 'three';
 import Block from '../scripts/logic/Block';
 
 export interface IPropertiesState {
@@ -24,7 +24,6 @@ export interface IPropertiesState {
     errorBlock?: Block | null;
 }
 export interface IScene {
-    scene: Object3D;
     lightPositionX: number;
     lightPositionY: number;
     lightPositionZ: number;

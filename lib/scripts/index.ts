@@ -23,14 +23,19 @@ function animate() {
 }
 
 function initCallback() {
-    void tower.init();
+    tower
+        .init()
+        .then(() => {
+            time = performance.now() / 1000;
+            lastRender = time;
 
-    time = performance.now() / 1000;
-    lastRender = time;
-
-    window.addEventListener('resize', () => tower.onResize());
-    tower.onResize();
-    animate();
+            window.addEventListener('resize', () => tower.onResize());
+            tower.onResize();
+            animate();
+        })
+        .catch((e) => {
+            console.error('init err:', e);
+        });
 }
 
 export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: string; offset?: number }) {

@@ -6,6 +6,15 @@ import { animationCycleStore } from '../../store/animationCycleStore.ts';
 import { ANIMATION_SPEED, ERROR_BLOCK_MAX_LIFE_CYCLE, MIN_SPAWN_COUNT_FOR_ERROR } from '../core/settings.ts';
 import { propertiesStore, setErrorBlock } from '../../store/propertiesStore.ts';
 
+let flags = stateManagerStore.getState().flags;
+
+stateManagerStore.subscribe(
+    (state) => state.flags,
+    (_flags) => {
+        flags = _flags;
+    },
+    { fireImmediately: true }
+);
 export default class Block {
     id: BlockType['id'] = -1;
     isMoving: BlockType['isMoving'] = false;
@@ -182,25 +191,20 @@ export default class Block {
     }
 
     _updateMovement(dt: number) {
-        stateManagerStore.subscribe(
-            (state) => state.flags,
-            (flags) => {
-                const { isFree, isResult } = flags;
+        const isFree = flags.isFree;
+        const isResult = flags.isResult;
 
-                if ((this.isMoving && !this.hasAnimationEnded) || isResult) {
-                    this.moveAnimationRatio = Math.min(
-                        1,
-                        this.moveAnimationRatio + ANIMATION_SPEED * dt * (this.isErrorBlock ? 0.7 : 1)
-                    );
-                    this.easedAnimationRatio = this.easingFunction?.(Math.max(0, this.moveAnimationRatio)) || 0;
+        if ((this.isMoving && !this.hasAnimationEnded) || isResult) {
+            this.moveAnimationRatio = Math.min(
+                1,
+                this.moveAnimationRatio + ANIMATION_SPEED * dt * (this.isErrorBlock ? 0.7 : 1)
+            );
+            this.easedAnimationRatio = this.easingFunction?.(Math.max(0, this.moveAnimationRatio)) || 0;
 
-                    if (this.easedAnimationRatio === 1 && (isFree || isResult)) {
-                        this._onMovementEnd();
-                    }
-                }
-            },
-            { fireImmediately: true }
-        );
+            if (this.easedAnimationRatio === 1 && (isFree || isResult)) {
+                this._onMovementEnd();
+            }
+        }
     }
 
     _updateTileRatios() {

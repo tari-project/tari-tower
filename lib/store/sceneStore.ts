@@ -1,11 +1,9 @@
-import { Scene } from 'three';
 import { createStore } from 'zustand/vanilla';
 import { subscribeWithSelector } from 'zustand/middleware';
 
 import { IScene } from '../types/properties.ts';
 
 const initialState = {
-    scene: new Scene(),
     lightPositionX: -2,
     lightPositionY: 6,
     lightPositionZ: -4,

@@ -11,7 +11,7 @@ import {
 import { Uniform } from './properties';
 import HeroBlockCoordinates from '../scripts/visuals/hero/HeroBlockCoordinates';
 
-export interface HeroSharedUniforms {
+interface HeroSharedUniforms {
     u_lightPosition: Uniform<Vector3>;
     u_goboTexture: Uniform<Texture | null>;
     u_goboIntensity: Uniform<number>;

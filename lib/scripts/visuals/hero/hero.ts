@@ -143,22 +143,19 @@ const Hero = () => {
         heroState._blockList = arr.map((_) => new HeroBlockCoordinates());
         heroState._blockRenderList = [...heroState._blockList];
 
-        const modelPath = ASSETS_PATH + 'models';
-        const texturePath = ASSETS_PATH + 'textures';
-
-        loader.loadBuf(`${modelPath}/BASE.buf`, (geometry) => {
+        loader.loadBuf(`${ASSETS_PATH}/BASE.buf`, (geometry) => {
             _onBaseBlocksLoaded(geometry);
         });
-        loader.loadBuf(`${modelPath}/BOX.buf`, (geometry) => {
+        loader.loadBuf(`${ASSETS_PATH}/BOX.buf`, (geometry) => {
             _onBoxLoaded(geometry);
         });
-        loader.loadBuf(`${modelPath}/LOSE_ANIMATION.buf`, (geometry) => {
+        loader.loadBuf(`${ASSETS_PATH}/LOSE_ANIMATION.buf`, (geometry) => {
             const { position, orient } = geometry.attributes;
             heroState.animationTotalFrames = position.count / TOTAL_TILES;
             heroState.heroLoseAnimationPositionArray = position.array;
             heroState.heroLoseAnimationOrientArray = orient.array;
         });
-        loader.loadTexture(`${texturePath}/gobo.jpg`, (texture) => {
+        loader.loadTexture(`${ASSETS_PATH}/gobo.jpg`, (texture) => {
             texture.flipY = false;
             texture.needsUpdate = true;
             uniformsStore.setState({ u_goboTexture: { value: texture } });
@@ -249,7 +246,7 @@ const Hero = () => {
         heroContainer.add(heroState._blocksMesh);
     }
 
-    function init() {
+    async function init() {
         const sceneState = sceneStore.getState();
         heroState.directLight = new DirectionalLight(0xffffff, 1);
         heroState.directLight.castShadow = true;
@@ -262,8 +259,6 @@ const Hero = () => {
         heroState.directLight.shadow.bias = sceneState.lightCameraBias;
         heroState.directLight.shadow.mapSize.width = 768;
         heroState.directLight.shadow.mapSize.height = 768;
-        sceneState.scene?.add(heroState.directLight);
-        sceneState.scene?.add(heroState.directLight.target);
 
         heroState.isShadowCameraHelperVisible = true;
         heroState.shadowCameraHelper = new CameraHelper(heroState.directLight.shadow.camera);
@@ -299,6 +294,7 @@ const Hero = () => {
             u_infoTexture: { value: heroState.infoTexture },
             u_infoTextureLinear: { value: heroState.infoTextureLinear },
         });
+        return heroState.directLight;
     }
 
     function _assignFinalAnimationToTiles() {
@@ -328,11 +324,6 @@ const Hero = () => {
     function reset() {
         heroState.successColorRatio = 0;
         heroState._blockList.forEach((block) => block.reset());
-    }
-
-    function resetBlockFromLogicBlock(logicBlock) {
-        const block = heroState._blockList[logicBlock.id];
-        block.reset();
     }
 
     function _updateColors(dt: number) {
@@ -648,7 +639,6 @@ const Hero = () => {
         preload,
         init,
         reset,
-        resetBlockFromLogicBlock,
         update,
         heroContainer,
     };
