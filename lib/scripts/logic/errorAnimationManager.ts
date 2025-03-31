@@ -52,10 +52,4 @@ const ErrorAnimationManager = () => {
     };
 };
 const errorAnimationManager = ErrorAnimationManager();
-export {
-    errorAnimationManager,
-    failShakeRatio,
-    failFloatingCubesRatio,
-    failSpawnRatio,
-    failPushDownRatio,
-};
+export { errorAnimationManager, failShakeRatio, failFloatingCubesRatio, failSpawnRatio, failPushDownRatio };
