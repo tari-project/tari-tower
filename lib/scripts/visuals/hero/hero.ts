@@ -517,8 +517,6 @@ const Hero = () => {
             if (logicBlock) {
                 const tile = logicBlock.currentTile;
 
-                console.debug(blocks);
-
                 if (failFloatingCubesRatio > 0) {
                     const frameStart = Math.floor(failFloatingCubesRatio * heroState.animationTotalFrames);
                     const frameEnd = Math.min(frameStart + 1, heroState.animationTotalFrames - 1);
@@ -604,6 +602,7 @@ const Hero = () => {
             if (block.showRatio > 0) {
                 heroState._blockRenderList[renderCount++] = block;
             }
+
             _updateFailAnimation(logicBlock, block, i);
             _updateLongBlockAnimation(logicBlock, block);
             _updateFloatAnimation(logicBlock, block);

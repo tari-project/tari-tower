@@ -45,7 +45,6 @@ export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: s
 }
 
 export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
-    console.debug('ANI remove tower', canvasId);
     if (!document.getElementById(canvasId)) return;
     const status = stateManagerStore.getState().status;
     if (status === 'not-started') {

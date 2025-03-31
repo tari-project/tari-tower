@@ -1,6 +1,35 @@
 import { Vector2, ColorRepresentation, Object3D, Color } from 'three';
 import Block from '../scripts/logic/Block';
 
+export interface IProperties {
+    offsetX: number;
+    deltaTime: number;
+    cameraOffsetX: number;
+    bgColor1: ColorRepresentation;
+    bgColor2: ColorRepresentation;
+    width: number;
+    height: number;
+    viewportWidth: number;
+    viewportHeight: number;
+    neutralColor: ColorRepresentation;
+    mainColor: ColorRepresentation;
+    successColor: ColorRepresentation;
+    failColor: ColorRepresentation;
+    particlesOpacity: number;
+    particlesSize: number;
+    particlesColor?: ColorRepresentation;
+    goboIntensity: number;
+}
+export interface IScene {
+    scene: Object3D;
+    lightPositionX: number;
+    lightPositionY: number;
+    lightPositionZ: number;
+    lightCameraSize: number;
+    lightCameraBias: number;
+    lightCameraNear: number;
+    lightCameraFar: number;
+}
 export interface PropertiesType {
     canvasId?: string;
     time: number;

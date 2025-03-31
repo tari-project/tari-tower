@@ -106,7 +106,7 @@ const SystemManager = () => {
         const activeBlocksCount = animationCycleStore.getState().blocks?.length;
 
         const _isFree = cycleIndex % 2 === 0 ? true : activeBlocksCount < properties.maxFreeBlocksCount - 1;
-        console.debug(cycleIndex, activeBlocksCount, _isFree);
+
         if (lastSpawnedBlock?.hasBeenSpawned) {
             lastSpawnedBlock.moveToNextTile(_isFree, 0);
         }
