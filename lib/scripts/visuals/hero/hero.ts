@@ -39,7 +39,7 @@ import HeroBlockCoordinates from './HeroBlockCoordinates';
 import { InstancedBufferAttribute } from 'three';
 import { HeroSharedUniforms, HeroType } from '../../../types/hero';
 import { AnimationResult } from '../../../types/stateManager';
-import { ASSETS_PATH } from '../../core/settings';
+import { ASSETS_PATH, ERROR_BLOCK_MAX_LIFE_CYCLE } from '../../core/settings';
 import { stateManagerStore } from '../../../store/stateManagerStore';
 import { animationCycleStore } from '../../../store/animationCycleStore.ts';
 
@@ -490,11 +490,7 @@ const Hero = () => {
     }
 
     function _updateLongBlockAnimation(logicBlock, block) {
-        if (
-            logicBlock &&
-            logicBlock.isErrorBlock &&
-            logicBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 1
-        ) {
+        if (logicBlock && logicBlock.isErrorBlock && logicBlock.errorLifeCycle >= ERROR_BLOCK_MAX_LIFE_CYCLE - 1) {
             const tile = logicBlock.currentTile;
             const animationRatio = logicBlock.errorFallAnimationTime;
 

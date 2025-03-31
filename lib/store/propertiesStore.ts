@@ -3,7 +3,7 @@ import { subscribeWithSelector } from 'zustand/middleware';
 
 import { IProperties } from '../types/properties.ts';
 
-const initialState = {
+const initialState: IProperties = {
     deltaTime: 0,
     offsetX: 0,
     cameraOffsetX: 0,
@@ -23,8 +23,20 @@ const initialState = {
     particlesOpacity: 0.75,
     particlesSize: 0.01,
 };
-const propertiesStore = createStore<IProperties>()(
+
+type TPropertyName = keyof IProperties;
+type TPropertyValue = IProperties[TPropertyName];
+interface TPropertyPair {
+    propertyName: TPropertyName;
+    value: TPropertyValue;
+}
+
+interface IPropertiesStoreState extends IProperties {
+    setProperty: (property: TPropertyPair) => void;
+}
+export const propertiesStore = createStore<IPropertiesStoreState>()(
     subscribeWithSelector((set) => ({
         ...initialState,
+        setProperty: (property: TPropertyPair) => set((c) => ({ ...c, property })),
     }))
 );

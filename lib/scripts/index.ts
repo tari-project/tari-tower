@@ -1,6 +1,6 @@
 import TariTower from './tower.ts';
-import { properties } from './core/properties.ts';
 import { setStop, stateManagerStore } from '../store/stateManagerStore';
+import { propertiesStore } from '../store/propertiesStore.ts';
 
 const tower = TariTower();
 
@@ -35,8 +35,9 @@ function initCallback() {
 
 export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: string; offset?: number }) {
     if (document.getElementById(canvasId)) return;
-    properties.offsetX = offset;
-    properties.cameraOffsetX = properties.offsetX / window.innerWidth;
+    const setProperty = propertiesStore.getState().setProperty;
+    setProperty({ propertyName: 'offsetX', value: offset });
+    setProperty({ propertyName: 'cameraOffsetX', value: offset / window.innerWidth });
     try {
         await tower.preload({ canvasId, initCallback });
     } catch (e) {

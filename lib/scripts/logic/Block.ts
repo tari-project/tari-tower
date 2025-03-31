@@ -4,6 +4,7 @@ import { customEasing } from '../utils/ease';
 import { BlockType } from '../../types/block';
 import { stateManagerStore } from '../../store/stateManagerStore';
 import { animationCycleStore } from '../../store/animationCycleStore.ts';
+import { ANIMATION_SPEED, ERROR_BLOCK_MAX_LIFE_CYCLE, MIN_SPAWN_COUNT_FOR_ERROR } from '../core/settings.ts';
 
 export default class Block {
     id: BlockType['id'] = -1;
@@ -102,7 +103,7 @@ export default class Block {
 
         if (this.isErrorBlock && !this.skipFallAnimation) {
             this.errorLifeCycle++;
-            this.isErrorBlockFalling = this.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 1;
+            this.isErrorBlockFalling = this.errorLifeCycle >= ERROR_BLOCK_MAX_LIFE_CYCLE - 1;
         }
 
         let isFree = false;
@@ -118,7 +119,7 @@ export default class Block {
             this.currentTile?.isBorder &&
             !properties.errorBlock &&
             Math.random() < 0.5 &&
-            activeBlocksCount >= properties.minSpawnedBlocksForTheErrorBlock &&
+            activeBlocksCount >= MIN_SPAWN_COUNT_FOR_ERROR &&
             isFree
         ) {
             properties.errorBlock = this;
@@ -172,7 +173,7 @@ export default class Block {
     }
 
     _updateSpawnAnimation(dt: number) {
-        this.spawnAnimationRatioUnclamped += 0.75 * properties.animationSpeed * dt;
+        this.spawnAnimationRatioUnclamped += 0.75 * ANIMATION_SPEED * dt;
         this.spawnAnimationRatio = Math.max(0, Math.min(1, this.spawnAnimationRatioUnclamped));
 
         if (this.spawnAnimationRatio === 1) {
@@ -189,7 +190,7 @@ export default class Block {
                 if ((this.isMoving && !this.hasAnimationEnded) || isResult) {
                     this.moveAnimationRatio = Math.min(
                         1,
-                        this.moveAnimationRatio + properties.animationSpeed * dt * (this.isErrorBlock ? 0.7 : 1)
+                        this.moveAnimationRatio + ANIMATION_SPEED * dt * (this.isErrorBlock ? 0.7 : 1)
                     );
                     this.easedAnimationRatio = this.easingFunction?.(Math.max(0, this.moveAnimationRatio)) || 0;
 
@@ -237,7 +238,7 @@ export default class Block {
         }
 
         if (this.isErrorBlockFalling) {
-            this.errorFallAnimationTime = this.errorFallAnimationTime + 3 * properties.animationSpeed * dt;
+            this.errorFallAnimationTime = this.errorFallAnimationTime + 3 * ANIMATION_SPEED * dt;
         }
         if (this.isErrorBlock) {
             this.errorPreFallAnimationTimeScale = this.errorPreFallAnimationTimeScale + 3 * dt;
