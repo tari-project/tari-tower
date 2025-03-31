@@ -29,18 +29,18 @@ const initialState: IProperties = {
 
 type TPropertyName = keyof IProperties;
 type TPropertyValue = IProperties[TPropertyName];
-interface TPropertyPair {
+export interface IPropertyPair {
     propertyName: TPropertyName;
     value: TPropertyValue;
 }
 
 interface IPropertiesStoreState extends IProperties {
-    setProperty: (property: TPropertyPair) => void;
+    setProperty: (property: IPropertyPair) => void;
 }
 export const propertiesStore = createStore<IPropertiesStoreState>()(
     subscribeWithSelector((set) => ({
         ...initialState,
-        setProperty: (property: TPropertyPair) => set((c) => ({ ...c, property })),
+        setProperty: (property: IPropertyPair) => set((c) => ({ ...c, property })),
     }))
 );
 

@@ -1,3 +1,10 @@
+import { IProperties } from '../types/properties.ts';
+
+export declare interface IPropertyPair {
+    propertyName: TPropertyName;
+    value: TPropertyValue;
+}
+
 export declare function loadTowerAnimation({ canvasId, offset }: {
     canvasId: string;
     offset?: number;
@@ -6,6 +13,8 @@ export declare function loadTowerAnimation({ canvasId, offset }: {
 export declare function removeTowerAnimation({ canvasId }: {
     canvasId: string;
 }): Promise<void>;
+
+export declare const setAnimationProperties: (properties: IPropertyPair[]) => void;
 
 export declare const setLose: () => void;
 
@@ -27,5 +36,9 @@ export declare enum SuccessLevel {
     TWO = 2,
     THREE = 3
 }
+
+declare type TPropertyName = keyof IProperties;
+
+declare type TPropertyValue = IProperties[TPropertyName];
 
 export { }

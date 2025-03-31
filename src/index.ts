@@ -10,13 +10,8 @@ import {
     setWin,
     showVisual,
     SuccessLevel,
+    type IPropertyPair,
 } from '../lib';
-// import {
-//     loadTowerAnimation,
-//     removeTowerAnimation,
-//     setAnimationProperties,
-//     setAnimationState,
-// } from '@tari-project/tari-tower';
 
 if (import.meta.env.MODE === 'development') {
     const gui = new GUI();
@@ -65,28 +60,28 @@ if (import.meta.env.MODE === 'development') {
         clearTimeout(timeOutId);
     }, 500);
 
-    const animationLightBg = [
-        { property: 'bgColor1', value: '#ffffff' },
-        { property: 'bgColor2', value: '#d0d0d0' },
-        { property: 'neutralColor', value: '#ffffff' },
-        { property: 'mainColor', value: '#0096ff' },
-        { property: 'successColor', value: '#00c881' },
-        { property: 'failColor', value: '#ca0101' },
-        { property: 'particlesColor', value: '#505050' },
-        { property: 'goboIntensity', value: 0.45 },
-        { property: 'particlesOpacity', value: 0.75 },
-        { property: 'particlesSize', value: 0.01 },
+    const animationLightBg: IPropertyPair[] = [
+        { propertyName: 'bgColor1', value: '#ffffff' },
+        { propertyName: 'bgColor2', value: '#d0d0d0' },
+        { propertyName: 'neutralColor', value: '#ffffff' },
+        { propertyName: 'mainColor', value: '#0096ff' },
+        { propertyName: 'successColor', value: '#00c881' },
+        { propertyName: 'failColor', value: '#ca0101' },
+        { propertyName: 'particlesColor', value: '#505050' },
+        { propertyName: 'goboIntensity', value: 0.45 },
+        { propertyName: 'particlesOpacity', value: 0.75 },
+        { propertyName: 'particlesSize', value: 0.01 },
     ];
-    const animationDarkBg = [
-        { property: 'bgColor1', value: '#212121' },
-        { property: 'bgColor2', value: '#212121' },
-        { property: 'neutralColor', value: '#040723' },
-        { property: 'successColor', value: '#c9eb00' },
-        { property: 'mainColor', value: '#813bf5' },
-        { property: 'failColor', value: '#ff5610' },
-        { property: 'particlesColor', value: '#813bf5' },
-        { property: 'goboIntensity', value: 0.75 },
-        { property: 'particlesOpacity', value: 0.95 },
-        { property: 'particlesSize', value: 0.015 },
+    const animationDarkBg: IPropertyPair[] = [
+        { propertyName: 'bgColor1', value: '#212121' },
+        { propertyName: 'bgColor2', value: '#212121' },
+        { propertyName: 'neutralColor', value: '#040723' },
+        { propertyName: 'successColor', value: '#c9eb00' },
+        { propertyName: 'mainColor', value: '#813bf5' },
+        { propertyName: 'failColor', value: '#ff5610' },
+        { propertyName: 'particlesColor', value: '#813bf5' },
+        { propertyName: 'goboIntensity', value: 0.75 },
+        { propertyName: 'particlesOpacity', value: 0.95 },
+        { propertyName: 'particlesSize', value: 0.015 },
     ];
 }
