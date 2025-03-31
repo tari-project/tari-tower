@@ -1,4 +1,4 @@
-import { Color, Vector2, DataTexture } from 'three';
+import { Color, Vector2, Vector3, DataTexture } from 'three';
 import { createStore } from 'zustand/vanilla';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { propertiesStore } from './propertiesStore.ts';
@@ -12,7 +12,7 @@ const blueNoiseUniforms = {
 
 const heroSharedUniforms = {
     u_lightPosition: {
-        value: new THREE.Vector3(
+        value: new Vector3(
             sceneStore.getState().lightPositionX,
             sceneStore.getState().lightPositionY,
             sceneStore.getState().lightPositionZ

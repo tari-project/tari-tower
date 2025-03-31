@@ -1,7 +1,12 @@
-import * as THREE from 'three';
-import { Mesh, ShaderMaterial } from 'three';
-
-import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
+import {
+    Color,
+    InstancedBufferAttribute,
+    InstancedBufferGeometry,
+    Mesh,
+    Object3D,
+    PlaneGeometry,
+    ShaderMaterial,
+} from 'three';
 
 import vert from './bg.vert?raw';
 import frag from './bg.frag?raw';
@@ -10,10 +15,11 @@ import particlesFrag from './particles.frag?raw';
 import { TSharedUniforms, uniformsStore } from '../../../store/uniformsStore.ts';
 import { propertiesStore } from '../../../store/propertiesStore.ts';
 
-const container = new THREE.Object3D();
+const container = new Object3D();
 const Background = () => {
-    const particles: Mesh & { material: ShaderMaterial } = new THREE.Mesh();
-    const mesh: Mesh & { material: ShaderMaterial } = new THREE.Mesh(new THREE.PlaneGeometry(2, 2));
+    const mesh: Mesh & { material: ShaderMaterial } = new Mesh(new PlaneGeometry(2, 2));
+    const particlesMesh: Mesh & { material: ShaderMaterial } = new Mesh();
+
     let sharedUniforms: TSharedUniforms;
 
     uniformsStore.subscribe(
@@ -28,10 +34,12 @@ const Background = () => {
             u_resolution: sharedUniforms.u_resolution,
             u_bgColor1: sharedUniforms.u_bgColor1,
             u_bgColor2: sharedUniforms.u_bgColor2,
-            ...bn_sharedUniforms,
+            u_blueNoiseTexture: sharedUniforms.u_blueNoiseTexture,
+            u_blueNoiseTexelSize: sharedUniforms.u_blueNoiseTexelSize,
+            u_blueNoiseCoordOffset: sharedUniforms.u_blueNoiseCoordOffset,
         } as unknown as ShaderMaterial['uniforms'];
 
-        mesh.material = new THREE.ShaderMaterial({
+        mesh.material = new ShaderMaterial({
             uniforms,
             vertexShader: vert,
             fragmentShader: frag,
@@ -43,9 +51,9 @@ const Background = () => {
 
     function initParticles() {
         const particlesCount = 50;
-        const refGeometry = new THREE.PlaneGeometry(1, 1);
+        const refGeometry = new PlaneGeometry(1, 1);
 
-        const geometry = new THREE.InstancedBufferGeometry();
+        const geometry = new InstancedBufferGeometry();
         geometry.index = refGeometry.index;
         Object.keys(refGeometry.attributes).forEach((id) => {
             geometry.setAttribute(id, refGeometry.attributes[id]);
@@ -65,30 +73,32 @@ const Background = () => {
             randomArray[i * 3 + 2] = Math.random();
         }
 
-        geometry.setAttribute('a_instancePosition', new THREE.InstancedBufferAttribute(positionArray, 3));
-        geometry.setAttribute('a_instanceRandom', new THREE.InstancedBufferAttribute(randomArray, 3));
+        geometry.setAttribute('a_instancePosition', new InstancedBufferAttribute(positionArray, 3));
+        geometry.setAttribute('a_instanceRandom', new InstancedBufferAttribute(randomArray, 3));
+
         const uniforms = {
             u_time: sharedUniforms?.u_time || { value: propertiesStore.getState().time },
             u_resolution: sharedUniforms.u_resolution,
-            u_size: { value: 0.01 },
-            u_color: { value: new THREE.Color() },
-            u_opacity: { value: 0 },
+            u_size: { value: propertiesStore.getState().particlesSize },
+            u_color: { value: new Color(propertiesStore.getState().particlesColor) },
+            u_opacity: { value: propertiesStore.getState().particlesOpacity },
         };
-        particles.material = new THREE.ShaderMaterial({
+
+        particlesMesh.material = new ShaderMaterial({
             vertexShader: particlesVert,
             fragmentShader: particlesFrag,
             uniforms,
             transparent: true,
         });
-        particles.geometry = geometry;
-        particles.frustumCulled = false;
-        container.add(particles);
+        particlesMesh.geometry = geometry;
+        particlesMesh.frustumCulled = false;
+        container.add(particlesMesh);
     }
 
     function update(_dt: number) {
-        particles.material.uniforms.u_size.value = propertiesStore.getState().particlesSize;
-        particles.material.uniforms.u_color.value.set(propertiesStore.getState().particlesColor);
-        particles.material.uniforms.u_opacity.value = propertiesStore.getState().particlesOpacity;
+        particlesMesh.material.uniforms.u_size.value = propertiesStore.getState().particlesSize;
+        particlesMesh.material.uniforms.u_color.value.set(propertiesStore.getState().particlesColor);
+        particlesMesh.material.uniforms.u_opacity.value = propertiesStore.getState().particlesOpacity;
     }
 
     return { init, update };

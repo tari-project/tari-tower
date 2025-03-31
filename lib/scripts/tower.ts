@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import settings, { WEBGL_OPTS } from './core/settings.ts';
-import { heroBlocks, heroContainer } from './visuals/hero/hero.ts';
+import { heroBlocks } from './visuals/hero/hero.ts';
 import { coinContainer, Coins } from './visuals/coins/coins.ts';
 import BlueNoise from './utils/blueNoise/blueNoise.ts';
 import { OrbitControls } from './controls/OrbitControls';
@@ -64,11 +64,6 @@ const TariTower = () => {
     function _handleResize(viewportWidth: number, viewportHeight: number) {
         setProperty({ propertyName: 'viewportWidth', value: viewportWidth });
         setProperty({ propertyName: 'viewportHeight', value: viewportHeight });
-        uniformsStore.setState((c) => ({
-            u_viewportResolution: {
-                value: c.u_viewportResolution.value.clone().set(viewportWidth, window.innerHeight),
-            },
-        }));
 
         let dprWidth = viewportWidth * settings.DPR;
         let dprHeight = viewportHeight * settings.DPR;
@@ -85,6 +80,13 @@ const TariTower = () => {
         setProperty({ propertyName: 'height', value: dprHeight });
 
         camera.updateProjectionMatrix();
+
+        uniformsStore.setState((c) => ({
+            u_viewportResolution: {
+                value: c.u_viewportResolution.value.clone().set(viewportWidth, window.innerHeight),
+            },
+            u_resolution: { value: c.u_resolution.value.clone().set(dprWidth, dprHeight) },
+        }));
 
         renderer.setSize(dprWidth, dprHeight);
         canvas.style.width = viewportWidth + 'px';
@@ -139,7 +141,7 @@ const TariTower = () => {
 
             scene.add(coinContainer);
             scene.add(bgContainer);
-            scene.add(heroContainer);
+            scene.add(heroBlocks.heroContainer);
         } catch (error) {
             console.error('init tower error: ', error);
         }

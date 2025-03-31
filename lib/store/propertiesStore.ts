@@ -17,7 +17,8 @@ const initialState: IPropertiesState = {
 
     bgColor1: '#ffffff',
     bgColor2: '#d0d0d0',
-    neutralColor: '#ffffff',
+    // neutralColor: '#ffffff',
+    neutralColor: '#e20093',
     mainColor: '#0096ff',
     successColor: '#00c881',
     failColor: '#ca0101',

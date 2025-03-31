@@ -1,7 +1,26 @@
-import * as THREE from 'three';
-
+import {
+    CameraHelper,
+    ClampToEdgeWrapping,
+    Color,
+    DataTexture,
+    DirectionalLight,
+    DynamicDrawUsage,
+    FloatType,
+    InstancedBufferAttribute,
+    InstancedBufferGeometry,
+    LinearFilter,
+    Mesh,
+    Object3D,
+    Quaternion,
+    RGBAFormat,
+    ShaderMaterial,
+    UniformsLib,
+    UniformsUtils,
+    UVMapping,
+    Vector2,
+    Vector3,
+} from 'three';
 import loader from '../../core/loader';
-
 import math from '../../utils/math';
 import ease, { customEasing } from '../../utils/ease';
 
@@ -35,7 +54,7 @@ import {
     failSpawnRatio,
 } from '../../logic/errorAnimationManager';
 import HeroBlockCoordinates from './HeroBlockCoordinates';
-import { InstancedBufferAttribute } from 'three';
+
 import { HeroType } from '../../../types/hero';
 import { AnimationResult } from '../../../types/stateManager';
 import { ASSETS_PATH, ERROR_BLOCK_MAX_LIFE_CYCLE } from '../../core/settings';
@@ -47,19 +66,18 @@ import { propertiesStore } from '../../../store/propertiesStore.ts';
 import { sceneStore } from '../../../store/sceneStore.ts';
 
 const TOTAL_BLOCKS = 2 * TOTAL_TILES;
-const _v2_0 = new THREE.Vector2();
-const _v2_1 = new THREE.Vector2();
-const _v3_0 = new THREE.Vector3();
-const _v3_1 = new THREE.Vector3();
-const _q_0 = new THREE.Quaternion();
-const _q_1 = new THREE.Quaternion();
-const MAIN_COLOR = new THREE.Color();
-const SUCCESS_COLOR = new THREE.Color();
-const ERROR_COLOR = new THREE.Color();
-const DEFAULT_COLOR = new THREE.Color();
-const _c = new THREE.Color();
-const _c2 = new THREE.Color();
-const heroContainer = new THREE.Object3D();
+const _v2_0 = new Vector2();
+const _v2_1 = new Vector2();
+const _v3_0 = new Vector3();
+const _v3_1 = new Vector3();
+const _q_0 = new Quaternion();
+const _q_1 = new Quaternion();
+const MAIN_COLOR = new Color();
+const SUCCESS_COLOR = new Color();
+const ERROR_COLOR = new Color();
+const DEFAULT_COLOR = new Color();
+const _c = new Color();
+const _c2 = new Color();
 
 const heroState: HeroType = {
     _baseMesh: undefined,
@@ -86,14 +104,27 @@ const heroState: HeroType = {
 };
 
 const Hero = () => {
+    const heroContainer = new Object3D();
+    let animationCycleState = animationCycleStore.getState();
     let result = stateManagerStore.getState().result;
-    const animationCycleState = animationCycleStore.getState();
-    let previousSuccessBlocksAnimationRatio = animationCycleState.previousSuccessBlocksAnimationRatio;
-    let lastSpawnedBlock = animationCycleState.lastSpawnedBlock;
-    let blocks = animationCycleState.blocks;
+    const { blocks, previousSuccessBlocksAnimationRatio, lastSpawnedBlock } = animationCycleState;
 
     let sharedUniforms = uniformsStore.getState();
     let propertiesState = propertiesStore.getState();
+
+    animationCycleStore.subscribe(
+        (state) => state,
+        (state) => (animationCycleState = state),
+        { fireImmediately: true }
+    );
+
+    stateManagerStore.subscribe(
+        (state) => state.result,
+        (_result) => {
+            result = _result;
+        },
+        { fireImmediately: true }
+    );
     propertiesStore.subscribe(
         (state) => state,
         (state) => (propertiesState = state),
@@ -137,25 +168,18 @@ const Hero = () => {
     function _onBaseBlocksLoaded(geometry) {
         const uniforms = {
             ...sharedUniforms,
-            ...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
-            u_color: { value: new THREE.Color(propertiesState.neutralColor) },
-            u_blocksColor: { value: new THREE.Color(propertiesState.neutralColor) },
+            ...UniformsUtils.merge([UniformsLib.lights]),
+            u_color: { value: new Color(propertiesState.neutralColor) },
+            u_blocksColor: { value: new Color(propertiesState.neutralColor) },
             u_yDisplacement: { value: 0 },
             u_prevSuccessColor: {
-                value: new THREE.Color(propertiesState.neutralColor).convertSRGBToLinear(),
+                value: new Color(propertiesState.neutralColor).convertSRGBToLinear(),
             },
-            u_successColor: { value: new THREE.Color(propertiesState.successColor).convertSRGBToLinear() },
+            u_successColor: { value: new Color(propertiesState.successColor).convertSRGBToLinear() },
             u_successAnimationRatio: { value: 0 },
         };
 
-        let logged = false;
-
-        if (!logged) {
-            console.debug('first', uniforms);
-            logged = true;
-        }
-
-        const material = new THREE.ShaderMaterial({
+        const material = new ShaderMaterial({
             uniforms,
             vertexShader: vert,
             fragmentShader: frag,
@@ -163,11 +187,11 @@ const Hero = () => {
             transparent: true,
             defines: { IS_BASE: true },
         });
-        heroState._baseMesh = new THREE.Mesh(geometry, material);
+        heroState._baseMesh = new Mesh(geometry, material);
         heroState._baseMesh.receiveShadow = heroState._baseMesh.castShadow = true;
         heroState._baseMesh.frustumCulled = false;
 
-        heroState._baseMesh.customDepthMaterial = new THREE.ShaderMaterial({
+        heroState._baseMesh.customDepthMaterial = new ShaderMaterial({
             vertexShader: vert,
             fragmentShader: fragDepth,
             defines: { IS_DEPTH: true, IS_BASE: true },
@@ -176,7 +200,7 @@ const Hero = () => {
     }
 
     function _onBoxLoaded(refGeometry) {
-        const geometry = new THREE.InstancedBufferGeometry();
+        const geometry = new InstancedBufferGeometry();
         geometry.index = refGeometry.index;
         Object.keys(refGeometry.attributes).forEach((id) => {
             geometry.setAttribute(id, refGeometry.attributes[id]);
@@ -187,7 +211,7 @@ const Hero = () => {
             const array = new Float32Array(TOTAL_BLOCKS * itemSize);
             geometry.setAttribute(
                 name,
-                new THREE.InstancedBufferAttribute(array, itemSize, itemSize !== 4, 1).setUsage(THREE.DynamicDrawUsage)
+                new InstancedBufferAttribute(array, itemSize, itemSize !== 4, 1).setUsage(DynamicDrawUsage)
             );
             return array;
         };
@@ -201,9 +225,9 @@ const Hero = () => {
         heroState._instanceIsActiveArray = createInstancedAttribute('instanceIsActive', 1);
         heroState._instanceNextDirectionArray = createInstancedAttribute('instanceNextDirection', 2);
 
-        const material = new THREE.ShaderMaterial({
+        const material = new ShaderMaterial({
             uniforms: {
-                ...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
+                ...UniformsUtils.merge([UniformsLib.lights]),
                 ...sharedUniforms,
             },
             vertexShader: vert,
@@ -211,11 +235,11 @@ const Hero = () => {
             lights: true,
         });
 
-        heroState._blocksMesh = new THREE.Mesh(geometry, material);
+        heroState._blocksMesh = new Mesh(geometry, material);
         heroState._blocksMesh.frustumCulled = false;
         heroState._blocksMesh.castShadow = heroState._blocksMesh.receiveShadow = true;
 
-        heroState._blocksMesh.customDepthMaterial = new THREE.ShaderMaterial({
+        heroState._blocksMesh.customDepthMaterial = new ShaderMaterial({
             uniforms: sharedUniforms,
             vertexShader: vert,
             fragmentShader: fragDepth,
@@ -226,33 +250,8 @@ const Hero = () => {
     }
 
     function init() {
-        animationCycleStore.subscribe(
-            (state) => state.blocks,
-            (_blocks) => (blocks = _blocks),
-            { fireImmediately: true }
-        );
-        animationCycleStore.subscribe(
-            (state) => state.lastSpawnedBlock,
-            (_lastSpawnedBlock) => (lastSpawnedBlock = _lastSpawnedBlock),
-            { fireImmediately: true }
-        );
-        animationCycleStore.subscribe(
-            (state) => state.previousSuccessBlocksAnimationRatio,
-            (_previousSuccessBlocksAnimationRatio) =>
-                (previousSuccessBlocksAnimationRatio = _previousSuccessBlocksAnimationRatio),
-            { fireImmediately: true }
-        );
-
-        stateManagerStore.subscribe(
-            (state) => state.result,
-            (_result) => {
-                result = _result;
-            },
-            { fireImmediately: true }
-        );
-
         const sceneState = sceneStore.getState();
-        heroState.directLight = new THREE.DirectionalLight(0xffffff, 1);
+        heroState.directLight = new DirectionalLight(0xffffff, 1);
         heroState.directLight.castShadow = true;
         heroState.directLight.shadow.camera.near = sceneState.lightCameraNear;
         heroState.directLight.shadow.camera.far = sceneState.lightCameraFar;
@@ -267,7 +266,7 @@ const Hero = () => {
         sceneState.scene?.add(heroState.directLight.target);
 
         heroState.isShadowCameraHelperVisible = true;
-        heroState.shadowCameraHelper = new THREE.CameraHelper(heroState.directLight.shadow.camera);
+        heroState.shadowCameraHelper = new CameraHelper(heroState.directLight.shadow.camera);
 
         _assignFinalAnimationToTiles();
 
@@ -281,24 +280,18 @@ const Hero = () => {
             }
         }
 
-        heroState.infoTexture = new THREE.DataTexture(
+        heroState.infoTexture = new DataTexture(infoData, SIZE_WITH_PADDING, SIZE_WITH_PADDING, RGBAFormat, FloatType);
+        heroState.infoTextureLinear = new DataTexture(
             infoData,
             SIZE_WITH_PADDING,
             SIZE_WITH_PADDING,
-            THREE.RGBAFormat,
-            THREE.FloatType
-        );
-        heroState.infoTextureLinear = new THREE.DataTexture(
-            infoData,
-            SIZE_WITH_PADDING,
-            SIZE_WITH_PADDING,
-            THREE.RGBAFormat,
-            THREE.FloatType,
-            THREE.UVMapping,
-            THREE.ClampToEdgeWrapping,
-            THREE.ClampToEdgeWrapping,
-            THREE.LinearFilter,
-            THREE.LinearFilter,
+            RGBAFormat,
+            FloatType,
+            UVMapping,
+            ClampToEdgeWrapping,
+            ClampToEdgeWrapping,
+            LinearFilter,
+            LinearFilter,
             0
         );
         heroState.infoTextureLinear.needsUpdate = true;
@@ -341,7 +334,6 @@ const Hero = () => {
         const block = heroState._blockList[logicBlock.id];
         block.reset();
     }
-    let logged1 = false;
 
     function _updateColors(dt: number) {
         MAIN_COLOR.set(propertiesState.mainColor);
@@ -392,10 +384,6 @@ const Hero = () => {
         }
 
         if (heroState._baseMesh) {
-            if (!logged1) {
-                console.debug('second', heroState._baseMesh.material.uniforms);
-                logged1 = true;
-            }
             heroState._baseMesh.material.uniforms.u_color.value.set(DEFAULT_COLOR).convertSRGBToLinear();
             heroState._baseMesh.material.uniforms.u_blocksColor.value.copy(_c);
             heroState._baseMesh.material.uniforms.u_successColor.value.copy(SUCCESS_COLOR);
@@ -649,7 +637,7 @@ const Hero = () => {
             },
         });
         if (heroState.directLight) {
-            heroState.directLight.position.copy(uniformsStore.getState().u_lightPosition.value);
+            heroState.directLight.position.copy(sharedUniforms.u_lightPosition.value);
             heroState.directLight.shadow.camera.top = sceneState.lightCameraSize;
             heroState.directLight.shadow.camera.bottom = -sceneState.lightCameraSize;
             heroState.directLight.shadow.bias = sceneState.lightCameraBias;
@@ -662,7 +650,7 @@ const Hero = () => {
         reset,
         resetBlockFromLogicBlock,
         update,
+        heroContainer,
     };
 };
-const heroBlocks = Hero();
-export { heroBlocks, heroContainer };
+export const heroBlocks = Hero();

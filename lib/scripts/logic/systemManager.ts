@@ -1,5 +1,5 @@
 import math from '../utils/math';
-import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
+import { heroBlocks } from '../visuals/hero/hero';
 import { board, mainTile, TOTAL_TILES } from './board';
 import Block from './Block';
 
@@ -121,7 +121,7 @@ const SystemManager = () => {
 
     function reset(preventRestart = false) {
         blocks.forEach((block) => block.reset());
-        blocksVisual.reset();
+        heroBlocks.reset();
         board.reset();
         animationCycleStore.getState().reset();
 

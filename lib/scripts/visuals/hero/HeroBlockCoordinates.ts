@@ -1,29 +1,28 @@
 import math from '../../utils/math';
-import * as THREE from 'three';
 import { Quaternion, Vector2, Vector3 } from 'three';
 
 const HALF_PI = Math.PI / 2;
-const _v0 = new THREE.Vector3();
+const _v0 = new Vector3();
 
 export default class HeroBlockCoordinates {
     animation = 0;
-    boardDir: Vector2 = new THREE.Vector2();
-    boardPos: Vector2 = new THREE.Vector2();
-    pos: Vector3 = new THREE.Vector3();
-    orient: Quaternion = new THREE.Quaternion();
+    boardDir: Vector2 = new Vector2();
+    boardPos: Vector2 = new Vector2();
+    pos: Vector3 = new Vector3();
+    orient: Quaternion = new Quaternion();
     showRatio = 0;
-    spinPivot: Vector3 = new THREE.Vector3();
-    spinOrient: Quaternion = new THREE.Quaternion();
+    spinPivot: Vector3 = new Vector3();
+    spinOrient: Quaternion = new Quaternion();
 
     constructor() {
         this.animation = 0;
-        this.boardDir = new THREE.Vector2();
-        this.boardPos = new THREE.Vector2();
-        this.pos = new THREE.Vector3();
-        this.orient = new THREE.Quaternion();
+        this.boardDir = new Vector2();
+        this.boardPos = new Vector2();
+        this.pos = new Vector3();
+        this.orient = new Quaternion();
         this.showRatio = 0;
-        this.spinPivot = new THREE.Vector3();
-        this.spinOrient = new THREE.Quaternion();
+        this.spinPivot = new Vector3();
+        this.spinOrient = new Quaternion();
     }
 
     reset() {
@@ -44,7 +43,7 @@ export default class HeroBlockCoordinates {
         this.spinOrient.setFromAxisAngle(_v0, this.animation * HALF_PI);
     }
 
-    addsFallAnimation(ratio) {
+    addsFallAnimation(ratio: number) {
         _v0.set(this.boardDir.x, -ratio, -this.boardDir.y);
         this.pos.addScaledVector(_v0, ratio);
         _v0.set(this.boardDir.x * 0.5, 0, -this.boardDir.y * 0.5);

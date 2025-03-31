@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import loader from '../../core/loader';
-import { heroSharedUniforms } from '../hero/hero';
 
 import vert from './coins.vert?raw';
 import frag from './coins.frag?raw';
@@ -90,10 +89,10 @@ const Coins = () => {
     }
 
     function _setupMaterial() {
+        const sharedUniforms = uniformsStore.getState();
         coinMaterial = new THREE.ShaderMaterial({
             uniforms: {
-                ...heroSharedUniforms,
-                ...uniformsStore.getInitialState(),
+                ...sharedUniforms,
                 ...coinsSharedUniforms,
                 ...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
                 u_matcapTexture: { value: matcapTexture },
