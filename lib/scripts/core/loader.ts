@@ -34,7 +34,10 @@ const Loader = () => {
     function loadBuf(file, cb) {
         const url = assets[file];
         list.push(async () => {
-            try {
+            let attempts = 0;
+			const maxAttempts = 3;
+
+			while (attempts < maxAttempts) {try {
                 const response = await fetch(url);
                 const buffer = await response.arrayBuffer();
                 const schematicJsonSize = new Uint32Array(buffer, 0, 1)[0];
@@ -72,8 +75,16 @@ const Loader = () => {
 
                 if (cb) cb(geometry);
                 _onLoad();
-            } catch (error) {
-                console.error(`Tower animation | error loading buffer: ${file}`, error);
+            break;
+				} catch (error) {
+					attempts++;
+					if (attempts >= maxAttempts) {
+                console.error(`Tower animation | error loading buffer: ${file}after ${maxAttempts} attempts`, error);
+					} else {
+						console.warn(`Tower animation | error loading buffer: ${file}, attempt ${attempts}/${maxAttempts}, retrying...`, error);
+						await new Promise((resolve) => setTimeout(resolve, 100));
+					}
+				}
             }
         });
     }
