@@ -4,7 +4,6 @@ import loader from '../../core/loader';
 
 import math from '../../utils/math';
 import ease, { customEasing } from '../../utils/ease';
-import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
 
 import {
     HALF_SIZE,
@@ -37,7 +36,7 @@ import {
 } from '../../logic/errorAnimationManager';
 import HeroBlockCoordinates from './HeroBlockCoordinates';
 import { InstancedBufferAttribute } from 'three';
-import { HeroSharedUniforms, HeroType } from '../../../types/hero';
+import { HeroType } from '../../../types/hero';
 import { AnimationResult } from '../../../types/stateManager';
 import { ASSETS_PATH, ERROR_BLOCK_MAX_LIFE_CYCLE } from '../../core/settings';
 import { stateManagerStore } from '../../../store/stateManagerStore';
@@ -62,15 +61,6 @@ const _c = new THREE.Color();
 const _c2 = new THREE.Color();
 const heroContainer = new THREE.Object3D();
 
-const heroSharedUniforms: HeroSharedUniforms = {
-    u_lightPosition: { value: new THREE.Vector3(-2, 6, -4) },
-    u_goboTexture: { value: null },
-    u_goboIntensity: { value: 0.45 },
-    u_infoTexture: { value: null },
-    u_infoTextureLinear: { value: null },
-    u_endAnimationRatio: { value: 0 },
-};
-
 const heroState: HeroType = {
     _baseMesh: undefined,
     _blocksMesh: undefined,
@@ -93,7 +83,6 @@ const heroState: HeroType = {
     isShadowCameraHelperVisible: undefined,
     shadowCameraHelper: undefined,
     infoTextureLinear: undefined,
-    heroSharedUniforms,
 };
 
 const Hero = () => {
@@ -104,10 +93,19 @@ const Hero = () => {
     let blocks = animationCycleState.blocks;
 
     let sharedUniforms = uniformsStore.getState();
-
-    uniformsStore.subscribe((state) => {
-        sharedUniforms = state;
-    });
+    let propertiesState = propertiesStore.getState();
+    propertiesStore.subscribe(
+        (state) => state,
+        (state) => (propertiesState = state),
+        { fireImmediately: true }
+    );
+    uniformsStore.subscribe(
+        (state) => state,
+        (state) => {
+            sharedUniforms = state;
+        },
+        { fireImmediately: true }
+    );
 
     async function preload() {
         const arr = Array.from({ length: TOTAL_BLOCKS });
@@ -132,9 +130,7 @@ const Hero = () => {
         loader.loadTexture(`${texturePath}/gobo.jpg`, (texture) => {
             texture.flipY = false;
             texture.needsUpdate = true;
-            if (heroSharedUniforms) {
-                heroSharedUniforms.u_goboTexture.value = texture;
-            }
+            uniformsStore.setState({ u_goboTexture: { value: texture } });
         });
     }
 
@@ -142,17 +138,22 @@ const Hero = () => {
         const uniforms = {
             ...sharedUniforms,
             ...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
-            ...heroSharedUniforms,
-            ...bn_sharedUniforms,
-            u_color: { value: new THREE.Color(propertiesStore.getState().neutralColor) },
-            u_blocksColor: { value: new THREE.Color() },
+            u_color: { value: new THREE.Color(propertiesState.neutralColor) },
+            u_blocksColor: { value: new THREE.Color(propertiesState.neutralColor) },
             u_yDisplacement: { value: 0 },
             u_prevSuccessColor: {
-                value: new THREE.Color(propertiesStore.getState().neutralColor).convertSRGBToLinear(),
+                value: new THREE.Color(propertiesState.neutralColor).convertSRGBToLinear(),
             },
-            u_successColor: { value: new THREE.Color(propertiesStore.getState().successColor).convertSRGBToLinear() },
+            u_successColor: { value: new THREE.Color(propertiesState.successColor).convertSRGBToLinear() },
             u_successAnimationRatio: { value: 0 },
         };
+
+        let logged = false;
+
+        if (!logged) {
+            console.debug('first', uniforms);
+            logged = true;
+        }
 
         const material = new THREE.ShaderMaterial({
             uniforms,
@@ -203,9 +204,7 @@ const Hero = () => {
         const material = new THREE.ShaderMaterial({
             uniforms: {
                 ...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
-                ...uniformsStore.getState(),
-                ...heroSharedUniforms,
-                ...bn_sharedUniforms,
+                ...sharedUniforms,
             },
             vertexShader: vert,
             fragmentShader: frag,
@@ -217,7 +216,7 @@ const Hero = () => {
         heroState._blocksMesh.castShadow = heroState._blocksMesh.receiveShadow = true;
 
         heroState._blocksMesh.customDepthMaterial = new THREE.ShaderMaterial({
-            uniforms: { ...heroSharedUniforms },
+            uniforms: sharedUniforms,
             vertexShader: vert,
             fragmentShader: fragDepth,
             defines: { IS_DEPTH: true },
@@ -303,10 +302,10 @@ const Hero = () => {
             0
         );
         heroState.infoTextureLinear.needsUpdate = true;
-        if (heroSharedUniforms) {
-            heroSharedUniforms.u_infoTexture.value = heroState.infoTexture;
-            heroSharedUniforms.u_infoTextureLinear.value = heroState.infoTextureLinear;
-        }
+        uniformsStore.setState({
+            u_infoTexture: { value: heroState.infoTexture },
+            u_infoTextureLinear: { value: heroState.infoTextureLinear },
+        });
     }
 
     function _assignFinalAnimationToTiles() {
@@ -342,9 +341,9 @@ const Hero = () => {
         const block = heroState._blockList[logicBlock.id];
         block.reset();
     }
+    let logged1 = false;
 
     function _updateColors(dt: number) {
-        const propertiesState = propertiesStore.getState();
         MAIN_COLOR.set(propertiesState.mainColor);
         SUCCESS_COLOR.set(propertiesState.successColor);
         ERROR_COLOR.set(propertiesState.failColor);
@@ -393,6 +392,10 @@ const Hero = () => {
         }
 
         if (heroState._baseMesh) {
+            if (!logged1) {
+                console.debug('second', heroState._baseMesh.material.uniforms);
+                logged1 = true;
+            }
             heroState._baseMesh.material.uniforms.u_color.value.set(DEFAULT_COLOR).convertSRGBToLinear();
             heroState._baseMesh.material.uniforms.u_blocksColor.value.copy(_c);
             heroState._baseMesh.material.uniforms.u_successColor.value.copy(SUCCESS_COLOR);
@@ -634,22 +637,19 @@ const Hero = () => {
             heroState._baseMesh.material.uniforms.u_successAnimationRatio.value = successColorTowerRatio;
         }
         const sceneState = sceneStore.getState();
-        if (heroSharedUniforms) {
-            heroSharedUniforms.u_endAnimationRatio.value = Math.min(
-                1,
-                math.fit(stopSpawnRatio, 0.5, 2, 0, 1) +
-                    math.fit(failSpawnRatio, 0.5, 2, 0, 1) +
-                    math.fit(successRatio, 0, 0.2, 0, 1)
-            );
-            heroSharedUniforms.u_goboIntensity.value = propertiesStore.getState().goboIntensity;
-            heroSharedUniforms.u_lightPosition.value.set(
-                sceneState.lightPositionX,
-                sceneState.lightPositionY,
-                sceneState.lightPositionZ
-            );
-        }
+
+        uniformsStore.setState({
+            u_endAnimationRatio: {
+                value: Math.min(
+                    1,
+                    math.fit(stopSpawnRatio, 0.5, 2, 0, 1) +
+                        math.fit(failSpawnRatio, 0.5, 2, 0, 1) +
+                        math.fit(successRatio, 0, 0.2, 0, 1)
+                ),
+            },
+        });
         if (heroState.directLight) {
-            heroState.directLight.position.copy(heroSharedUniforms?.u_lightPosition.value);
+            heroState.directLight.position.copy(uniformsStore.getState().u_lightPosition.value);
             heroState.directLight.shadow.camera.top = sceneState.lightCameraSize;
             heroState.directLight.shadow.camera.bottom = -sceneState.lightCameraSize;
             heroState.directLight.shadow.bias = sceneState.lightCameraBias;
@@ -665,4 +665,4 @@ const Hero = () => {
     };
 };
 const heroBlocks = Hero();
-export { heroBlocks, heroContainer, heroSharedUniforms };
+export { heroBlocks, heroContainer };

@@ -51,15 +51,13 @@ const TariTower = () => {
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFShadowMap;
 
-            const bgColor1 = propertiesStore.getState().bgColor1;
-            const bgColor2 = propertiesStore.getState().bgColor2;
+            const pBgColor1 = propertiesStore.getState().bgColor1;
+            const pBgColor2 = propertiesStore.getState().bgColor2;
+            const ubgColor1 = uniformsStore.getState().u_bgColor1.value.set(pBgColor1).convertSRGBToLinear();
+            const ubgColor2 = uniformsStore.getState().u_bgColor2.value.set(pBgColor2).convertSRGBToLinear();
 
-            uniformsStore.setState((c) => ({
-                u_bgColor1: { value: c.u_bgColor1.value.clone().set(bgColor1).convertSRGBToLinear() },
-                u_bgColor2: { value: c.u_bgColor2.value.clone().set(bgColor2).convertSRGBToLinear() },
-            }));
-
-            renderer.setClearColor(bgColor1, 1);
+            uniformsStore.setState({ u_bgColor1: { value: ubgColor1 }, u_bgColor2: { value: ubgColor2 } });
+            renderer.setClearColor(ubgColor1, 1);
         }
     }
 

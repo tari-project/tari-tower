@@ -16,9 +16,13 @@ const Background = () => {
     const mesh: Mesh & { material: ShaderMaterial } = new THREE.Mesh(new THREE.PlaneGeometry(2, 2));
     let sharedUniforms: TSharedUniforms;
 
-    uniformsStore.subscribe((state) => {
-        sharedUniforms = state;
-    });
+    uniformsStore.subscribe(
+        (state) => state,
+        (state) => {
+            sharedUniforms = state;
+        },
+        { fireImmediately: true }
+    );
     function init() {
         const uniforms = {
             u_resolution: sharedUniforms.u_resolution,

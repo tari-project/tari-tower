@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import loader from '../../core/loader';
-import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
 import { heroSharedUniforms } from '../hero/hero';
 
 import vert from './coins.vert?raw';
@@ -96,7 +95,6 @@ const Coins = () => {
                 ...heroSharedUniforms,
                 ...uniformsStore.getInitialState(),
                 ...coinsSharedUniforms,
-                ...bn_sharedUniforms,
                 ...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
                 u_matcapTexture: { value: matcapTexture },
             },
