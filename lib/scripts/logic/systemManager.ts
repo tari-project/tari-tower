@@ -20,15 +20,15 @@ import { MAX_FREE_BLOCKS_COUNT } from '../core/settings.ts';
 import { propertiesStore } from '../../store/propertiesStore.ts';
 
 const SystemManager = () => {
-    const animationCycleState = animationCycleStore.getState();
-    const flags = stateManagerStore.getState().flags;
-
+    let flagsState = stateManagerStore.getInitialState().flags;
+    const animationCycleStoreInitial = animationCycleStore.getInitialState();
+    let { blocks: blocksState, ...animationCycleState } = animationCycleStoreInitial;
     function _spawnBlock() {
-        const { isFailResult, isStopped, isSuccessResult, isReplayResult, isFree } = flags;
+        const { isFailResult, isStopped, isSuccessResult, isReplayResult, isFree } = flagsState;
         const preventSpawn =
             isFailResult ||
             isStopped ||
-            animationCycleState.blocks.length >= TOTAL_TILES ||
+            blocksState.length >= TOTAL_TILES ||
             (mainTile?.isOccupied && !isSuccessResult && !isReplayResult);
         if (preventSpawn) return;
 
@@ -37,17 +37,17 @@ const SystemManager = () => {
         } else {
             _spawnSingleBlock();
         }
-        if (animationCycleState.blocks.length === MAX_FREE_BLOCKS_COUNT && isFree) return;
+        if (blocksState.length === MAX_FREE_BLOCKS_COUNT && isFree) return;
     }
 
     function _spawnMultipleBlocks() {
-        const activeBlocksCount = animationCycleState.blocks?.length;
+        const activeBlocksCount = blocksState?.length ?? 0;
         const blocksToSpawn = TOTAL_TILES - activeBlocksCount;
 
         for (let i = 0; i < blocksToSpawn; i++) {
             const newTile = board.getRandomFreeTile();
             if (newTile) {
-                const block = new Block(animationCycleState.blocks.length);
+                const block = new Block(blocksState.length);
                 block.currentTile = newTile;
                 block.init();
                 block.updateTile();
@@ -58,11 +58,11 @@ const SystemManager = () => {
 
     function _spawnSingleBlock() {
         let block: Block | null | undefined = null;
-        const isFree = flags.isFree;
-        const canAddNewBlock = Boolean(animationCycleState.blocks.length < MAX_FREE_BLOCKS_COUNT && isFree);
+        const isFree = flagsState.isFree;
+        const canAddNewBlock = Boolean(blocksState.length < MAX_FREE_BLOCKS_COUNT && isFree);
         console.debug(`isFree=`, isFree);
         if (canAddNewBlock) {
-            block = new Block(animationCycleState.blocks.length);
+            block = new Block(blocksState.length);
             console.debug(`block1=`, block);
             setLastSpawnedBlock(block);
         }
@@ -76,9 +76,9 @@ const SystemManager = () => {
     }
 
     function _startNewCycle() {
-        const notStarted = flags.hasNotStarted;
-        const isFailResult = flags.isFailResult;
-        const isStopped = flags.isStopped;
+        const notStarted = flagsState.hasNotStarted;
+        const isFailResult = flagsState.isFailResult;
+        const isStopped = flagsState.isStopped;
 
         if (notStarted) return;
 
@@ -88,7 +88,7 @@ const SystemManager = () => {
         }
         if (isFailResult || isStopped) return;
 
-        animationCycleState.blocks.forEach((block) => block.resetAfterCycle());
+        blocksState.forEach((block) => block.resetAfterCycle());
         animationCycleStore.getState().incCycleIndex();
 
         _spawnBlock();
@@ -96,8 +96,8 @@ const SystemManager = () => {
     }
 
     function _calculatePaths() {
-        const cycleIndex = animationCycleStore.getState().cycleIndex;
-        const activeBlocksCount = animationCycleStore.getState().blocks?.length;
+        const cycleIndex = animationCycleState.cycleIndex;
+        const activeBlocksCount = blocksState?.length ?? 0;
 
         const _isFree = cycleIndex % 2 === 0 ? true : activeBlocksCount < MAX_FREE_BLOCKS_COUNT - 1;
 
@@ -105,7 +105,7 @@ const SystemManager = () => {
             animationCycleState.lastSpawnedBlock.moveToNextTile(_isFree, 0);
         }
 
-        animationCycleState.blocks.forEach((block, index) => {
+        blocksState.forEach((block, index) => {
             if (!block.hasBeenEvaluated && block.hasBeenSpawned) {
                 block.moveToNextTile(_isFree, index * 0.2);
             }
@@ -113,7 +113,7 @@ const SystemManager = () => {
     }
 
     function reset(preventRestart = false) {
-        animationCycleState.blocks.forEach((block) => block.reset());
+        blocksState.forEach((block) => block.reset());
         heroBlocks.reset();
         board.reset();
         animationCycleStore.getState().reset();
@@ -129,10 +129,10 @@ const SystemManager = () => {
     }
 
     function _updateAnimationRatios(dt: number) {
-        const isResult = flags.isResult;
-        const speedRatio = animationCycleStore.getState().animationSpeedRatio;
-        const firstStartRatio = animationCycleStore.getState().firstStartAnimationRatio;
-        const prevSuccessRatio = animationCycleStore.getState().previousSuccessBlocksAnimationRatio;
+        const isResult = flagsState.isResult;
+        const speedRatio = animationCycleState.animationSpeedRatio;
+        const firstStartRatio = animationCycleState.firstStartAnimationRatio;
+        const prevSuccessRatio = animationCycleState.previousSuccessBlocksAnimationRatio;
 
         const animationSpeedRatio = Math.min(1, speedRatio + dt * (isResult ? 1 : 0));
 
@@ -154,7 +154,7 @@ const SystemManager = () => {
             isCycleComplete = !!animationCycleState.lastSpawnedBlock?.hasBeenSpawned;
         }
 
-        animationCycleState.blocks.forEach((block) => {
+        blocksState.forEach((block) => {
             if (block.lifeCycle > 0) {
                 isCycleComplete = Boolean(block.hasBeenEvaluated && block.hasAnimationEnded);
             } else {
@@ -162,7 +162,7 @@ const SystemManager = () => {
             }
         });
 
-        const { isStopped, isFailResult, isResult } = flags;
+        const { isStopped, isFailResult, isResult } = flagsState;
         return isCycleComplete || isResult || isFailResult || isStopped;
     }
 
@@ -173,7 +173,7 @@ const SystemManager = () => {
         stopAnimationManager.update(dt);
         errorAnimationManager.update(dt);
 
-        if (flags.hasNotStarted) {
+        if (flagsState.hasNotStarted) {
             _startNewCycle();
             return;
         }
@@ -182,7 +182,7 @@ const SystemManager = () => {
         if (animationCycleState.lastSpawnedBlock) {
             animationCycleState.lastSpawnedBlock.update(dt);
         }
-        animationCycleState.blocks.forEach((block) => block.update(dt));
+        blocksState.forEach((block) => block.update(dt));
         board.update(dt);
 
         const isCycleComplete = _checkCycleCompletion();
@@ -193,6 +193,36 @@ const SystemManager = () => {
     }
 
     async function init() {
+        const stateListener: Parameters<typeof stateManagerStore.subscribe>[0] = ({ flags, animationTypeEnded }) => {
+            flagsState = flags;
+            if (animationTypeEnded) {
+                switch (animationTypeEnded) {
+                    case 'win': {
+                        reset();
+                        setAnimationRatios({ previousSuccessBlocksAnimationRatio: 1 });
+                        _startNewCycle();
+                        break;
+                    }
+                    case 'lose': {
+                        reset();
+                        _startNewCycle();
+                        break;
+                    }
+                    case 'stop':
+                    default:
+                        reset(true);
+                        break;
+                }
+            }
+        };
+        const animationCycleListener: Parameters<typeof animationCycleStore.subscribe>[0] = ({ blocks, ...rest }) => {
+            blocksState = blocks;
+            animationCycleState = rest;
+        };
+
+        stateManagerStore.subscribe((state) => stateListener(state));
+        animationCycleStore.subscribe((state) => animationCycleListener(state));
+
         successAnimationManager.init();
         stopAnimationManager.init();
         errorAnimationManager.init();

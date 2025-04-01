@@ -131,6 +131,14 @@ const TariTower = () => {
     async function init() {
         await _initScene();
 
+        const destroyListener = (destroyCanvas: boolean) => {
+            if (destroyCanvas) {
+                destroy();
+            }
+        };
+
+        stateManagerStore.subscribe((state) => destroyListener(state.destroyCanvas));
+
         try {
             // first the logic
             await game.init();

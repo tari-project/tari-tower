@@ -104,15 +104,17 @@ const heroState: HeroType = {
 };
 
 const Hero = () => {
-    const heroContainer = new Object3D();
-    const animationCycleState = animationCycleStore.getState();
-    const result = stateManagerStore.getState().result;
-    const { blocks, previousSuccessBlocksAnimationRatio, lastSpawnedBlock } = animationCycleState;
-
     let sharedUniforms;
     let propertiesState;
+    let result;
+    let status;
+    const animationCycleStoreInitial = animationCycleStore.getInitialState();
+    let { blocks: blocksState, ...animationCycleState } = animationCycleStoreInitial;
+    const heroContainer = new Object3D();
 
     async function preload() {
+        initListeners();
+
         const arr = Array.from({ length: TOTAL_BLOCKS });
         heroState._blockList = arr.map((_) => new HeroBlockCoordinates());
         heroState._blockRenderList = [...heroState._blockList];
@@ -220,6 +222,28 @@ const Hero = () => {
         heroContainer.add(heroState._blocksMesh);
     }
 
+    function initListeners() {
+        const propertiesListener: Parameters<typeof propertiesStore.subscribe>[0] = (state) =>
+            (propertiesState = state);
+        const stateListener: Parameters<typeof stateManagerStore.subscribe>[0] = ({
+            result: sResult,
+            status: sStatus,
+        }) => {
+            result = sResult;
+            status = sStatus;
+        };
+        const animationCycleListener: Parameters<typeof animationCycleStore.subscribe>[0] = ({ blocks, ...rest }) => {
+            blocksState = blocks;
+            animationCycleState = rest;
+        };
+
+        const uniformsListener: Parameters<typeof uniformsStore.subscribe>[0] = (state) => (sharedUniforms = state);
+
+        stateManagerStore.subscribe((s) => s, stateListener);
+        propertiesStore.subscribe((state) => propertiesListener(state));
+        animationCycleStore.subscribe((state) => animationCycleListener(state));
+        uniformsStore.subscribe((state) => uniformsListener(state));
+    }
     async function init() {
         const sceneState = sceneStore.getState();
         heroState.directLight = new DirectionalLight(0xffffff, 1);
@@ -326,9 +350,9 @@ const Hero = () => {
         SUCCESS_COLOR.convertSRGBToLinear();
 
         for (let i = 0; i < TOTAL_BLOCKS; i++) {
-            const logicBlock = blocks.filter((block) => block.id === i)[0];
+            const logicBlock = blocksState.filter((block) => block.id === i)[0];
 
-            const isActive = i < blocks.length + (lastSpawnedBlock ? 1 : 0);
+            const isActive = i < blocksState.length + (animationCycleState.lastSpawnedBlock ? 1 : 0);
             const color = isActive ? _c : DEFAULT_COLOR;
 
             if (isActive && logicBlock?.isErrorBlock) {
@@ -357,7 +381,7 @@ const Hero = () => {
 
             heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(
                 _c.set(propertiesState.successColor),
-                previousSuccessBlocksAnimationRatio
+                animationCycleState.previousSuccessBlocksAnimationRatio
             );
             heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.convertSRGBToLinear();
         }
@@ -389,15 +413,20 @@ const Hero = () => {
     }
 
     function _updateFreeBlocks() {
-        if (lastSpawnedBlock) {
-            const block = heroState._blockList[lastSpawnedBlock.id];
-            if (lastSpawnedBlock.currentTile) {
-                block.boardPos.set(lastSpawnedBlock.currentTile?.row, lastSpawnedBlock.currentTile?.col);
+        if (animationCycleState.lastSpawnedBlock) {
+            const block = heroState._blockList[animationCycleState.lastSpawnedBlock.id];
+            if (animationCycleState.lastSpawnedBlock.currentTile) {
+                block.boardPos.set(
+                    animationCycleState.lastSpawnedBlock.currentTile?.row,
+                    animationCycleState.lastSpawnedBlock.currentTile?.col
+                );
             }
-            block.showRatio = customEasing(math.saturate(lastSpawnedBlock.spawnAnimationRatioUnclamped));
+            block.showRatio = customEasing(
+                math.saturate(animationCycleState.lastSpawnedBlock.spawnAnimationRatioUnclamped)
+            );
         }
 
-        blocks?.forEach((logicBlock) => {
+        blocksState?.forEach((logicBlock) => {
             const block = heroState._blockList[logicBlock.id];
 
             if (block) {
@@ -564,7 +593,7 @@ const Hero = () => {
             const block = heroState._blockList[i];
             block.update(dt);
 
-            const logicBlock = blocks.find((block) => block.id === i);
+            const logicBlock = blocksState.find((block) => block.id === i);
 
             if (block.showRatio > 0) {
                 heroState._blockRenderList[renderCount++] = block;

@@ -1,5 +1,5 @@
-import { createStore } from 'zustand/vanilla';
 import { subscribeWithSelector } from 'zustand/middleware';
+import { createStore } from 'zustand/vanilla';
 import { AnimationResult, AnimationStatus, Flags, SuccessLevel } from '../types/stateManager.ts';
 
 interface SetWinArgs {
@@ -41,6 +41,7 @@ const initialState: State = {
     status: AnimationStatus.NOT_STARTED,
     result: AnimationResult.NONE,
 };
+
 export const stateManagerStore = createStore<ManagerState>()(
     subscribeWithSelector((set) => ({
         ...initialState,
