@@ -120,7 +120,6 @@ const TariTower = () => {
                 destroy();
             }
         };
-
         stateManagerStore.subscribe((state) => destroyListener(state.destroyCanvas));
 
         try {

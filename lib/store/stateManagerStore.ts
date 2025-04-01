@@ -57,7 +57,7 @@ export const stateManagerStore = createStore<ManagerState>()(
                     isReplayResult: result === AnimationResult.REPLAY,
                     isSuccessResult: true,
                 };
-                return { ...currentState, status: AnimationStatus.RESULT, result, completeAnimationLevel, flags };
+                return { status: AnimationStatus.RESULT, result, completeAnimationLevel, flags };
             }),
         setAnimationState: (animationType: AnimationType) =>
             set((currentState) => {
@@ -97,7 +97,6 @@ export const stateManagerStore = createStore<ManagerState>()(
                 };
 
                 return {
-                    ...currentState,
                     status: animationStatus,
                     result: animationResult,
                     flags: { ...currentState.flags, ...newFlags },

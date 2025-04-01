@@ -1,15 +1,5 @@
-import { Mesh, CameraHelper, DataTexture, DirectionalLight, InstancedBufferGeometry, ShaderMaterial, Vector3, Texture } from 'three';
-import { Uniform } from './properties';
+import { Mesh, CameraHelper, DataTexture, DirectionalLight, InstancedBufferGeometry, ShaderMaterial } from 'three';
 import HeroBlockCoordinates from '../scripts/visuals/hero/HeroBlockCoordinates';
-
-interface HeroSharedUniforms {
-    u_lightPosition: Uniform<Vector3>;
-    u_goboTexture: Uniform<Texture | null>;
-    u_goboIntensity: Uniform<number>;
-    u_infoTexture: Uniform<DataTexture | null>;
-    u_infoTextureLinear: Uniform<DataTexture | null>;
-    u_endAnimationRatio: Uniform<number>;
-}
 
 export interface HeroType {
     _baseMesh?: Mesh & { material: ShaderMaterial };
@@ -33,5 +23,4 @@ export interface HeroType {
     isShadowCameraHelperVisible?: boolean;
     shadowCameraHelper?: CameraHelper;
     infoTextureLinear?: DataTexture;
-    heroSharedUniforms?: HeroSharedUniforms;
 }

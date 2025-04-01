@@ -33,10 +33,6 @@ export interface IScene {
     lightCameraFar: number;
 }
 
-export interface Uniform<T = unknown> {
-    value: T;
-}
-
 type TPropertyName = keyof IPropertiesState;
 type TPropertyValue = IPropertiesState[TPropertyName];
 export interface IPropertyPair {

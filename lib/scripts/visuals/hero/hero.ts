@@ -84,9 +84,9 @@ const heroState: HeroType = {
 };
 
 const Hero = () => {
-    let sharedUniforms = uniformsStore.getState();
     let propertiesState = propertiesStore.getState();
     let result = stateManagerStore.getState().result;
+    let sharedUniforms = uniformsStore.getState().sharedUniforms;
 
     const animationCycleStoreInitial = animationCycleStore.getInitialState();
     let { blocks: blocksState, ...animationCycleState } = animationCycleStoreInitial;
@@ -112,7 +112,7 @@ const Hero = () => {
         loader.loadTexture(`${ASSETS_PATH}/gobo.jpg`, (texture) => {
             texture.flipY = false;
             texture.needsUpdate = true;
-            uniformsStore.setState({ u_goboTexture: { value: texture } });
+            uniformsStore.getState().setUniform({ u_goboTexture: { value: texture } });
         });
 
         initListeners();
@@ -190,7 +190,7 @@ const Hero = () => {
         heroState._blocksMesh.castShadow = heroState._blocksMesh.receiveShadow = true;
 
         heroState._blocksMesh.customDepthMaterial = new ShaderMaterial({
-            uniforms: sharedUniforms,
+            uniforms: { ...sharedUniforms },
             vertexShader: vert,
             fragmentShader: fragDepth,
             defines: { IS_DEPTH: true },
@@ -561,7 +561,7 @@ const Hero = () => {
         }
         const sceneState = sceneStore.getState();
 
-        uniformsStore.setState({
+        uniformsStore.getState().setUniform({
             u_endAnimationRatio: {
                 value: Math.min(1, math.fit(stopSpawnRatio, 0.5, 2, 0, 1) + math.fit(failSpawnRatio, 0.5, 2, 0, 1) + math.fit(successRatio, 0, 0.2, 0, 1)),
             },

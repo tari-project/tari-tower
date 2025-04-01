@@ -23,6 +23,8 @@ export default [
             },
         },
         rules: {
+            '@typescript-eslint/consistent-type-definitions': 'off',
+            '@typescript-eslint/consistent-indexed-object-style': 'off',
             'no-unused-vars': 'off', // base rule must be disabled
             '@typescript-eslint/no-unused-vars': [
                 'warn',

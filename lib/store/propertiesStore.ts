@@ -17,14 +17,13 @@ const initialState: IPropertiesState = {
     viewportWidth: 0,
     viewportHeight: 0,
 
-    bgColor1: '#c2b2b2',
-    bgColor2: '#858585',
+    bgColor1: '#ffffff',
+    bgColor2: '#d0d0d0',
     neutralColor: '#ffffff',
     mainColor: '#0096ff',
     successColor: '#00c881',
     failColor: '#ca0101',
-    particlesColor: '#ca0101',
-    // particlesColor: '#505050',
+    particlesColor: '#505050',
     goboIntensity: 0.45,
     particlesOpacity: 1,
     particlesSize: 1,
@@ -47,10 +46,6 @@ const setErrorBlock = (errorBlock?: Block | null): void => {
     propertiesStore.setState({ errorBlock });
 };
 
-function showVisual() {
-    propertiesStore.getState().setProperty({ propertyName: 'showVisual', value: false });
-}
-
 const setAnimationProperties = (properties: Record<string, unknown>[]) => {
     const propertyPairs: IPropertyPair[] = properties as unknown as IPropertyPair[];
     for (const property of propertyPairs) {
@@ -67,8 +62,6 @@ const setAnimationProperties = (properties: Record<string, unknown>[]) => {
         }
 
         propertiesStore.getState().setProperty(property);
-
-        console.debug(property);
     }
 };
-export { setErrorBlock, showVisual, setAnimationProperties };
+export { setErrorBlock, setAnimationProperties };

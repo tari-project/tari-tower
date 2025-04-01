@@ -1,17 +1,24 @@
 import { createStore } from 'zustand/vanilla';
-import { Color, Vector2, Vector3, DataTexture, type IUniform } from 'three';
+import { Color, Vector2, Vector3, DataTexture, Texture } from 'three';
 import { subscribeWithSelector } from 'zustand/middleware';
 import { sceneStore } from './sceneStore.ts';
+import { ISharedUniforms, TUniform } from '../types/uniforms.ts';
 
-type TSharedUniforms = Record<string, IUniform>;
+type State = ISharedUniforms & {
+    sharedUniforms: ISharedUniforms;
+};
+interface Actions {
+    setUniform: (u: TUniform) => void;
+}
+type UniformState = State & Actions;
 
-const blueNoiseUniforms: TSharedUniforms = {
-    u_blueNoiseTexture: { value: null },
+const blueNoiseUniforms = {
+    u_blueNoiseTexture: { value: new Texture() },
     u_blueNoiseTexelSize: { value: new Vector2() },
     u_blueNoiseCoordOffset: { value: new Vector2() },
 };
 
-const heroSharedUniforms: TSharedUniforms = {
+const heroSharedUniforms = {
     u_lightPosition: {
         value: new Vector3(sceneStore.getState().lightPositionX, sceneStore.getState().lightPositionY, sceneStore.getState().lightPositionZ),
     },
@@ -22,7 +29,7 @@ const heroSharedUniforms: TSharedUniforms = {
     u_endAnimationRatio: { value: 0 },
 };
 
-const initialState: TSharedUniforms = {
+const initialStateUniforms: ISharedUniforms = {
     u_time: { value: 0 },
     u_deltaTime: { value: 1 },
     u_resolution: { value: new Vector2() },
@@ -33,9 +40,19 @@ const initialState: TSharedUniforms = {
     ...heroSharedUniforms,
 };
 
-export const uniformsStore = createStore<TSharedUniforms>()(
+export const uniformsStore = createStore<UniformState>()(
     subscribeWithSelector((set) => ({
-        ...initialState,
+        sharedUniforms: initialStateUniforms,
+        ...initialStateUniforms,
+        setUniform: (u) =>
+            set((s) => {
+                const { setUniform: _, ...c } = s;
+                const updatedUniforms = { ...c, ...u };
+                return { ...updatedUniforms, sharedUniforms: updatedUniforms };
+            }),
     }))
 );
-export const setTimes = (time: number, dt: number) => uniformsStore.setState((c) => ({ u_time: { value: time }, u_deltaTime: { value: dt } }));
+export const setTimes = (time: number, dt: number) => {
+    uniformsStore.getState().setUniform({ u_time: { value: time } });
+    uniformsStore.getState().setUniform({ u_deltaTime: { value: dt } });
+};

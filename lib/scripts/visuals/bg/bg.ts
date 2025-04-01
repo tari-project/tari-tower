@@ -96,7 +96,7 @@ const Background = () => {
                 if (particlesMesh.material.uniforms.u_opacity.value === s.particlesOpacity) {
                     return;
                 }
-                console.debug(particlesMesh.material.uniforms.u_color.value);
+
                 particlesMesh.material.uniforms.u_size.value = s.particlesSize;
                 particlesMesh.material.uniforms.u_color.value.set(s.particlesColor);
                 particlesMesh.material.uniforms.u_opacity.value = s.particlesOpacity;
