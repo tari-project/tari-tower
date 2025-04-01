@@ -8,10 +8,10 @@ import {
     setStart,
     setStop,
     setWin,
+    showVisual,
     SuccessLevel,
     type IPropertyPair,
-} from '../lib';
-import { showVisual } from '../lib/store/propertiesStore.ts';
+} from '@tari-project/tari-tower';
 
 if (import.meta.env.MODE === 'development') {
     const gui = new GUI();

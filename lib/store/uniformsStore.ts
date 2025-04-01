@@ -30,8 +30,8 @@ const initialState = {
     u_deltaTime: { value: 1 },
     u_resolution: { value: new Vector2() },
     u_viewportResolution: { value: new Vector2() },
-    u_bgColor1: { value: new Color() },
-    u_bgColor2: { value: new Color() },
+    u_bgColor1: { value: new Color(propertiesStore.getState().bgColor1) },
+    u_bgColor2: { value: new Color(propertiesStore.getState().bgColor2) },
     ...blueNoiseUniforms,
     ...heroSharedUniforms,
 };

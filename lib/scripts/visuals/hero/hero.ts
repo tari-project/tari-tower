@@ -109,12 +109,16 @@ const Hero = () => {
     let result = stateManagerStore.getState().result;
     const { blocks, previousSuccessBlocksAnimationRatio, lastSpawnedBlock } = animationCycleState;
 
-    let sharedUniforms = uniformsStore.getState();
-    let propertiesState = propertiesStore.getState();
+    let sharedUniforms;
+    let propertiesState;
 
     animationCycleStore.subscribe(
         (state) => state,
-        (state) => (animationCycleState = state),
+        (state, prev) => {
+            if (prev !== state) {
+                animationCycleState = state;
+            }
+        },
         { fireImmediately: true }
     );
 
@@ -125,15 +129,13 @@ const Hero = () => {
         },
         { fireImmediately: true }
     );
+
     propertiesStore.subscribe(
-        (state) => state,
-        (state) => (propertiesState = state),
-        { fireImmediately: true }
-    );
-    uniformsStore.subscribe(
-        (state) => state,
-        (state) => {
-            sharedUniforms = state;
+        ({ time, deltaTime, ...state }) => state,
+        (state, prev) => {
+            if (prev !== state) {
+                propertiesState = state;
+            }
         },
         { fireImmediately: true }
     );
