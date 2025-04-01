@@ -41,7 +41,7 @@ import { ASSETS_PATH, ERROR_BLOCK_MAX_LIFE_CYCLE } from '../../core/settings';
 import { stateManagerStore } from '../../../store/stateManagerStore';
 import { animationCycleStore } from '../../../store/animationCycleStore.ts';
 
-import { uniformsStore } from '../../../store/uniformsStore.ts';
+import { setUniform, uniformsStore } from '../../../store/uniformsStore.ts';
 import { propertiesStore } from '../../../store/propertiesStore.ts';
 import { sceneStore } from '../../../store/sceneStore.ts';
 
@@ -86,7 +86,7 @@ const heroState: HeroType = {
 const Hero = () => {
     let propertiesState = propertiesStore.getState();
     let result = stateManagerStore.getState().result;
-    let sharedUniforms = uniformsStore.getState().sharedUniforms;
+    let sharedUniforms = uniformsStore.getState();
 
     const animationCycleStoreInitial = animationCycleStore.getInitialState();
     let { blocks: blocksState, ...animationCycleState } = animationCycleStoreInitial;
@@ -112,7 +112,7 @@ const Hero = () => {
         loader.loadTexture(`${ASSETS_PATH}/gobo.jpg`, (texture) => {
             texture.flipY = false;
             texture.needsUpdate = true;
-            uniformsStore.getState().setUniform({ u_goboTexture: { value: texture } });
+            setUniform({ u_goboTexture: { value: texture } });
         });
 
         initListeners();
@@ -208,12 +208,12 @@ const Hero = () => {
             blocksState = blocks;
             animationCycleState = rest;
         };
-        const uniformsListener: Parameters<typeof uniformsStore.subscribe>[0] = (state) => (sharedUniforms = state);
+        const uniformsListener = (state) => (sharedUniforms = state);
 
-        stateManagerStore.subscribe((s) => stateListener(s.result));
-        propertiesStore.subscribe((state) => propertiesListener(state));
-        animationCycleStore.subscribe((state) => animationCycleListener(state));
-        uniformsStore.subscribe((state) => uniformsListener(state));
+        stateManagerStore.subscribe((s) => s.result, stateListener);
+        propertiesStore.subscribe((s) => s, propertiesListener);
+        animationCycleStore.subscribe((s) => s, animationCycleListener);
+        uniformsStore.subscribe((s) => s, uniformsListener);
     }
     async function init() {
         const sceneState = sceneStore.getState();
@@ -561,7 +561,7 @@ const Hero = () => {
         }
         const sceneState = sceneStore.getState();
 
-        uniformsStore.getState().setUniform({
+        setUniform({
             u_endAnimationRatio: {
                 value: Math.min(1, math.fit(stopSpawnRatio, 0.5, 2, 0, 1) + math.fit(failSpawnRatio, 0.5, 2, 0, 1) + math.fit(successRatio, 0, 0.2, 0, 1)),
             },

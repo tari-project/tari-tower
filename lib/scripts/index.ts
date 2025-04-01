@@ -25,7 +25,6 @@ function animate() {
 }
 
 function initCallback() {
-    void tower.init();
     time = performance.now() / 1000;
     lastRender = time;
 

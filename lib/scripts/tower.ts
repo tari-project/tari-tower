@@ -17,7 +17,6 @@ ColorManagement.enabled = false;
 
 const TariTower = () => {
     const scene = new Scene();
-    const setProperty = propertiesStore.getState().setProperty;
     const renderer = new WebGLRenderer(WEBGL_OPTS);
     const background = Background();
     const blueNoise = BlueNoise();
@@ -45,18 +44,15 @@ const TariTower = () => {
             renderer.shadowMap.type = PCFShadowMap;
 
             const pBgColor1 = propertiesStore.getState().bgColor1;
-            const pBgColor2 = propertiesStore.getState().bgColor2;
             const ubgColor1 = uniformsStore.getState().u_bgColor1.value.set(pBgColor1).convertSRGBToLinear();
-            const ubgColor2 = uniformsStore.getState().u_bgColor2.value.set(pBgColor2).convertSRGBToLinear();
 
-            uniformsStore.setState({ u_bgColor1: { value: ubgColor1 }, u_bgColor2: { value: ubgColor2 } });
             renderer.setClearColor(ubgColor1, 1);
         }
     }
 
     function _handleResize(viewportWidth: number, viewportHeight: number) {
-        setProperty({ propertyName: 'viewportWidth', value: viewportWidth });
-        setProperty({ propertyName: 'viewportHeight', value: viewportHeight });
+        propertiesStore.getState().setProperty({ propertyName: 'viewportWidth', value: viewportWidth });
+        propertiesStore.getState().setProperty({ propertyName: 'viewportHeight', value: viewportHeight });
 
         let dprWidth = viewportWidth * DPR;
         let dprHeight = viewportHeight * DPR;
@@ -69,8 +65,8 @@ const TariTower = () => {
             dprHeight = Math.ceil(dprHeight);
         }
 
-        setProperty({ propertyName: 'width', value: dprWidth });
-        setProperty({ propertyName: 'height', value: dprHeight });
+        propertiesStore.getState().setProperty({ propertyName: 'width', value: dprWidth });
+        propertiesStore.getState().setProperty({ propertyName: 'height', value: dprHeight });
 
         camera.updateProjectionMatrix();
 
@@ -92,15 +88,14 @@ const TariTower = () => {
 
     async function preload({ canvasId, initCallback }: { canvasId: string; initCallback: () => void }) {
         _canvasId = canvasId;
+        await heroBlocks.preload();
+        await blueNoise.preInit();
+        await coins.preload();
         await _handleRenderer();
 
-        await heroBlocks.preload();
-
-        await blueNoise.preInit();
-
-        await coins.preload();
-
-        loader.start(initCallback);
+        loader.start(() => {
+            init().then(initCallback);
+        });
     }
 
     async function _initScene() {

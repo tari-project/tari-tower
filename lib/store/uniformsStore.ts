@@ -4,13 +4,7 @@ import { subscribeWithSelector } from 'zustand/middleware';
 import { sceneStore } from './sceneStore.ts';
 import { ISharedUniforms, TUniform } from '../types/uniforms.ts';
 
-type State = ISharedUniforms & {
-    sharedUniforms: ISharedUniforms;
-};
-interface Actions {
-    setUniform: (u: TUniform) => void;
-}
-type UniformState = State & Actions;
+type UniformState = ISharedUniforms;
 
 const blueNoiseUniforms = {
     u_blueNoiseTexture: { value: new Texture() },
@@ -42,17 +36,11 @@ const initialStateUniforms: ISharedUniforms = {
 
 export const uniformsStore = createStore<UniformState>()(
     subscribeWithSelector((set) => ({
-        sharedUniforms: initialStateUniforms,
         ...initialStateUniforms,
-        setUniform: (u) =>
-            set((s) => {
-                const { setUniform: _, ...c } = s;
-                const updatedUniforms = { ...c, ...u };
-                return { ...updatedUniforms, sharedUniforms: updatedUniforms };
-            }),
     }))
 );
+export const setUniform = (u: TUniform) => uniformsStore.setState((s) => ({ ...s, ...u }));
 export const setTimes = (time: number, dt: number) => {
-    uniformsStore.getState().setUniform({ u_time: { value: time } });
-    uniformsStore.getState().setUniform({ u_deltaTime: { value: dt } });
+    setUniform({ u_time: { value: time } });
+    setUniform({ u_deltaTime: { value: dt } });
 };

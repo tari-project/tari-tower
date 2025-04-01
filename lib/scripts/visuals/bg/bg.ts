@@ -30,7 +30,7 @@ const Background = () => {
         uniformsStore.subscribe((s) => s, listen);
 
         const material = new ShaderMaterial({
-            uniforms: u,
+            uniforms: { ...u },
             vertexShader: vert,
             fragmentShader: frag,
         });

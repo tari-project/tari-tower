@@ -87,7 +87,7 @@ const Coins = () => {
     }
 
     function _setupMaterial() {
-        const sharedUniforms = uniformsStore.getState().sharedUniforms;
+        const sharedUniforms = uniformsStore.getInitialState();
         coinMaterial = new ShaderMaterial({
             uniforms: {
                 ...sharedUniforms,

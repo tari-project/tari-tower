@@ -1,6 +1,6 @@
 import { Color, DataTexture, Texture, Vector2, Vector3 } from 'three';
 
-export interface Uniform<T = unknown> {
+interface Uniform<T = unknown> {
     value: T;
 }
 
