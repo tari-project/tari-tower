@@ -4,6 +4,7 @@ import { defineConfig } from 'vite';
 import eslint from '@nabla/vite-plugin-eslint';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import dts from 'vite-plugin-dts';
+import glsl from 'vite-plugin-glsl';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
@@ -12,6 +13,7 @@ export default defineConfig({
         port: 3001,
     },
     plugins: [
+        glsl(),
         tsconfigPaths(),
         dts({
             include: ['lib'],

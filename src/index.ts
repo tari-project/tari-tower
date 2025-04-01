@@ -1,16 +1,20 @@
 import GUI from 'lil-gui';
 
-import { loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setLose, setStart, setStop, setWin, showVisual, SuccessLevel } from '../lib/index';
+import { loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setLose, setStart, setStop, setWin, SuccessLevel } from '../lib/index';
 // } from '@tari-project/tari-tower';
 
 if (import.meta.env.MODE === 'development') {
-    const gui = new GUI();
-    gui.add(document, 'title');
+    const gui = new GUI({
+        closeFolders: true,
+    });
+
+    const states = gui.addFolder('states');
+    const theme = gui.addFolder('theme');
+    const canvas = gui.addFolder('canvas');
 
     const actions = {
         removeCanvas: () => removeTowerAnimation({ canvasId: 'canvas-id' }),
         initCanvas: () => loadTowerAnimation({ canvasId: 'canvas-id', offset: 0 }),
-        showVisual: () => showVisual(),
         start: () => setStart(),
         stopVis: () => setStop(),
         success: () => setWin({ completeAnimationLevel: SuccessLevel.ONE }),
@@ -27,17 +31,16 @@ if (import.meta.env.MODE === 'development') {
         },
     };
 
-    gui.add(actions, 'showVisual');
-    gui.add(actions, 'start');
-    gui.add(actions, 'stopVis');
-    gui.add(actions, 'success');
-    gui.add(actions, 'success2');
-    gui.add(actions, 'success3');
-    gui.add(actions, 'fail');
-    gui.add(actions, 'removeCanvas');
-    gui.add(actions, 'darkMode');
-    gui.add(actions, 'lightMode');
-    gui.add(actions, 'initCanvas');
+    states.add(actions, 'start');
+    states.add(actions, 'stopVis');
+    states.add(actions, 'success');
+    states.add(actions, 'success2');
+    states.add(actions, 'success3');
+    states.add(actions, 'fail');
+    theme.add(actions, 'darkMode');
+    theme.add(actions, 'lightMode');
+    canvas.add(actions, 'initCanvas');
+    canvas.add(actions, 'removeCanvas');
 
     function handleLoad() {
         loadTowerAnimation({ canvasId: 'canvas-id', offset: 0 });

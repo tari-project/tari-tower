@@ -6,12 +6,12 @@ import { coinContainer, Coins } from './visuals/coins/coins.ts';
 import BlueNoise from './utils/blueNoise/blueNoise.ts';
 import { OrbitControls } from './controls/OrbitControls';
 import game from './logic/systemManager.ts';
-import { Background, bgContainer } from './visuals/bg/bg.ts';
+import { Background } from './visuals/bg/bg.ts';
 import loader from './core/loader.ts';
 import { OrthographicCamera } from 'three';
 import { stateManagerStore } from '../store/stateManagerStore';
 import { propertiesStore } from '../store/propertiesStore.ts';
-import { uniformsStore } from '../store/uniformsStore.ts';
+import { setTimes, uniformsStore } from '../store/uniformsStore.ts';
 
 ColorManagement.enabled = false;
 
@@ -92,29 +92,13 @@ const TariTower = () => {
 
     async function preload({ canvasId, initCallback }: { canvasId: string; initCallback: () => void }) {
         _canvasId = canvasId;
-        try {
-            await _handleRenderer();
-        } catch (e) {
-            console.error('renderer', e);
-        }
+        await _handleRenderer();
 
-        try {
-            await heroBlocks.preload();
-        } catch (e) {
-            console.error('blocks preload', e);
-        }
+        await heroBlocks.preload();
 
-        try {
-            await blueNoise.preInit();
-        } catch (e) {
-            console.error('blue noise preload', e);
-        }
+        await blueNoise.preInit();
 
-        try {
-            await coins.preload();
-        } catch (e) {
-            console.error('coins preload', e);
-        }
+        await coins.preload();
 
         loader.start(initCallback);
     }
@@ -142,6 +126,7 @@ const TariTower = () => {
         try {
             // first the logic
             await game.init();
+            background.init();
 
             // then the visuals
             const directLight = await heroBlocks.init();
@@ -150,10 +135,8 @@ const TariTower = () => {
                 scene.add(directLight.target);
             }
             coins.init();
-            background.init();
-
+            scene.add(background.container);
             scene.add(coinContainer);
-            scene.add(bgContainer);
             scene.add(heroBlocks.heroContainer);
         } catch (error) {
             console.error('init tower error: ', error);
@@ -173,9 +156,7 @@ const TariTower = () => {
 
         time += dt;
 
-        setProperty({ propertyName: 'time', value: time });
-        setProperty({ propertyName: 'deltaTime', value: dt });
-
+        setTimes(time, dt);
         uniformsStore.setState({
             u_time: { value: time },
             u_deltaTime: { value: dt },
@@ -193,6 +174,9 @@ const TariTower = () => {
         const left = -viewWidth / 2 - offsetX / 2;
         const right = viewWidth / 2 - offsetX / 2;
 
+        blueNoise.update(dt);
+        game.update(dt);
+
         camera.left = left;
         camera.right = right;
         camera.top = viewHeight / 2;
@@ -204,15 +188,10 @@ const TariTower = () => {
         orbitCamera?.matrix.decompose(camera.position, camera.quaternion, camera.scale);
         camera.matrix.compose(camera.position, camera.quaternion, camera.scale);
 
-        blueNoise.update(dt);
-        game.update(dt);
+        background.update(dt);
         heroBlocks.update(dt);
         coins.update(dt);
-        background.update(dt);
-
-        if (renderer && scene) {
-            renderer.render(scene, camera);
-        }
+        renderer.render(scene, camera);
     }
     function destroy() {
         stateManagerStore.getState().reset();

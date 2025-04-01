@@ -22,8 +22,6 @@ declare interface SetWinArgs {
     completeAnimationLevel?: SuccessLevel | null;
 }
 
-export declare function showVisual(): void;
-
 export declare enum SuccessLevel {
     ONE = 1,
     TWO = 2,

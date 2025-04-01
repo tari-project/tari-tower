@@ -1,17 +1,17 @@
+import { createStore } from 'zustand/vanilla';
 import { Color, Vector2, Vector3, DataTexture, type IUniform } from 'three';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { createStore } from 'zustand/vanilla';
 import { sceneStore } from './sceneStore.ts';
 
 type TSharedUniforms = Record<string, IUniform>;
 
-const blueNoiseUniforms = {
+const blueNoiseUniforms: TSharedUniforms = {
     u_blueNoiseTexture: { value: null },
     u_blueNoiseTexelSize: { value: new Vector2() },
     u_blueNoiseCoordOffset: { value: new Vector2() },
 };
 
-const heroSharedUniforms = {
+const heroSharedUniforms: TSharedUniforms = {
     u_lightPosition: {
         value: new Vector3(sceneStore.getState().lightPositionX, sceneStore.getState().lightPositionY, sceneStore.getState().lightPositionZ),
     },
@@ -38,3 +38,4 @@ export const uniformsStore = createStore<TSharedUniforms>()(
         ...initialState,
     }))
 );
+export const setTimes = (time: number, dt: number) => uniformsStore.setState((c) => ({ u_time: { value: time }, u_deltaTime: { value: dt } }));

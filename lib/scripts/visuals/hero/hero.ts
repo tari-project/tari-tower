@@ -26,9 +26,9 @@ import ease, { customEasing } from '../../utils/ease';
 
 import { HALF_SIZE, SIZE, TOTAL_TILES, SIZE_WITH_PADDING, TOTAL_TILES_WITH_PADDING, tiles, board } from '../../logic/board';
 
-import vert from './hero.vert?raw';
-import frag from './hero.frag?raw';
-import fragDepth from './heroDepth.frag?raw';
+import vert from './hero.vert';
+import frag from './hero.frag';
+import fragDepth from './heroDepth.frag';
 
 import { floatingCubesDisplacement, floatingCubesRatio, successPushDownRatio, successRatio, successColorTowerRatio, towerRotationRatio } from '../../logic/successAnimationManager';
 import { stopPushDownRatio, stopSpawnRatio } from '../../logic/stopAnimationManager';

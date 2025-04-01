@@ -17,25 +17,29 @@ const initialState: IPropertiesState = {
     viewportWidth: 0,
     viewportHeight: 0,
 
-    bgColor1: '#ffffff',
-    bgColor2: '#d0d0d0',
+    bgColor1: '#c2b2b2',
+    bgColor2: '#858585',
     neutralColor: '#ffffff',
     mainColor: '#0096ff',
     successColor: '#00c881',
     failColor: '#ca0101',
-    particlesColor: '#505050',
+    particlesColor: '#ca0101',
+    // particlesColor: '#505050',
     goboIntensity: 0.45,
-    particlesOpacity: 0.75,
-    particlesSize: 0.7,
+    particlesOpacity: 1,
+    particlesSize: 1,
 };
 
-interface IPropertiesStoreState extends IPropertiesState {
+type State = IPropertiesState;
+interface Actions {
     setProperty: (property: IPropertyPair) => void;
 }
-export const propertiesStore = createStore<IPropertiesStoreState>()(
+
+type PropertiesState = State & Actions;
+export const propertiesStore = createStore<PropertiesState>()(
     subscribeWithSelector((set) => ({
         ...initialState,
-        setProperty: (property: IPropertyPair) => set((c) => ({ ...c, property })),
+        setProperty: (property: IPropertyPair) => set({ [property.propertyName]: property.value }),
     }))
 );
 
@@ -44,7 +48,7 @@ const setErrorBlock = (errorBlock?: Block | null): void => {
 };
 
 function showVisual() {
-    propertiesStore.getState().setProperty({ propertyName: 'showVisual', value: true });
+    propertiesStore.getState().setProperty({ propertyName: 'showVisual', value: false });
 }
 
 const setAnimationProperties = (properties: Record<string, unknown>[]) => {
@@ -63,6 +67,8 @@ const setAnimationProperties = (properties: Record<string, unknown>[]) => {
         }
 
         propertiesStore.getState().setProperty(property);
+
+        console.debug(property);
     }
 };
 export { setErrorBlock, showVisual, setAnimationProperties };

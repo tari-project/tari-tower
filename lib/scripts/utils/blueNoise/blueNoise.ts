@@ -2,7 +2,7 @@ import { NearestFilter, RepeatWrapping, ShaderChunk } from 'three';
 import { ASSETS_PATH } from '../../core/settings';
 import loader from '../../core/loader';
 import { uniformsStore } from '../../../store/uniformsStore.ts';
-import getBlueNoiseShader from './getBlueNoise.glsl?raw';
+import getBlueNoiseShader from './getBlueNoise.glsl';
 
 const BlueNoise = () => {
     const TEXTURE_SIZE = 128;

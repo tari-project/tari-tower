@@ -1,9 +1,9 @@
 import { InstancedBufferAttribute, Object3D, UniformsLib, UniformsUtils } from 'three';
 import loader from '../../core/loader';
 
-import vert from './coins.vert?raw';
-import frag from './coins.frag?raw';
-import fragDepth from './coinsDepth.frag?raw';
+import vert from './coins.vert';
+import frag from './coins.frag';
+import fragDepth from './coinsDepth.frag';
 import { floatingCoinsRatio, vortexCoinsRatio } from '../../logic/successAnimationManager';
 import { BufferGeometry, InstancedBufferGeometry, Mesh, ShaderMaterial } from 'three';
 import { ASSETS_PATH } from '../../core/settings';
