@@ -8,37 +8,45 @@ import { uniformsStore } from '../../../store/uniformsStore.ts';
 import { propertiesStore } from '../../../store/propertiesStore.ts';
 
 const Background = () => {
+    let propertiesState = propertiesStore.getState();
     const container = new Object3D();
     let particlesMesh: Mesh & { material: ShaderMaterial } = new Mesh();
+    let bgMesh: Mesh & { material: ShaderMaterial } = new Mesh();
 
     function init() {
-        let u: Partial<typeof uniformsStore.subscribe> = {
-            u_bgColor1: uniformsStore.getState().u_bgColor1,
-            u_bgColor2: uniformsStore.getState().u_bgColor2,
+        const ul = propertiesStore.subscribe(
+            (s) => s,
+            (s, p) => {
+                propertiesState = s;
+            },
+            { fireImmediately: true }
+        );
+
+        ul();
+
+        initBg();
+    }
+    function initBg() {
+        const { u_resolution, u_bgColor1, u_bgColor2, u_blueNoiseTexture, u_blueNoiseTexelSize, u_blueNoiseCoordOffset } = uniformsStore.getState();
+        const u: Partial<typeof uniformsStore.subscribe> = {
+            u_resolution,
+            u_bgColor1,
+            u_bgColor2,
+            u_blueNoiseTexture,
+            u_blueNoiseTexelSize,
+            u_blueNoiseCoordOffset,
         };
-        const listen: Parameters<typeof uniformsStore.subscribe>[0] = ({ u_resolution, u_bgColor1, u_bgColor2, u_blueNoiseTexture, u_blueNoiseTexelSize, u_blueNoiseCoordOffset }) => {
-            u = {
-                ...u,
-                u_resolution,
-                u_bgColor1,
-                u_bgColor2,
-                u_blueNoiseTexture,
-                u_blueNoiseTexelSize,
-                u_blueNoiseCoordOffset,
-            };
-        };
-        uniformsStore.subscribe((s) => s, listen);
 
         const material = new ShaderMaterial({
-            uniforms: { ...u },
+            uniforms: u,
             vertexShader: vert,
             fragmentShader: frag,
         });
 
-        const mesh: Mesh & { material: ShaderMaterial } = new Mesh(new PlaneGeometry(2, 2), material);
+        bgMesh = new Mesh(new PlaneGeometry(2, 2), material);
 
-        mesh.renderOrder = 1;
-        container.add(mesh);
+        bgMesh.renderOrder = 1;
+        container.add(bgMesh);
         initParticles();
     }
 
@@ -90,21 +98,9 @@ const Background = () => {
     }
 
     function update(_dt: number) {
-        const ul = propertiesStore.subscribe(
-            (s) => s,
-            (s) => {
-                if (particlesMesh.material.uniforms.u_opacity.value === s.particlesOpacity) {
-                    return;
-                }
-
-                particlesMesh.material.uniforms.u_size.value = s.particlesSize;
-                particlesMesh.material.uniforms.u_color.value.set(s.particlesColor);
-                particlesMesh.material.uniforms.u_opacity.value = s.particlesOpacity;
-            },
-            { fireImmediately: true }
-        );
-
-        ul();
+        particlesMesh.material.uniforms.u_size.value = propertiesState.particlesSize;
+        particlesMesh.material.uniforms.u_color.value.set(propertiesState.particlesColor);
+        particlesMesh.material.uniforms.u_opacity.value = propertiesState.particlesOpacity;
     }
 
     return { init, update, container };

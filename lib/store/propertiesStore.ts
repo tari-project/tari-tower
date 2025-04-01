@@ -63,6 +63,5 @@ const setAnimationProperties = (properties: Record<string, unknown>[]) => {
 
         propertiesStore.getState().setProperty(property);
     }
-    console.debug(propertiesStore.getState());
 };
 export { setErrorBlock, setAnimationProperties };
