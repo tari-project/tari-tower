@@ -62,7 +62,8 @@ const Loader = () => {
                     attempts++;
                     if (attempts >= maxAttempts) {
                         console.error(
-                            `Tower animation | error loading buffer: ${url}after ${maxAttempts} attempts`,
+                            `Tower animation | error loading buffer [%c${url}] after ${maxAttempts} attempts, %O: `,
+                            'font-weight:900;',
                             error
                         );
                     } else {
@@ -111,7 +112,8 @@ const Loader = () => {
                     }
                 },
                 undefined,
-                (error) => console.error(`Tower animation | error loading texture: ${url}`, error)
+                (error) =>
+                    console.error(`Tower animation | error loading texture [%c${url}] %O: `, 'font-weight:900;', error)
             );
         });
     }

@@ -1,54 +1,57 @@
 {
-	"name": "@tari-project/tari-tower",
-	"type": "module",
-	"version": "0.0.25",
-	"private": false,
-	"description": "the tower animation used in Tari Universe",
-	"homepage": "https://github.com/tari-project/tari-tower#readme",
-	"bugs": {
-		"url": "https://github.com/tari-project/tari-tower/issues"
-	},
-	"author": "Tari Labs",
-	"license": "ISC",
-	"scripts": {
-		"dev": "vite",
-		"build": "tsc --p ./tsconfig.lib.json && vite build",
-		"build:watch": "tsc --p ./tsconfig.lib.json && vite build -w",
-		"preview": "vite preview",
-		"lint": "eslint lib src",
-		"knip": "knip"
-	},
-	"exports": {
-		".": {
-			"assets": "./public/assets/",
-			"types": "./dist/index.d.ts",
-			"default": "./dist/index.js"
-		}
-	},
-	"dependencies": {
-		"three": "^0.175.0",
-		"zustand": "^5.0.3"
-	},
-	"devDependencies": {
-		"@eslint/js": "^9.19.0",
-		"@nabla/vite-plugin-eslint": "^2.0.5",
-		"@types/node": "^22.13.15",
-		"@types/three": "^0.175.0",
-		"@typescript-eslint/parser": "^8.24.1",
-		"eslint": "^9.23.0",
-		"eslint-config-prettier": "^10.1.1",
-		"eslint-plugin-prettier": "^5.2.5",
-		"globals": "^16.0.0",
-		"knip": "^5.46.2",
-		"lil-gui": "^0.20.0",
-		"prettier": "3.5.3",
-		"typescript": "^5.8.2",
-		"typescript-eslint": "^8.29.0",
-		"vite": "^6.2.4",
-		"vite-plugin-dts": "^4.5.3",
-		"vite-tsconfig-paths": "^5.1.4"
-	},
-	"publishConfig": {
-		"access": "public"
-	}
+    "name": "@tari-project/tari-tower",
+    "type": "module",
+    "version": "0.0.25",
+    "files": [
+        "dist"
+    ],
+    "exports": {
+        ".": {
+            "assets": "./public/assets/",
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
+        }
+    },
+    "private": false,
+    "description": "the tower animation used in Tari Universe",
+    "homepage": "https://github.com/tari-project/tari-tower#readme",
+    "bugs": {
+        "url": "https://github.com/tari-project/tari-tower/issues"
+    },
+    "author": "Tari Labs",
+    "license": "ISC",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc --p ./tsconfig.lib.json && vite build",
+        "build:watch": "tsc --p ./tsconfig.lib.json && vite build -w",
+        "preview": "vite preview",
+        "lint": "eslint lib src",
+        "knip": "knip"
+    },
+    "dependencies": {
+        "three": "^0.175.0",
+        "zustand": "^5.0.3"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.19.0",
+        "@nabla/vite-plugin-eslint": "^2.0.5",
+        "@types/node": "^22.13.15",
+        "@types/three": "^0.175.0",
+        "@typescript-eslint/parser": "^8.24.1",
+        "eslint": "^9.23.0",
+        "eslint-config-prettier": "^10.1.1",
+        "eslint-plugin-prettier": "^5.2.5",
+        "globals": "^16.0.0",
+        "knip": "^5.46.2",
+        "lil-gui": "^0.20.0",
+        "prettier": "3.5.3",
+        "typescript": "^5.8.2",
+        "typescript-eslint": "^8.29.0",
+        "vite": "^6.2.4",
+        "vite-plugin-dts": "^4.5.3",
+        "vite-tsconfig-paths": "^5.1.4"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
 }

@@ -113,8 +113,6 @@ const Hero = () => {
     const heroContainer = new Object3D();
 
     async function preload() {
-        initListeners();
-
         const arr = Array.from({ length: TOTAL_BLOCKS });
         heroState._blockList = arr.map((_) => new HeroBlockCoordinates());
         heroState._blockRenderList = [...heroState._blockList];
@@ -136,6 +134,8 @@ const Hero = () => {
             texture.needsUpdate = true;
             uniformsStore.setState({ u_goboTexture: { value: texture } });
         });
+
+        initListeners();
     }
 
     function _onBaseBlocksLoaded(geometry) {

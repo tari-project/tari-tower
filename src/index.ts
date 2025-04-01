@@ -50,7 +50,7 @@ if (import.meta.env.MODE === 'development') {
     gui.add(actions, 'initCanvas');
 
     function handleLoad() {
-        void loadTowerAnimation({ canvasId: 'canvas-id', offset: 0 });
+        loadTowerAnimation({ canvasId: 'canvas-id', offset: 0 });
     }
 
     document.addEventListener('DOMContentLoaded', handleLoad);
