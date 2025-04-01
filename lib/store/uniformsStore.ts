@@ -38,7 +38,7 @@ const initialState = {
 export type TSharedUniforms = typeof initialState;
 
 export const uniformsStore = createStore<TSharedUniforms>()(
-    subscribeWithSelector((set) => ({
+    subscribeWithSelector(() => ({
         ...initialState,
     }))
 );

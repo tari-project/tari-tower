@@ -105,40 +105,12 @@ const heroState: HeroType = {
 
 const Hero = () => {
     const heroContainer = new Object3D();
-    let animationCycleState = animationCycleStore.getState();
-    let result = stateManagerStore.getState().result;
+    const animationCycleState = animationCycleStore.getState();
+    const result = stateManagerStore.getState().result;
     const { blocks, previousSuccessBlocksAnimationRatio, lastSpawnedBlock } = animationCycleState;
 
     let sharedUniforms;
     let propertiesState;
-
-    animationCycleStore.subscribe(
-        (state) => state,
-        (state, prev) => {
-            if (prev !== state) {
-                animationCycleState = state;
-            }
-        },
-        { fireImmediately: true }
-    );
-
-    stateManagerStore.subscribe(
-        (state) => state.result,
-        (_result) => {
-            result = _result;
-        },
-        { fireImmediately: true }
-    );
-
-    propertiesStore.subscribe(
-        ({ time, deltaTime, ...state }) => state,
-        (state, prev) => {
-            if (prev !== state) {
-                propertiesState = state;
-            }
-        },
-        { fireImmediately: true }
-    );
 
     async function preload() {
         const arr = Array.from({ length: TOTAL_BLOCKS });

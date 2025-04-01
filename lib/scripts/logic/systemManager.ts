@@ -20,48 +20,8 @@ import { MAX_FREE_BLOCKS_COUNT } from '../core/settings.ts';
 import { propertiesStore } from '../../store/propertiesStore.ts';
 
 const SystemManager = () => {
-    let animationCycleState = animationCycleStore.getState();
-    let flags = stateManagerStore.getState().flags;
-
-    stateManagerStore.subscribe(
-        (state) => state.flags,
-        (_flags) => {
-            flags = _flags;
-        },
-        { fireImmediately: true }
-    );
-
-    animationCycleStore.subscribe(
-        (state) => state,
-        (state) => (animationCycleState = state),
-        { fireImmediately: true }
-    );
-
-    stateManagerStore.subscribe(
-        (state) => state.animationTypeEnded,
-        (animationTypeEnded) => {
-            if (animationTypeEnded) {
-                switch (animationTypeEnded) {
-                    case 'win': {
-                        reset();
-                        setAnimationRatios({ previousSuccessBlocksAnimationRatio: 1 });
-                        _startNewCycle();
-                        break;
-                    }
-                    case 'lose': {
-                        reset();
-                        _startNewCycle();
-                        break;
-                    }
-                    case 'stop':
-                    default:
-                        reset(true);
-                        break;
-                }
-            }
-        },
-        { fireImmediately: true }
-    );
+    const animationCycleState = animationCycleStore.getState();
+    const flags = stateManagerStore.getState().flags;
 
     function _spawnBlock() {
         const { isFailResult, isStopped, isSuccessResult, isReplayResult, isFree } = flags;

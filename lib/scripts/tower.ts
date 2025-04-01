@@ -131,16 +131,6 @@ const TariTower = () => {
     async function init() {
         await _initScene();
 
-        stateManagerStore.subscribe(
-            (state) => state.destroyCanvas,
-            (destroyCanvas) => {
-                if (destroyCanvas) {
-                    destroy();
-                }
-            },
-            { fireImmediately: true }
-        );
-
         try {
             // first the logic
             await game.init();

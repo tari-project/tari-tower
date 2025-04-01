@@ -93,7 +93,6 @@ export default class Block {
     }
 
     resetAfterCycle() {
-
         this.hasBeenEvaluated = false;
         this.hasAnimationEnded = false;
         this.moveAnimationRatio = 0;
