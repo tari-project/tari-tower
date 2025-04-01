@@ -10,8 +10,7 @@ import {
     setWin,
     showVisual,
     SuccessLevel,
-    type IPropertyPair,
-} from '@tari-project/tari-tower';
+} from '../lib/index';
 
 if (import.meta.env.MODE === 'development') {
     const gui = new GUI();
@@ -60,7 +59,7 @@ if (import.meta.env.MODE === 'development') {
         clearTimeout(timeOutId);
     }, 500);
 
-    const animationLightBg: IPropertyPair[] = [
+    const animationLightBg = [
         { propertyName: 'bgColor1', value: '#ffffff' },
         { propertyName: 'bgColor2', value: '#d0d0d0' },
         { propertyName: 'neutralColor', value: '#ffffff' },
@@ -72,7 +71,7 @@ if (import.meta.env.MODE === 'development') {
         { propertyName: 'particlesOpacity', value: 0.75 },
         { propertyName: 'particlesSize', value: 0.01 },
     ];
-    const animationDarkBg: IPropertyPair[] = [
+    const animationDarkBg = [
         { propertyName: 'bgColor1', value: '#212121' },
         { propertyName: 'bgColor2', value: '#212121' },
         { propertyName: 'neutralColor', value: '#040723' },

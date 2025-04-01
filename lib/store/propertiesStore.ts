@@ -3,6 +3,8 @@ import { subscribeWithSelector } from 'zustand/middleware';
 
 import type { IPropertiesState, IPropertyPair } from '../types/properties.ts';
 import Block from '../scripts/logic/Block.ts';
+import { uniformsStore } from './uniformsStore.ts';
+import { Color } from 'three';
 
 const initialState: IPropertiesState = {
     time: 0,
@@ -38,10 +40,30 @@ export const propertiesStore = createStore<IPropertiesStoreState>()(
     }))
 );
 
-export const setErrorBlock = (errorBlock?: Block | null): void => {
+const setErrorBlock = (errorBlock?: Block | null): void => {
     propertiesStore.setState({ errorBlock });
 };
 
-export function showVisual() {
+function showVisual() {
     propertiesStore.getState().setProperty({ propertyName: 'showVisual', value: true });
 }
+
+const setAnimationProperties = (properties: Record<string, unknown>[]) => {
+    const propertyPairs: IPropertyPair[] = properties as unknown as IPropertyPair[];
+    for (const property of propertyPairs) {
+        if (property.propertyName === 'bgColor1') {
+            uniformsStore.setState((c) => ({
+                u_bgColor1: { value: c.u_bgColor1.value.set(property.value as Color).convertSRGBToLinear() },
+            }));
+        }
+
+        if (property.propertyName === 'bgColor2') {
+            uniformsStore.setState((c) => ({
+                u_bgColor2: { value: c.u_bgColor2.value.set(property.value as Color).convertSRGBToLinear() },
+            }));
+        }
+
+        propertiesStore.getState().setProperty(property);
+    }
+};
+export { setErrorBlock, showVisual, setAnimationProperties };

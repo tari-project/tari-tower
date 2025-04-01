@@ -107,7 +107,7 @@ const Hero = () => {
     let sharedUniforms;
     let propertiesState;
     let result;
-    let status;
+
     const animationCycleStoreInitial = animationCycleStore.getInitialState();
     let { blocks: blocksState, ...animationCycleState } = animationCycleStoreInitial;
     const heroContainer = new Object3D();
@@ -225,21 +225,16 @@ const Hero = () => {
     function initListeners() {
         const propertiesListener: Parameters<typeof propertiesStore.subscribe>[0] = (state) =>
             (propertiesState = state);
-        const stateListener: Parameters<typeof stateManagerStore.subscribe>[0] = ({
-            result: sResult,
-            status: sStatus,
-        }) => {
+        const stateListener = (sResult) => {
             result = sResult;
-            status = sStatus;
         };
         const animationCycleListener: Parameters<typeof animationCycleStore.subscribe>[0] = ({ blocks, ...rest }) => {
             blocksState = blocks;
             animationCycleState = rest;
         };
-
         const uniformsListener: Parameters<typeof uniformsStore.subscribe>[0] = (state) => (sharedUniforms = state);
 
-        stateManagerStore.subscribe((s) => s, stateListener);
+        stateManagerStore.subscribe((s) => stateListener(s.result));
         propertiesStore.subscribe((state) => propertiesListener(state));
         animationCycleStore.subscribe((state) => animationCycleListener(state));
         uniformsStore.subscribe((state) => uniformsListener(state));

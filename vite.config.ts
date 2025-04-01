@@ -12,22 +12,17 @@ export default defineConfig({
         port: 3001,
     },
     plugins: [
-        tsconfigPaths(),
-        eslint({ eslintOptions: { cache: false, fix: true } }),
         dts({
             include: ['lib'],
             exclude: ['src'],
             rollupTypes: true,
             staticImport: true,
-            compilerOptions: {
-                declarationMap: true,
-            },
-            tsconfigPath: resolve(__dirname, 'tsconfig.lib.json'),
+            tsconfigPath: 'tsconfig.lib.json',
         }),
+        tsconfigPaths(),
+        eslint({ eslintOptions: { cache: false, fix: true } }),
     ],
     build: {
-        sourcemap: 'inline',
-        emptyOutDir: true,
         lib: {
             entry: resolve(__dirname, 'lib/index.ts'),
             name: '@tari-project/tari-tower',
