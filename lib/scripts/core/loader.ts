@@ -21,9 +21,7 @@ const Loader = () => {
                     const response = await fetch(url);
                     const buffer = await response.arrayBuffer();
                     const schematicJsonSize = new Uint32Array(buffer, 0, 1)[0];
-                    const schematic = JSON.parse(
-                        new TextDecoder().decode(new Uint8Array(buffer, 4, schematicJsonSize))
-                    );
+                    const schematic = JSON.parse(new TextDecoder().decode(new Uint8Array(buffer, 4, schematicJsonSize)));
 
                     const { vertexCount, indexCount, attributes: schematicAttributeList } = schematic;
                     let offset = 4 + schematicJsonSize;
@@ -61,16 +59,9 @@ const Loader = () => {
                 } catch (error) {
                     attempts++;
                     if (attempts >= maxAttempts) {
-                        console.error(
-                            `Tower animation | error loading buffer [%c${url}] after ${maxAttempts} attempts, %O: `,
-                            'font-weight:900;',
-                            error
-                        );
+                        console.error(`Tower animation | error loading buffer [%c${url}] after ${maxAttempts} attempts, %O: `, 'font-weight:900;', error);
                     } else {
-                        console.warn(
-                            `Tower animation | error loading buffer: ${url}, attempt ${attempts}/${maxAttempts}, retrying...`,
-                            error
-                        );
+                        console.warn(`Tower animation | error loading buffer: ${url}, attempt ${attempts}/${maxAttempts}, retrying...`, error);
                         await new Promise((resolve) => setTimeout(resolve, 100));
                     }
                 }
@@ -112,8 +103,7 @@ const Loader = () => {
                     }
                 },
                 undefined,
-                (error) =>
-                    console.error(`Tower animation | error loading texture [%c${url}] %O: `, 'font-weight:900;', error)
+                (error) => console.error(`Tower animation | error loading texture [%c${url}] %O: `, 'font-weight:900;', error)
             );
         });
     }

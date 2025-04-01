@@ -10,12 +10,7 @@ import { successAnimationManager } from '../logic/successAnimationManager';
 import { resetCycleResults } from '../../types/stateManager';
 import { setStart, stateManagerStore } from '../../store/stateManagerStore';
 
-import {
-    addBlock,
-    animationCycleStore,
-    setAnimationRatios,
-    setLastSpawnedBlock,
-} from '../../store/animationCycleStore.ts';
+import { addBlock, animationCycleStore, setAnimationRatios, setLastSpawnedBlock } from '../../store/animationCycleStore.ts';
 import { MAX_FREE_BLOCKS_COUNT } from '../core/settings.ts';
 import { propertiesStore } from '../../store/propertiesStore.ts';
 
@@ -25,11 +20,7 @@ const SystemManager = () => {
     let { blocks: blocksState, ...animationCycleState } = animationCycleStoreInitial;
     function _spawnBlock() {
         const { isFailResult, isStopped, isSuccessResult, isReplayResult, isFree } = flagsState;
-        const preventSpawn =
-            isFailResult ||
-            isStopped ||
-            blocksState.length >= TOTAL_TILES ||
-            (mainTile?.isOccupied && !isSuccessResult && !isReplayResult);
+        const preventSpawn = isFailResult || isStopped || blocksState.length >= TOTAL_TILES || (mainTile?.isOccupied && !isSuccessResult && !isReplayResult);
         if (preventSpawn) return;
 
         if (isSuccessResult || isReplayResult) {
@@ -60,10 +51,8 @@ const SystemManager = () => {
         let block: Block | null | undefined = null;
         const isFree = flagsState.isFree;
         const canAddNewBlock = Boolean(blocksState.length < MAX_FREE_BLOCKS_COUNT && isFree);
-        console.debug(`isFree=`, isFree);
         if (canAddNewBlock) {
             block = new Block(blocksState.length);
-            console.debug(`block1=`, block);
             setLastSpawnedBlock(block);
         }
 
@@ -72,7 +61,6 @@ const SystemManager = () => {
             block.init();
             block.updateTile();
         }
-        console.debug(`block2=`, block);
     }
 
     function _startNewCycle() {
@@ -137,9 +125,7 @@ const SystemManager = () => {
         const animationSpeedRatio = Math.min(1, speedRatio + dt * (isResult ? 1 : 0));
 
         const previousSuccessBlocksAnimationRatio = math.saturate(prevSuccessRatio - dt / 1.5);
-        const firstStartAnimationRatio = math.saturate(
-            firstStartRatio + dt * (propertiesStore.getState().showVisual ? 1 : 0)
-        );
+        const firstStartAnimationRatio = math.saturate(firstStartRatio + dt * (propertiesStore.getState().showVisual ? 1 : 0));
 
         setAnimationRatios({
             animationSpeedRatio,

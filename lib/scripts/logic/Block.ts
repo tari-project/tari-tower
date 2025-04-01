@@ -75,9 +75,7 @@ export default class Block {
         }
 
         this.currentTile.shuffleReachableNeighbours();
-        const neighbours = nextFree
-            ? this.currentTile.reachableNeighbours
-            : this.currentTile.prioritySortedReachableNeighbours;
+        const neighbours = nextFree ? this.currentTile.reachableNeighbours : this.currentTile.prioritySortedReachableNeighbours;
 
         const bestTile = this._findBestTile(neighbours, nextFree);
 
@@ -110,13 +108,7 @@ export default class Block {
 
         const isFree = stateManagerStore.getState().flags.isFree;
         const errorBlock = propertiesStore.getState().errorBlock;
-        if (
-            this.currentTile?.isBorder &&
-            !errorBlock &&
-            Math.random() < 0.5 &&
-            activeBlocksCount >= MIN_SPAWN_COUNT_FOR_ERROR &&
-            isFree
-        ) {
+        if (this.currentTile?.isBorder && !errorBlock && Math.random() < 0.5 && activeBlocksCount >= MIN_SPAWN_COUNT_FOR_ERROR && isFree) {
             setErrorBlock(this);
             this.isErrorBlock = true;
         }
@@ -180,10 +172,7 @@ export default class Block {
         const isResult = stateManagerStore.getState().flags.isResult;
         const isFree = stateManagerStore.getState().flags.isFree;
         if ((this.isMoving && !this.hasAnimationEnded) || isResult) {
-            this.moveAnimationRatio = Math.min(
-                1,
-                this.moveAnimationRatio + ANIMATION_SPEED * dt * (this.isErrorBlock ? 0.7 : 1)
-            );
+            this.moveAnimationRatio = Math.min(1, this.moveAnimationRatio + ANIMATION_SPEED * dt * (this.isErrorBlock ? 0.7 : 1));
             this.easedAnimationRatio = this.easingFunction?.(Math.max(0, this.moveAnimationRatio)) || 0;
 
             if (this.easedAnimationRatio === 1 && (isFree || isResult)) {
@@ -193,17 +182,10 @@ export default class Block {
     }
 
     _updateTileRatios() {
-        const clampedMoveAnimationRatio = Math.max(
-            0,
-            Math.min(1, this.hasBeenSpawned ? this.easedAnimationRatio : this.spawnAnimationRatio)
-        );
+        const clampedMoveAnimationRatio = Math.max(0, Math.min(1, this.hasBeenSpawned ? this.easedAnimationRatio : this.spawnAnimationRatio));
 
         if (this.currentTile) {
-            this.currentTile.activeRatio = this.hasBeenSpawned
-                ? this.targetTile
-                    ? 1 - clampedMoveAnimationRatio
-                    : 1
-                : this.spawnAnimationRatio;
+            this.currentTile.activeRatio = this.hasBeenSpawned ? (this.targetTile ? 1 - clampedMoveAnimationRatio : 1) : this.spawnAnimationRatio;
         }
         if (this.targetTile) {
             this.targetTile.activeRatio = clampedMoveAnimationRatio;

@@ -1,13 +1,4 @@
-import {
-    Mesh,
-    CameraHelper,
-    DataTexture,
-    DirectionalLight,
-    InstancedBufferGeometry,
-    ShaderMaterial,
-    Vector3,
-    Texture,
-} from 'three';
+import { Mesh, CameraHelper, DataTexture, DirectionalLight, InstancedBufferGeometry, ShaderMaterial, Vector3, Texture } from 'three';
 import { Uniform } from './properties';
 import HeroBlockCoordinates from '../scripts/visuals/hero/HeroBlockCoordinates';
 

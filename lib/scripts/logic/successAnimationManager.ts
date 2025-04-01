@@ -15,15 +15,8 @@ let floatingCubesDisplacement = 1;
 
 const SuccessAnimationManager = () => {
     function init() {
-        const listen: Parameters<typeof stateManagerStore.subscribe>[0] = ({
-            status,
-            result,
-            completeAnimationLevel,
-        }) => {
-            if (
-                status === AnimationStatus.RESULT &&
-                (result === AnimationResult.COMPLETED || result === AnimationResult.REPLAY)
-            ) {
+        const listen: Parameters<typeof stateManagerStore.subscribe>[0] = ({ status, result, completeAnimationLevel }) => {
+            if (status === AnimationStatus.RESULT && (result === AnimationResult.COMPLETED || result === AnimationResult.REPLAY)) {
                 _triggerNewAnimation(completeAnimationLevel);
             }
         };
@@ -106,14 +99,4 @@ const SuccessAnimationManager = () => {
 };
 
 const successAnimationManager = SuccessAnimationManager();
-export {
-    successAnimationManager,
-    successRatio,
-    towerRotationRatio,
-    floatingCoinsRatio,
-    floatingCubesRatio,
-    vortexCoinsRatio,
-    successPushDownRatio,
-    successColorTowerRatio,
-    floatingCubesDisplacement,
-};
+export { successAnimationManager, successRatio, towerRotationRatio, floatingCoinsRatio, floatingCubesRatio, vortexCoinsRatio, successPushDownRatio, successColorTowerRatio, floatingCubesDisplacement };

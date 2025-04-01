@@ -26,8 +26,7 @@ const initialState: IPropertiesState = {
     particlesColor: '#505050',
     goboIntensity: 0.45,
     particlesOpacity: 0.75,
-    particlesSize: 0.6,
-    // particlesSize: 0.01,
+    particlesSize: 0.7,
 };
 
 interface IPropertiesStoreState extends IPropertiesState {

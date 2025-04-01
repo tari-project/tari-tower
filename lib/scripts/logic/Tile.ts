@@ -40,26 +40,20 @@ export default class Tile {
     }
 
     init() {
-        this.reachableNeighbours =
-            this.neighbours?.filter((neighbour) => neighbour?.row === this.row || neighbour?.col === this.col) || null;
+        this.reachableNeighbours = this.neighbours?.filter((neighbour) => neighbour?.row === this.row || neighbour?.col === this.col) || null;
 
         this._sortPriorityNeighbours();
     }
 
     _sortPriorityNeighbours() {
-        this.prioritySortedReachableNeighbours = this.reachableNeighbours
-            ? [...this.reachableNeighbours].sort((a, b) => (a?.priority || 0) - (b?.priority || 0))
-            : null;
+        this.prioritySortedReachableNeighbours = this.reachableNeighbours ? [...this.reachableNeighbours].sort((a, b) => (a?.priority || 0) - (b?.priority || 0)) : null;
     }
 
     shuffleReachableNeighbours() {
         if (this.reachableNeighbours) {
             for (let i = this.reachableNeighbours.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
-                [this.reachableNeighbours[i], this.reachableNeighbours[j]] = [
-                    this.reachableNeighbours[j],
-                    this.reachableNeighbours[i],
-                ];
+                [this.reachableNeighbours[i], this.reachableNeighbours[j]] = [this.reachableNeighbours[j], this.reachableNeighbours[i]];
             }
         }
 

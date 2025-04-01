@@ -116,5 +116,4 @@ export const setStop = () => {
 export const setLose = () => {
     stateManagerStore.getState().setAnimationState('lose');
 };
-export const setWin = ({ isReplay, completeAnimationLevel }: SetWinArgs) =>
-    stateManagerStore.getState().setWinAnimation({ isReplay, completeAnimationLevel });
+export const setWin = ({ isReplay, completeAnimationLevel }: SetWinArgs) => stateManagerStore.getState().setWinAnimation({ isReplay, completeAnimationLevel });

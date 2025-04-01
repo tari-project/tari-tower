@@ -24,35 +24,15 @@ import loader from '../../core/loader';
 import math from '../../utils/math';
 import ease, { customEasing } from '../../utils/ease';
 
-import {
-    HALF_SIZE,
-    SIZE,
-    TOTAL_TILES,
-    SIZE_WITH_PADDING,
-    TOTAL_TILES_WITH_PADDING,
-    tiles,
-    board,
-} from '../../logic/board';
+import { HALF_SIZE, SIZE, TOTAL_TILES, SIZE_WITH_PADDING, TOTAL_TILES_WITH_PADDING, tiles, board } from '../../logic/board';
 
 import vert from './hero.vert?raw';
 import frag from './hero.frag?raw';
 import fragDepth from './heroDepth.frag?raw';
 
-import {
-    floatingCubesDisplacement,
-    floatingCubesRatio,
-    successPushDownRatio,
-    successRatio,
-    successColorTowerRatio,
-    towerRotationRatio,
-} from '../../logic/successAnimationManager';
+import { floatingCubesDisplacement, floatingCubesRatio, successPushDownRatio, successRatio, successColorTowerRatio, towerRotationRatio } from '../../logic/successAnimationManager';
 import { stopPushDownRatio, stopSpawnRatio } from '../../logic/stopAnimationManager';
-import {
-    failFloatingCubesRatio,
-    failPushDownRatio,
-    failShakeRatio,
-    failSpawnRatio,
-} from '../../logic/errorAnimationManager';
+import { failFloatingCubesRatio, failPushDownRatio, failShakeRatio, failSpawnRatio } from '../../logic/errorAnimationManager';
 import HeroBlockCoordinates from './HeroBlockCoordinates';
 
 import { HeroType } from '../../../types/hero';
@@ -104,9 +84,9 @@ const heroState: HeroType = {
 };
 
 const Hero = () => {
-    let sharedUniforms;
-    let propertiesState;
-    let result;
+    let sharedUniforms = uniformsStore.getState();
+    let propertiesState = propertiesStore.getState();
+    let result = stateManagerStore.getState().result;
 
     const animationCycleStoreInitial = animationCycleStore.getInitialState();
     let { blocks: blocksState, ...animationCycleState } = animationCycleStoreInitial;
@@ -182,10 +162,7 @@ const Hero = () => {
 
         const createInstancedAttribute = (name, itemSize) => {
             const array = new Float32Array(TOTAL_BLOCKS * itemSize);
-            geometry.setAttribute(
-                name,
-                new InstancedBufferAttribute(array, itemSize, itemSize !== 4, 1).setUsage(DynamicDrawUsage)
-            );
+            geometry.setAttribute(name, new InstancedBufferAttribute(array, itemSize, itemSize !== 4, 1).setUsage(DynamicDrawUsage));
             return array;
         };
 
@@ -223,8 +200,7 @@ const Hero = () => {
     }
 
     function initListeners() {
-        const propertiesListener: Parameters<typeof propertiesStore.subscribe>[0] = (state) =>
-            (propertiesState = state);
+        const propertiesListener: Parameters<typeof propertiesStore.subscribe>[0] = (state) => (propertiesState = state);
         const stateListener = (sResult) => {
             result = sResult;
         };
@@ -269,19 +245,7 @@ const Hero = () => {
         }
 
         heroState.infoTexture = new DataTexture(infoData, SIZE_WITH_PADDING, SIZE_WITH_PADDING, RGBAFormat, FloatType);
-        heroState.infoTextureLinear = new DataTexture(
-            infoData,
-            SIZE_WITH_PADDING,
-            SIZE_WITH_PADDING,
-            RGBAFormat,
-            FloatType,
-            UVMapping,
-            ClampToEdgeWrapping,
-            ClampToEdgeWrapping,
-            LinearFilter,
-            LinearFilter,
-            0
-        );
+        heroState.infoTextureLinear = new DataTexture(infoData, SIZE_WITH_PADDING, SIZE_WITH_PADDING, RGBAFormat, FloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, LinearFilter, 0);
         heroState.infoTextureLinear.needsUpdate = true;
         uniformsStore.setState({
             u_infoTexture: { value: heroState.infoTexture },
@@ -301,14 +265,8 @@ const Hero = () => {
                     const posIndex = (k * TOTAL_TILES + tileIndex) * 3;
                     const orientIndex = (k * TOTAL_TILES + tileIndex) * 4;
 
-                    tile.loseAnimationPositionArray.set(
-                        heroState.heroLoseAnimationPositionArray?.subarray(posIndex, posIndex + 3) || [],
-                        k * 3
-                    );
-                    tile.loseAnimationOrientArray.set(
-                        heroState.heroLoseAnimationOrientArray?.subarray(orientIndex, orientIndex + 4) || [],
-                        k * 4
-                    );
+                    tile.loseAnimationPositionArray.set(heroState.heroLoseAnimationPositionArray?.subarray(posIndex, posIndex + 3) || [], k * 3);
+                    tile.loseAnimationOrientArray.set(heroState.heroLoseAnimationOrientArray?.subarray(orientIndex, orientIndex + 4) || [], k * 4);
                 }
             });
         });
@@ -374,10 +332,7 @@ const Hero = () => {
 
             heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.set(DEFAULT_COLOR).convertSRGBToLinear();
 
-            heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(
-                _c.set(propertiesState.successColor),
-                animationCycleState.previousSuccessBlocksAnimationRatio
-            );
+            heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(_c.set(propertiesState.successColor), animationCycleState.previousSuccessBlocksAnimationRatio);
             heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.convertSRGBToLinear();
         }
     }
@@ -411,14 +366,9 @@ const Hero = () => {
         if (animationCycleState.lastSpawnedBlock) {
             const block = heroState._blockList[animationCycleState.lastSpawnedBlock.id];
             if (animationCycleState.lastSpawnedBlock.currentTile) {
-                block.boardPos.set(
-                    animationCycleState.lastSpawnedBlock.currentTile?.row,
-                    animationCycleState.lastSpawnedBlock.currentTile?.col
-                );
+                block.boardPos.set(animationCycleState.lastSpawnedBlock.currentTile?.row, animationCycleState.lastSpawnedBlock.currentTile?.col);
             }
-            block.showRatio = customEasing(
-                math.saturate(animationCycleState.lastSpawnedBlock.spawnAnimationRatioUnclamped)
-            );
+            block.showRatio = customEasing(math.saturate(animationCycleState.lastSpawnedBlock.spawnAnimationRatioUnclamped));
         }
 
         blocksState?.forEach((logicBlock) => {
@@ -431,10 +381,7 @@ const Hero = () => {
                 }
 
                 if (logicBlock.targetTile) {
-                    block.boardDir.set(
-                        logicBlock.targetTile.row - (logicBlock.currentTile?.row || 0),
-                        logicBlock.targetTile.col - (logicBlock.currentTile?.col || 0)
-                    );
+                    block.boardDir.set(logicBlock.targetTile.row - (logicBlock.currentTile?.row || 0), logicBlock.targetTile.col - (logicBlock.currentTile?.col || 0));
                 }
                 block.animation = logicBlock.hasAnimationEnded ? 0 : logicBlock.easedAnimationRatio;
             }
@@ -609,20 +556,14 @@ const Hero = () => {
         heroContainer.rotation.y = 0.5 * Math.PI * easedFirstStartAnimationRatio;
         heroContainer.rotation.y += 2 * Math.PI * ease.quartInOut(towerRotationRatio);
         if (heroState._baseMesh) {
-            heroState._baseMesh.material.uniforms.u_yDisplacement.value =
-                -easedRestartAnimationRatio - 5 * easedFirstStartAnimationRatio;
+            heroState._baseMesh.material.uniforms.u_yDisplacement.value = -easedRestartAnimationRatio - 5 * easedFirstStartAnimationRatio;
             heroState._baseMesh.material.uniforms.u_successAnimationRatio.value = successColorTowerRatio;
         }
         const sceneState = sceneStore.getState();
 
         uniformsStore.setState({
             u_endAnimationRatio: {
-                value: Math.min(
-                    1,
-                    math.fit(stopSpawnRatio, 0.5, 2, 0, 1) +
-                        math.fit(failSpawnRatio, 0.5, 2, 0, 1) +
-                        math.fit(successRatio, 0, 0.2, 0, 1)
-                ),
+                value: Math.min(1, math.fit(stopSpawnRatio, 0.5, 2, 0, 1) + math.fit(failSpawnRatio, 0.5, 2, 0, 1) + math.fit(successRatio, 0, 0.2, 0, 1)),
             },
         });
         if (heroState.directLight) {

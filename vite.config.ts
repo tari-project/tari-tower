@@ -12,6 +12,7 @@ export default defineConfig({
         port: 3001,
     },
     plugins: [
+        tsconfigPaths(),
         dts({
             include: ['lib'],
             exclude: ['src'],
@@ -19,24 +20,26 @@ export default defineConfig({
             staticImport: true,
             tsconfigPath: 'tsconfig.lib.json',
         }),
-        tsconfigPaths(),
         eslint({ eslintOptions: { cache: false, fix: true } }),
     ],
     build: {
+        emptyOutDir: true,
         lib: {
             entry: resolve(__dirname, 'lib/index.ts'),
             name: '@tari-project/tari-tower',
             formats: ['es'],
         },
         rollupOptions: {
-            external: ['three', 'zustand'],
+            external: ['lil-gui'],
             input: resolve(__dirname, 'lib/index.ts'),
             output: {
+                compact: true,
                 entryFileNames: '[name].js',
                 assetFileNames: 'assets/[name][extname]',
+                interop: 'auto',
+                validate: true,
                 globals: {
-                    three: 'Three',
-                    zustand: 'Zustand',
+                    'lil-gui': 'Lil-GUI',
                 },
             },
         },

@@ -1,8 +1,9 @@
-import { Color, Vector2, Vector3, DataTexture } from 'three';
-import { createStore } from 'zustand/vanilla';
+import { Color, Vector2, Vector3, DataTexture, type IUniform } from 'three';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { propertiesStore } from './propertiesStore.ts';
+import { createStore } from 'zustand/vanilla';
 import { sceneStore } from './sceneStore.ts';
+
+type TSharedUniforms = Record<string, IUniform>;
 
 const blueNoiseUniforms = {
     u_blueNoiseTexture: { value: null },
@@ -12,33 +13,28 @@ const blueNoiseUniforms = {
 
 const heroSharedUniforms = {
     u_lightPosition: {
-        value: new Vector3(
-            sceneStore.getState().lightPositionX,
-            sceneStore.getState().lightPositionY,
-            sceneStore.getState().lightPositionZ
-        ),
+        value: new Vector3(sceneStore.getState().lightPositionX, sceneStore.getState().lightPositionY, sceneStore.getState().lightPositionZ),
     },
     u_goboTexture: { value: null },
-    u_goboIntensity: { value: propertiesStore.getState().goboIntensity },
+    u_goboIntensity: { value: 0.4 },
     u_infoTexture: { value: new DataTexture() },
     u_infoTextureLinear: { value: new DataTexture() },
     u_endAnimationRatio: { value: 0 },
 };
 
-const initialState = {
+const initialState: TSharedUniforms = {
     u_time: { value: 0 },
     u_deltaTime: { value: 1 },
     u_resolution: { value: new Vector2() },
     u_viewportResolution: { value: new Vector2() },
-    u_bgColor1: { value: new Color(propertiesStore.getState().bgColor1) },
-    u_bgColor2: { value: new Color(propertiesStore.getState().bgColor2) },
+    u_bgColor1: { value: new Color('#ffffff').convertSRGBToLinear() },
+    u_bgColor2: { value: new Color('#d0d0d0').convertSRGBToLinear() },
     ...blueNoiseUniforms,
     ...heroSharedUniforms,
 };
-export type TSharedUniforms = typeof initialState;
 
 export const uniformsStore = createStore<TSharedUniforms>()(
-    subscribeWithSelector(() => ({
+    subscribeWithSelector((set) => ({
         ...initialState,
     }))
 );

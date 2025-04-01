@@ -1,45 +1,38 @@
-import {
-    InstancedBufferAttribute,
-    InstancedBufferGeometry,
-    Mesh,
-    Object3D,
-    PlaneGeometry,
-    ShaderMaterial,
-} from 'three';
+import { Color, InstancedBufferAttribute, InstancedBufferGeometry, Mesh, Object3D, PlaneGeometry, ShaderMaterial } from 'three';
 
 import vert from './bg.vert?raw';
 import frag from './bg.frag?raw';
 import particlesVert from './particles.vert?raw';
 import particlesFrag from './particles.frag?raw';
-import { TSharedUniforms, uniformsStore } from '../../../store/uniformsStore.ts';
+import { uniformsStore } from '../../../store/uniformsStore.ts';
 import { propertiesStore } from '../../../store/propertiesStore.ts';
 
 const container = new Object3D();
 const Background = () => {
-    const mesh: Mesh & { material: ShaderMaterial } = new Mesh(new PlaneGeometry(2, 2));
     const particlesMesh: Mesh & { material: ShaderMaterial } = new Mesh();
-    let sharedUniforms: Partial<TSharedUniforms>;
+    const mesh: Mesh & { material: ShaderMaterial } = new Mesh(new PlaneGeometry(2, 2));
 
-    function _updateUniforms(uniforms: Partial<TSharedUniforms>) {
-        sharedUniforms = uniforms;
-    }
     function init() {
-        const uniformsListeners: Parameters<typeof uniformsStore.subscribe>[0] = (uniformsState) => {
-            _updateUniforms({
-                u_resolution: uniformsState.u_resolution,
-                u_bgColor1: uniformsState.u_bgColor1,
-                u_bgColor2: uniformsState.u_bgColor2,
-                u_blueNoiseTexture: uniformsState.u_blueNoiseTexture,
-                u_blueNoiseTexelSize: uniformsState.u_blueNoiseTexelSize,
-                u_blueNoiseCoordOffset: uniformsState.u_blueNoiseCoordOffset,
-                u_time: uniformsState?.u_time || { value: propertiesStore.getState().time },
-            });
+        let u: Partial<typeof uniformsStore.subscribe> = {
+            u_bgColor1: uniformsStore.getState().u_bgColor1,
+            u_bgColor2: uniformsStore.getState().u_bgColor2,
+        };
+        const listen: Parameters<typeof uniformsStore.subscribe>[0] = ({ u_resolution, u_bgColor1, u_bgColor2, u_blueNoiseTexture, u_blueNoiseTexelSize, u_blueNoiseCoordOffset }) => {
+            u = {
+                ...u,
+                u_resolution,
+                u_bgColor1,
+                u_bgColor2,
+                u_blueNoiseTexture,
+                u_blueNoiseTexelSize,
+                u_blueNoiseCoordOffset,
+            };
         };
 
-        uniformsStore.subscribe((state) => uniformsListeners(state));
+        uniformsStore.subscribe((s) => s, listen);
 
         mesh.material = new ShaderMaterial({
-            uniforms: sharedUniforms,
+            uniforms: u,
             vertexShader: vert,
             fragmentShader: frag,
         });
@@ -49,6 +42,23 @@ const Background = () => {
     }
 
     function initParticles() {
+        const propertiesState = propertiesStore.getState();
+        let u = {
+            u_resolution: uniformsStore.getState().u_resolution,
+            u_time: uniformsStore.getState().u_time || { value: propertiesState.time },
+            u_size: { value: propertiesState.particlesSize || 0.01 },
+            u_color: { value: new Color(propertiesState.particlesColor) },
+            u_opacity: { value: propertiesState.particlesOpacity || 0 },
+        };
+        const listen: Parameters<typeof uniformsStore.subscribe>[0] = ({ u_time, u_resolution }) => {
+            u = {
+                ...u,
+                u_time,
+                u_resolution,
+            };
+        };
+        uniformsStore.subscribe((s) => s, listen);
+
         const particlesCount = 50;
         const refGeometry = new PlaneGeometry(1, 1);
 
@@ -78,7 +88,7 @@ const Background = () => {
         particlesMesh.material = new ShaderMaterial({
             vertexShader: particlesVert,
             fragmentShader: particlesFrag,
-            uniforms: sharedUniforms,
+            uniforms: u,
             transparent: true,
         });
         particlesMesh.geometry = geometry;
