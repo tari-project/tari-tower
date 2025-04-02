@@ -30,7 +30,6 @@ const initialBlock: IBlock = {
     spawnAnimationRatioUnclamped: -Math.random(),
     easedAnimationRatio: 0,
     lifeCycle: 0,
-    errorLifeCycle: 0,
     randomVector: {
         x: Math.random() - 0.5,
         y: Math.random() - 0.5,
@@ -89,67 +88,51 @@ export function createBlock({ id, currentTile = null }: CreateBlock): IBlock {
     return newBlock;
 }
 
-export function updateTile(block: IBlock, newTile?: IBlock['currentTile']) {
-    const t = block;
-    t.currentTile = newTile || block.currentTile;
-
-    if (t.currentTile) {
-        t.currentTile.isOccupied = true;
-        t.currentTile.willBeOccupied = false;
-    }
-    blockStore.getState().setUpdateBlock({ ...block, ...t });
-}
 export function updateBlock(block: IBlock, dt: number) {
-    const t = block;
+    const tBlock = block;
+    if (!tBlock.hasBeenSpawned) {
+        tBlock.spawnAnimationRatioUnclamped += 0.75 * ANIMATION_SPEED * dt;
+        tBlock.spawnAnimationRatio = Math.max(0, Math.min(1, tBlock.spawnAnimationRatioUnclamped));
 
-    function _onMovementEnd() {
-        t.moveAnimationRatio = 1;
-
-        if (t.currentTile) {
-            t.currentTile.isOccupied = false;
-        }
-        t.currentTile = t.targetTile;
-        t.targetTile = null;
-
-        t.hasAnimationEnded = true;
-
-        updateTile(t);
-    }
-
-    if (!t.hasBeenSpawned) {
-        //_updateSpawnAnimation
-        t.spawnAnimationRatioUnclamped += 0.75 * ANIMATION_SPEED * dt;
-        t.spawnAnimationRatio = Math.max(0, Math.min(1, t.spawnAnimationRatioUnclamped));
-
-        if (t.spawnAnimationRatio === 1) {
-            t.hasBeenSpawned = true;
+        if (tBlock.spawnAnimationRatio === 1) {
+            tBlock.hasBeenSpawned = true;
         }
     } else {
-        //_updateMovement
-        const isResult = stateManagerStore.getState().flags.isResult;
-        const isFree = stateManagerStore.getState().flags.isFree;
-        if ((t.isMoving && !t.hasAnimationEnded) || isResult) {
-            t.moveAnimationRatio = Math.min(1, t.moveAnimationRatio + ANIMATION_SPEED * dt);
-            t.easedAnimationRatio = t.easingFunction?.(Math.max(0, t.moveAnimationRatio)) || 0;
+        if ((tBlock.isMoving && !tBlock.hasAnimationEnded) || stateManagerStore.getState().flags.isResult) {
+            tBlock.moveAnimationRatio = Math.min(1, tBlock.moveAnimationRatio + ANIMATION_SPEED * dt);
+            tBlock.easedAnimationRatio = block.easingFunction?.(Math.max(0, tBlock.moveAnimationRatio));
 
-            if (t.easedAnimationRatio === 1 && (isFree || isResult)) {
-                _onMovementEnd();
+            if (tBlock.easedAnimationRatio === 1 && (stateManagerStore.getState().flags.isFree || stateManagerStore.getState().flags.isResult)) {
+                // movement end
+                tBlock.moveAnimationRatio = 1;
+
+                if (tBlock.currentTile) {
+                    tBlock.currentTile.isOccupied = false;
+                }
+                tBlock.currentTile = tBlock.targetTile;
+                tBlock.targetTile = null;
+
+                tBlock.hasAnimationEnded = true;
+                if (tBlock.currentTile) {
+                    tBlock.currentTile.isOccupied = true;
+                    tBlock.currentTile.willBeOccupied = false;
+                }
             }
         }
     }
 
-    //_updateTileRatios
+    // update Tile Ratios
 
-    const clampedMoveAnimationRatio = Math.max(0, Math.min(1, t.hasBeenSpawned ? t.easedAnimationRatio : t.spawnAnimationRatio));
+    const clampedMoveAnimationRatio = Math.max(0, Math.min(1, tBlock.hasBeenSpawned ? tBlock.easedAnimationRatio : tBlock.spawnAnimationRatio));
 
-    if (t.currentTile) {
-        t.currentTile.activeRatio = t.hasBeenSpawned ? (t.targetTile ? 1 - clampedMoveAnimationRatio : 1) : t.spawnAnimationRatio;
+    if (tBlock.currentTile) {
+        tBlock.currentTile.activeRatio = tBlock.hasBeenSpawned ? (tBlock.targetTile ? 1 - clampedMoveAnimationRatio : 1) : tBlock.spawnAnimationRatio;
     }
-    if (t.targetTile) {
-        t.targetTile.activeRatio = clampedMoveAnimationRatio;
+    if (tBlock.targetTile) {
+        tBlock.targetTile.activeRatio = clampedMoveAnimationRatio;
     }
 
-    blockStore.getState().setUpdateBlock({ ...block, ...t });
+    blockStore.getState().setUpdateBlock({ ...block, ...tBlock });
 }
 
 function _findBestTile(neighbours, isFree, currentTile): Tile | null {

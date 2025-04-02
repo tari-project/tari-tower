@@ -61,7 +61,6 @@ const Hero = () => {
     const DEFAULT_COLOR = new Color();
 
     const _c = new Color();
-    const _c2 = new Color();
 
     const { animationTotalFrames, blockList, blockRenderList, heroLoseAnimationPositionArray, heroLoseAnimationOrientArray } = heroStore.getState();
     let result = stateManagerStore.getState().result;

@@ -2,9 +2,10 @@ import { createStore } from 'zustand/vanilla';
 import { subscribeWithSelector } from 'zustand/middleware';
 
 import type { IPropertiesState, IPropertyPair } from '../types/properties.ts';
-import Block from '../scripts/logic/Block.ts';
+
 import { setUniform } from './uniformsStore.ts';
 import { Color, ColorRepresentation } from 'three';
+import { IBlock } from '../types/block.ts';
 
 const initialState: IPropertiesState = {
     time: 0,
@@ -42,7 +43,7 @@ export const propertiesStore = createStore<PropertiesState>()(
     }))
 );
 
-const setErrorBlock = (errorBlock?: Block | null): void => {
+const setErrorBlock = (errorBlock?: IBlock | null): void => {
     propertiesStore.setState({ errorBlock });
 };
 

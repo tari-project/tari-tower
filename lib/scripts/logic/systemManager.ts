@@ -12,7 +12,7 @@ import { setStart, stateManagerStore } from '../../store/stateManagerStore';
 import { addBlock, animationCycleStore, setAnimationRatios, setLastSpawnedBlock } from '../../store/animationCycleStore.ts';
 import { MAX_FREE_BLOCKS_COUNT } from '../core/settings.ts';
 import { propertiesStore } from '../../store/propertiesStore.ts';
-import { blockStore, createBlock, moveToNextTile, updateBlock, updateTile } from '../../store/blockStore.ts';
+import { blockStore, createBlock, moveToNextTile, updateBlock } from '../../store/blockStore.ts';
 
 const SystemManager = () => {
     let flagsState = stateManagerStore.getState().flags;
@@ -40,7 +40,7 @@ const SystemManager = () => {
             const newTile = board.getRandomFreeTile();
             if (newTile) {
                 const block = createBlock({ id: cycle.blocks.length, currentTile: newTile });
-                updateTile(block);
+
                 addBlock(block);
             }
         }
@@ -58,13 +58,9 @@ const SystemManager = () => {
 
             setLastSpawnedBlock(block);
         }
-        if (block) {
-            updateTile(block);
-        }
     }
 
     function _startNewCycle() {
-        console.debug(`wen`);
         const notStarted = flagsState.hasNotStarted;
         const isFailResult = flagsState.isFailResult;
         const isStopped = flagsState.isStopped;
@@ -75,9 +71,11 @@ const SystemManager = () => {
             addBlock(cycle.lastSpawnedBlock);
             setLastSpawnedBlock(null);
         }
-        if (isFailResult || isStopped) return;
 
-        cycle.blocks.forEach((block) => blockStore.getState().resetAfterCycle(block));
+        if (isFailResult || isStopped) return;
+        if (cycle.blocks?.length) {
+            cycle.blocks.forEach((block) => blockStore.getState().resetAfterCycle(block));
+        }
         animationCycleStore.getState().incCycleIndex();
 
         _spawnBlock();
@@ -136,17 +134,15 @@ const SystemManager = () => {
     function _checkCycleCompletion() {
         let isCycleComplete = true;
         if (cycle.lastSpawnedBlock) {
-            isCycleComplete = isCycleComplete && !!cycle.lastSpawnedBlock?.hasBeenSpawned;
+            isCycleComplete = isCycleComplete && cycle.lastSpawnedBlock.hasBeenSpawned;
         }
-
         cycle.blocks.forEach((block) => {
             if (block.lifeCycle > 0) {
-                isCycleComplete = isCycleComplete && Boolean(block.hasBeenEvaluated && block.hasAnimationEnded);
+                isCycleComplete = isCycleComplete && block.hasBeenEvaluated && block.hasAnimationEnded;
             } else {
                 isCycleComplete = isCycleComplete && block.spawnAnimationRatio === 1;
             }
         });
-
         const { isStopped, isFailResult, isResult } = flagsState;
         return isCycleComplete || isResult || isFailResult || isStopped;
     }
@@ -167,11 +163,13 @@ const SystemManager = () => {
         if (cycle.lastSpawnedBlock) {
             updateBlock(cycle.lastSpawnedBlock, dt);
         }
-        cycle.blocks.forEach((block) => updateBlock(block, dt));
+        if (cycle.blocks.length) {
+            cycle.blocks.forEach((block) => updateBlock(block, dt));
+        }
+
         board.update(dt);
 
         const isCycleComplete = _checkCycleCompletion();
-
         if (isCycleComplete) {
             _startNewCycle();
         }

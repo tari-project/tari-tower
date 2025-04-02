@@ -1,4 +1,3 @@
-import math from '../../utils/math';
 import { Quaternion, Vector2, Vector3 } from 'three';
 
 const HALF_PI = Math.PI / 2;
@@ -41,12 +40,5 @@ export default class HeroBlockCoordinates {
         this.spinPivot.set(this.boardDir.x * 0.5, -0.5, -this.boardDir.y * 0.5);
         _v0.set(-this.boardDir.y, 0, -this.boardDir.x);
         this.spinOrient.setFromAxisAngle(_v0, this.animation * HALF_PI);
-    }
-
-    addsFallAnimation(ratio: number) {
-        _v0.set(this.boardDir.x, -ratio, -this.boardDir.y);
-        this.pos.addScaledVector(_v0, ratio);
-        _v0.set(this.boardDir.x * 0.5, 0, -this.boardDir.y * 0.5);
-        this.spinPivot.lerp(_v0, math.saturate(ratio));
     }
 }

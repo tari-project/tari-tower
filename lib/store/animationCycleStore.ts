@@ -43,10 +43,7 @@ export const addBlock = (block) =>
         return { blocks };
     });
 
-export const setLastSpawnedBlock = (block) =>
-    animationCycleStore.setState((s) => {
-        return { lastSpawnedBlock: block };
-    });
+export const setLastSpawnedBlock = (block) => animationCycleStore.setState({ lastSpawnedBlock: block });
 
 export const setAnimationRatios = ({ animationSpeedRatio, firstStartAnimationRatio, previousSuccessBlocksAnimationRatio }: Ratios) =>
     animationCycleStore.setState((curr) => ({

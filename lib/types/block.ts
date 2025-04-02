@@ -33,10 +33,10 @@ export interface BlockType {
 
 export interface IBlock {
     id: number;
-    isMoving?: boolean;
-    hasBeenSpawned?: boolean;
-    hasAnimationEnded?: boolean;
-    hasBeenEvaluated?: boolean;
+    isMoving: boolean;
+    hasBeenSpawned: boolean;
+    hasAnimationEnded: boolean;
+    hasBeenEvaluated: boolean;
     currentTile: Tile | null;
     targetTile: Tile | null;
     moveAnimationRatio: number;
@@ -47,7 +47,6 @@ export interface IBlock {
 
     lifeCycle: number;
     easingFunction?: (x?: number) => ReturnType<typeof customEasing>;
-    errorLifeCycle: number;
 }
 
 export interface CreateBlock {
