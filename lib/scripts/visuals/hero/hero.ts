@@ -298,22 +298,10 @@ const Hero = () => {
             const instanceColorArray = heroStore.getState().instanceColorArray;
             const instanceIsActiveArray = heroStore.getState().instanceIsActiveArray;
 
-            const logicBlock = cycle.blocks.filter((block) => block.id === i)[0];
             const isActive = i < cycle.blocks.length + (cycle.lastSpawnedBlock ? 1 : 0);
             const color = isActive ? _c : DEFAULT_COLOR;
 
-            if (isActive && logicBlock?.isErrorBlock) {
-                let preFallColorRatio = math.saturate(0.5 * (1 - Math.cos(logicBlock.errorPreFallAnimationTime)));
-
-                if (logicBlock.errorFallAnimationTime > 0) {
-                    preFallColorRatio = math.saturate(0.5 * (1 - Math.cos(14 * logicBlock.errorFallAnimationTime)));
-                }
-
-                _c2.lerpColors(color, ERROR_COLOR, preFallColorRatio);
-                instanceColorArray?.set([_c2.r, _c2.g, _c2.b], i * 3);
-            } else {
-                instanceColorArray?.set([color.r, color.g, color.b], i * 3);
-            }
+            instanceColorArray?.set([color.r, color.g, color.b], i * 3);
 
             if (instanceIsActiveArray) {
                 instanceIsActiveArray[i] = isActive ? 1 : 0;
@@ -505,8 +493,6 @@ const Hero = () => {
 
     function _updateIndividualBlock(logicBlock, block, i) {
         if (result === AnimationResult.FAILED) {
-            // console.debug(`cycle.blocks=`, cycle.blocks);
-            // console.debug(`logicBlock=`, logicBlock.currentTile);
             _updateFailAnimation(logicBlock, block, i);
         }
         if (result === AnimationResult.COMPLETED || result === AnimationResult.REPLAY) {

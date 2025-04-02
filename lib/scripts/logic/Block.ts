@@ -1,5 +1,6 @@
 import math from '../utils/math';
 import { customEasing } from '../utils/ease';
+
 import { BlockType } from '../../types/block';
 import { stateManagerStore } from '../../store/stateManagerStore';
 import { animationCycleStore } from '../../store/animationCycleStore.ts';
@@ -34,10 +35,8 @@ export default class Block {
     isErrorBlockFalling: BlockType['isErrorBlockFalling'] = false;
     skipFallAnimation: BlockType['skipFallAnimation'] = false;
 
-    constructor(id = -1, currentTile) {
-        console.debug(`constructor`, id, currentTile);
+    constructor(id) {
         this.id = id;
-        this.currentTile = currentTile;
         this.init();
     }
 
@@ -52,7 +51,6 @@ export default class Block {
     }
 
     updateTile() {
-        console.debug(`this.currentTile=`, this.currentTile);
         if (this.currentTile) {
             this.currentTile.isOccupied = true;
             this.currentTile.willBeOccupied = false;

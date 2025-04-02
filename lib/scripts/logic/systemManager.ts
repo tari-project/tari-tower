@@ -1,7 +1,6 @@
 import math from '../utils/math';
 import { heroBlocks } from '../visuals/hero/hero';
 import { board, mainTile, TOTAL_TILES } from './board';
-import Block from './Block';
 
 import { stopAnimationManager } from './stopAnimationManager';
 import { errorAnimationManager } from './errorAnimationManager';
@@ -13,6 +12,7 @@ import { setStart, stateManagerStore } from '../../store/stateManagerStore';
 import { addBlock, animationCycleStore, setAnimationRatios, setLastSpawnedBlock } from '../../store/animationCycleStore.ts';
 import { MAX_FREE_BLOCKS_COUNT } from '../core/settings.ts';
 import { propertiesStore } from '../../store/propertiesStore.ts';
+import { blockStore, createBlock, moveToNextTile, updateBlock, updateTile } from '../../store/blockStore.ts';
 
 const SystemManager = () => {
     let flagsState = stateManagerStore.getState().flags;
@@ -38,10 +38,8 @@ const SystemManager = () => {
         for (let i = 0; i < blocksToSpawn; i++) {
             const newTile = board.getRandomFreeTile();
             if (newTile) {
-                const block = new Block(blocksState.length, newTile);
-                block.currentTile = newTile;
-                block.init();
-                block.updateTile();
+                const block = createBlock({ id: blocksState.length, currentTile: newTile });
+                updateTile(block);
                 addBlock(block);
             }
         }
@@ -51,14 +49,14 @@ const SystemManager = () => {
         const isFree = flagsState.isFree;
         const canAddNewBlock = Boolean(blocksState.length < MAX_FREE_BLOCKS_COUNT && isFree);
         if (canAddNewBlock) {
-            const block = new Block(blocksState.length, mainTile);
+            const block = createBlock({
+                id: blocksState.length,
+                currentTile: mainTile || undefined,
+            });
             if (block) {
-                console.debug(`block=`, block);
+                updateTile(block);
+                setLastSpawnedBlock(block);
             }
-            block.currentTile = mainTile;
-            block.init();
-            block.updateTile();
-            setLastSpawnedBlock(block);
         }
     }
 
@@ -70,14 +68,11 @@ const SystemManager = () => {
         if (notStarted) return;
 
         if (animationCycleState.lastSpawnedBlock) {
-            console.debug('addBlock from _startNewCycle', animationCycleState.lastSpawnedBlock);
             addBlock(animationCycleState.lastSpawnedBlock);
-            console.debug('setLastSpawnedBlock to NULL from _startNewCycle');
             setLastSpawnedBlock(null);
         }
         if (isFailResult || isStopped) return;
-
-        blocksState.forEach((block) => block.resetAfterCycle());
+        blockStore.getState().resetAfterCycle();
         animationCycleStore.getState().incCycleIndex();
 
         _spawnBlock();
@@ -91,18 +86,18 @@ const SystemManager = () => {
         const _isFree = cycleIndex % 2 === 0 ? true : activeBlocksCount < MAX_FREE_BLOCKS_COUNT - 1;
 
         if (animationCycleState.lastSpawnedBlock?.hasBeenSpawned) {
-            animationCycleState.lastSpawnedBlock.moveToNextTile(_isFree, 0);
+            moveToNextTile(animationCycleState.lastSpawnedBlock, _isFree, 0);
         }
 
         blocksState.forEach((block, index) => {
             if (!block.hasBeenEvaluated && block.hasBeenSpawned) {
-                block.moveToNextTile(_isFree, index * 0.2);
+                moveToNextTile(block, _isFree, index * 0.2);
             }
         });
     }
 
     function reset(preventRestart = false) {
-        blocksState.forEach((block) => block.reset());
+        blockStore.getState().reset();
         heroBlocks.reset();
         board.reset();
         animationCycleStore.getState().reset();
@@ -167,9 +162,9 @@ const SystemManager = () => {
 
         board.preUpdate(dt);
         if (animationCycleState.lastSpawnedBlock) {
-            animationCycleState.lastSpawnedBlock.update(dt);
+            updateBlock(animationCycleState.lastSpawnedBlock, dt);
         }
-        blocksState.forEach((block) => block.update(dt));
+        blocksState.forEach((block) => updateBlock(block, dt));
         board.update(dt);
 
         const isCycleComplete = _checkCycleCompletion();

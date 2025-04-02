@@ -36,7 +36,6 @@ export const animationCycleStore = createStore<AnimationCycleState>()(
 export const addBlock = (block) =>
     animationCycleStore.setState((s) => {
         const curr = s.blocks;
-        console.debug('addBlock CURR', curr);
         if (!curr.length) {
             return { blocks: [block] };
         }
@@ -46,9 +45,6 @@ export const addBlock = (block) =>
 
 export const setLastSpawnedBlock = (block) =>
     animationCycleStore.setState((s) => {
-        console.debug(`new l block=`, block);
-        console.debug(`curr l block=`, s.lastSpawnedBlock);
-
         return { lastSpawnedBlock: block };
     });
 
