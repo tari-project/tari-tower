@@ -4,7 +4,7 @@ import { subscribeWithSelector } from 'zustand/middleware';
 import type { IPropertiesState, IPropertyPair } from '../types/properties.ts';
 import Block from '../scripts/logic/Block.ts';
 import { setUniform } from './uniformsStore.ts';
-import { Color } from 'three';
+import { Color, ColorRepresentation } from 'three';
 
 const initialState: IPropertiesState = {
     time: 0,
@@ -23,10 +23,10 @@ const initialState: IPropertiesState = {
     mainColor: '#0096ff',
     successColor: '#00c881',
     failColor: '#ca0101',
-    particlesColor: '#e20093',
-    goboIntensity: 0.95,
-    particlesOpacity: 1,
-    particlesSize: 1,
+    particlesColor: '#505050',
+    goboIntensity: 0.45,
+    particlesOpacity: 0.75,
+    particlesSize: 0.01,
 };
 
 type State = IPropertiesState;
@@ -51,13 +51,13 @@ const setAnimationProperties = (properties: Record<string, unknown>[]) => {
     for (const property of propertyPairs) {
         if (property.propertyName === 'bgColor1') {
             setUniform({
-                u_bgColor1: { value: new Color(property.value as Color).convertSRGBToLinear() },
+                u_bgColor1: { value: new Color(property.value as ColorRepresentation).convertSRGBToLinear() },
             });
         }
 
         if (property.propertyName === 'bgColor2') {
             setUniform({
-                u_bgColor2: { value: new Color(property.value as Color).convertSRGBToLinear() },
+                u_bgColor2: { value: new Color(property.value as ColorRepresentation).convertSRGBToLinear() },
             });
         }
 

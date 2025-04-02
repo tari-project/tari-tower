@@ -6,7 +6,7 @@ const tower = TariTower();
 
 let time = 0;
 let lastRender = 0;
-const targetFPS = 60;
+const targetFPS = 50;
 const frameInterval = 1 / targetFPS;
 let frame: number;
 
@@ -17,7 +17,7 @@ function animate() {
     const dt = newTime - time;
     if (newTime - lastRender >= frameInterval) {
         lastRender = newTime;
-        tower.render(dt);
+        tower?.render(time, dt);
         time = newTime;
     }
     cancelAnimationFrame(frame);
@@ -25,10 +25,14 @@ function animate() {
 }
 
 function initCallback() {
+    tower.init();
+
     time = performance.now() / 1000;
+
     lastRender = time;
 
-    window.addEventListener('resize', () => tower.onResize());
+    window.addEventListener('resize', tower.onResize);
+
     tower.onResize();
     animate();
 }
@@ -39,7 +43,7 @@ export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: s
     setProperty({ propertyName: 'offsetX', value: offset });
     setProperty({ propertyName: 'cameraOffsetX', value: offset / window.innerWidth });
     try {
-        await tower.preload({ canvasId, initCallback });
+        await tower?.preload({ canvasId, initCallback });
     } catch (e) {
         console.error('loadTowerAnimation', e);
     }
@@ -55,4 +59,5 @@ export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
         setStop();
         stateManagerStore.getState().setDestroyCanvas(true);
     }
+    window.removeEventListener('resize', tower.onResize);
 }

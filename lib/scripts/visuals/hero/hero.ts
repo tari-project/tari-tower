@@ -195,7 +195,6 @@ const Hero = () => {
             fragmentShader: fragDepth,
             defines: { IS_DEPTH: true },
         });
-
         heroContainer.add(heroState._blocksMesh);
     }
 

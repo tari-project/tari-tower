@@ -35,7 +35,7 @@ const initialStateUniforms: ISharedUniforms = {
 };
 
 export const uniformsStore = createStore<UniformState>()(
-    subscribeWithSelector((set) => ({
+    subscribeWithSelector(() => ({
         ...initialStateUniforms,
     }))
 );

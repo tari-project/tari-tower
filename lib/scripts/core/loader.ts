@@ -111,7 +111,7 @@ const Loader = () => {
     function start(cb) {
         loadedCount = 0;
         onLoadCallback = cb;
-        list.forEach((loadFunction) => loadFunction());
+        list?.forEach((loadFunction) => loadFunction());
     }
 
     function _onLoad() {

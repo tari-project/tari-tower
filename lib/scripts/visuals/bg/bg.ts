@@ -8,27 +8,22 @@ import { uniformsStore } from '../../../store/uniformsStore.ts';
 import { propertiesStore } from '../../../store/propertiesStore.ts';
 
 const Background = () => {
-    let propertiesState = propertiesStore.getState();
     const container = new Object3D();
-    let particlesMesh: Mesh & { material: ShaderMaterial } = new Mesh();
+    const particlesMesh: Mesh & { material: ShaderMaterial } = new Mesh();
     let bgMesh: Mesh & { material: ShaderMaterial } = new Mesh();
+    let propertiesState = propertiesStore.getState();
+    let sharedUniforms = uniformsStore.getState();
 
     function init() {
-        const ul = propertiesStore.subscribe(
-            (s) => s,
-            (s, p) => {
-                propertiesState = s;
-            },
-            { fireImmediately: true }
-        );
-
-        ul();
-
+        const propertiesListener: Parameters<typeof propertiesStore.subscribe>[0] = (state) => (propertiesState = state);
+        const uniformsListener: Parameters<typeof uniformsStore.subscribe>[0] = (state) => (sharedUniforms = state);
+        uniformsStore.subscribe((s) => s, uniformsListener);
+        propertiesStore.subscribe((s) => s, propertiesListener);
         initBg();
     }
     function initBg() {
-        const { u_resolution, u_bgColor1, u_bgColor2, u_blueNoiseTexture, u_blueNoiseTexelSize, u_blueNoiseCoordOffset } = uniformsStore.getState();
-        const u: Partial<typeof uniformsStore.subscribe> = {
+        const { u_resolution, u_bgColor1, u_bgColor2, u_blueNoiseTexture, u_blueNoiseTexelSize, u_blueNoiseCoordOffset } = sharedUniforms;
+        const uniforms = {
             u_resolution,
             u_bgColor1,
             u_bgColor2,
@@ -36,9 +31,8 @@ const Background = () => {
             u_blueNoiseTexelSize,
             u_blueNoiseCoordOffset,
         };
-
         const material = new ShaderMaterial({
-            uniforms: u,
+            uniforms,
             vertexShader: vert,
             fragmentShader: frag,
         });
@@ -73,7 +67,6 @@ const Background = () => {
             randomArray[i * 3 + 1] = Math.random();
             randomArray[i * 3 + 2] = Math.random();
         }
-
         geometry.setAttribute('a_instancePosition', new InstancedBufferAttribute(positionArray, 3));
         geometry.setAttribute('a_instanceRandom', new InstancedBufferAttribute(randomArray, 3));
 
@@ -81,16 +74,17 @@ const Background = () => {
             vertexShader: particlesVert,
             fragmentShader: particlesFrag,
             uniforms: {
-                u_size: { value: 0.01 },
-                u_color: { value: new Color() },
-                u_opacity: { value: 0 },
-                u_resolution: uniformsStore.getState().u_resolution,
-                u_time: uniformsStore.getState().u_time,
+                u_time: sharedUniforms.u_time,
+                u_resolution: sharedUniforms.u_resolution,
+                u_size: { value: propertiesState.particlesSize },
+                u_color: { value: new Color(propertiesState.particlesColor) },
+                u_opacity: { value: propertiesState.particlesOpacity },
             },
             transparent: true,
         });
+        particlesMesh.geometry = geometry;
+        particlesMesh.material = material;
 
-        particlesMesh = new Mesh(geometry, material);
         particlesMesh.renderOrder = 2;
         particlesMesh.frustumCulled = false;
 
@@ -98,6 +92,9 @@ const Background = () => {
     }
 
     function update(_dt: number) {
+        bgMesh.material.uniforms.u_bgColor1.value = sharedUniforms.u_bgColor1.value;
+        bgMesh.material.uniforms.u_bgColor2.value = sharedUniforms.u_bgColor2.value;
+        particlesMesh.material.uniforms.u_time.value = sharedUniforms.u_time.value;
         particlesMesh.material.uniforms.u_size.value = propertiesState.particlesSize;
         particlesMesh.material.uniforms.u_color.value.set(propertiesState.particlesColor);
         particlesMesh.material.uniforms.u_opacity.value = propertiesState.particlesOpacity;

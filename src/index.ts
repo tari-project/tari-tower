@@ -9,7 +9,7 @@ if (import.meta.env.MODE === 'development') {
     });
 
     const states = gui.addFolder('states');
-    const theme = gui.addFolder('theme');
+    const theme = gui.addFolder('theme')?.open();
     const canvas = gui.addFolder('canvas');
 
     const actions = {
@@ -43,13 +43,13 @@ if (import.meta.env.MODE === 'development') {
     canvas.add(actions, 'removeCanvas');
 
     function handleLoad() {
-        loadTowerAnimation({ canvasId: 'canvas-id', offset: 0 });
+        void loadTowerAnimation({ canvasId: 'canvas-id', offset: 0 });
     }
 
-    document.addEventListener('DOMContentLoaded', handleLoad);
+    document?.addEventListener('DOMContentLoaded', handleLoad);
 
     const timeOutId = setTimeout(() => {
-        document.removeEventListener('DOMContentLoaded', handleLoad);
+        document?.removeEventListener('DOMContentLoaded', handleLoad);
         clearTimeout(timeOutId);
     }, 500);
 
