@@ -77,10 +77,10 @@ vec4 simplexNoiseDerivatives (vec4 v) {
     i = mod289(i);
     float j0 = permute( permute( permute( permute(i.w) + i.z) + i.y) + i.x);
     vec4 j1 = permute( permute( permute( permute (
-             i.w + vec4(i1.w, i2.w, i3.w, 1.0 ))
-           + i.z + vec4(i1.z, i2.z, i3.z, 1.0 ))
-           + i.y + vec4(i1.y, i2.y, i3.y, 1.0 ))
-           + i.x + vec4(i1.x, i2.x, i3.x, 1.0 ));
+    i.w + vec4(i1.w, i2.w, i3.w, 1.0 ))
+    + i.z + vec4(i1.z, i2.z, i3.z, 1.0 ))
+    + i.y + vec4(i1.y, i2.y, i3.y, 1.0 ))
+    + i.x + vec4(i1.x, i2.x, i3.x, 1.0 ));
 
 
     vec4 ip = vec4(1.0/294.0, 1.0/49.0, 1.0/7.0, 0.0) ;

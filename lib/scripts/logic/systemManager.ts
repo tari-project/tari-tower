@@ -1,274 +1,227 @@
 import math from '../utils/math';
-import { properties } from '../core/properties';
-import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
-import {
-	PREVENT_CYCLE_STATES,
-	resetCycleResults,
-	stateManager as sM,
-	status as stateStatus,
-	result as stateResult,
-	isSuccessResult,
-	isReplayResult,
-	isFree,
-	isFailResult,
-	isStopped,
-	isResult,
-	isResultAnimation,
-	isRestart,
-	hasNotStarted,
-} from './stateManager';
+import { heroBlocks } from '../visuals/hero/hero';
 import { board, mainTile, TOTAL_TILES } from './board';
-import Block from './Block';
 
 import { stopAnimationManager } from './stopAnimationManager';
 import { errorAnimationManager } from './errorAnimationManager';
 import { successAnimationManager } from '../logic/successAnimationManager';
-import { canvasSignal, completeAnimationEndedSignal, endCycleSignal, errorAnimationEndedSignal, gameEndedSignal, spawnSignal, stopAnimationEndedSignal } from '../logic/signals';
-import { SystemManagerState } from '../../types/systemManager';
-import { AnimationStatus } from '../../types';
 
-let firstStartAnimationRatio: SystemManagerState['firstStartAnimationRatio'] = 0;
-let blocks: SystemManagerState['blocks'] = [];
-let lastSpawnedBlock: SystemManagerState['lastSpawnedBlock'] = null;
-let cycleIndex: SystemManagerState['cycleIndex'] = 0;
-let animationSpeedRatio: SystemManagerState['animationSpeedRatio'] = 0;
-let previousSuccessBlocksAnimationRatio: SystemManagerState['previousSuccessBlocksAnimationRatio'] = 0;
+import { AnimationStatus, resetCycleResults } from '../../types/stateManager';
+import { setStart, setStarted, stateManagerStore } from '../../store/stateManagerStore';
+
+import { addBlock, animationCycleStore, setAnimationRatios, setLastSpawnedBlock } from '../../store/animationCycleStore.ts';
+import { MAX_FREE_BLOCKS_COUNT } from '../core/settings.ts';
+import { propertiesStore } from '../../store/propertiesStore.ts';
+import { blockStore, createBlock, moveToNextTile, updateBlock } from '../../store/blockStore.ts';
 
 const SystemManager = () => {
-	function _spawnBlock() {
-		if (_shouldPreventSpawn()) return;
-		if (isSuccessResult || isReplayResult) {
-			_spawnMultipleBlocks();
-		} else {
-			_spawnSingleBlock();
-		}
+    let flagsState = stateManagerStore.getState().flags;
+    let cycle = animationCycleStore.getState();
 
-		if (blocks.length === properties.maxFreeBlocksCount && isFree) return;
-		spawnSignal.dispatch();
-	}
+    function _shouldPreventSpawn() {
+        return flagsState.isFailResult || flagsState.isStopped || cycle.blocks.length >= TOTAL_TILES || (mainTile && mainTile.isOccupied && !flagsState.isSuccessResult && !flagsState.isReplayResult);
+    }
 
-	function _shouldPreventSpawn() {
-		return isFailResult || isStopped || blocks.length >= TOTAL_TILES || (mainTile?.isOccupied && !isSuccessResult && !isReplayResult);
-	}
+    function _spawnBlock() {
+        if (_shouldPreventSpawn()) return;
 
-	function _spawnMultipleBlocks() {
-		let blocksToSpawn = TOTAL_TILES - properties.activeBlocksCount;
-		if (properties.errorBlock) {
-			if (properties.errorBlock.currentTile) {
-				properties.errorBlock.currentTile.isOccupied = false;
-			}
-			blocksToSpawn += 1;
-		}
-		for (let i = 0; i < blocksToSpawn; i++) {
-			const newTile = board.getRandomFreeTile();
-			if (newTile) {
-				const block = new Block(blocks.length);
-				block.currentTile = newTile;
-				block.init();
-				block.updateTile();
-				blocks = [block, ...blocks];
-			}
-		}
-	}
+        if (flagsState.isSuccessResult || flagsState.isReplayResult) {
+            _spawnMultipleBlocks();
+        } else {
+            _spawnSingleBlock();
+        }
+    }
 
-	function _spawnSingleBlock() {
-		let block: Block | null | undefined = null;
-		const needsErrorBlockReplacement = Boolean(properties.errorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle);
-		const canAddNewBlock = Boolean(blocks.length < properties.maxFreeBlocksCount && stateStatus === AnimationStatus.FREE);
-		if (!needsErrorBlockReplacement) {
-			if (canAddNewBlock) {
-				block = new Block(blocks.length);
-				lastSpawnedBlock = block;
-			}
-		} else {
-			properties.errorBlock?.reset(true);
-			blocksVisual.resetBlockFromLogicBlock(properties.errorBlock);
-			block = properties.errorBlock;
-			properties.errorBlock = null;
-		}
-		if (block) {
-			block.currentTile = mainTile;
+    function _spawnMultipleBlocks() {
+        const activeBlocksCount = cycle.blocks?.length ?? 0;
+        const blocksToSpawn = TOTAL_TILES - activeBlocksCount;
 
-			block.init();
-			block.updateTile();
-		}
-	}
+        for (let i = 0; i < blocksToSpawn; i++) {
+            const newTile = board.getRandomFreeTile();
+            if (newTile) {
+                const block = createBlock({ id: cycle.blocks.length, currentTile: newTile });
 
-	function _startNewCycle() {
-		sM.updateAfterCycle();
-		if (PREVENT_CYCLE_STATES.includes(stateStatus)) return;
-		if (lastSpawnedBlock) {
-			blocks = [lastSpawnedBlock, ...blocks];
-			lastSpawnedBlock = null;
-		}
-		properties.activeBlocksCount = blocks.length;
-		if (isFailResult || isStopped) return;
+                addBlock(block);
+            }
+        }
+    }
 
-		blocks.forEach((block) => block.resetAfterCycle());
+    function _spawnSingleBlock() {
+        let block;
+        const isFree = flagsState.isFree;
+        const canAddNewBlock = Boolean(cycle.blocks.length < MAX_FREE_BLOCKS_COUNT && isFree);
+        if (canAddNewBlock) {
+            block = createBlock({
+                id: cycle.blocks.length,
+                currentTile: mainTile,
+            });
 
-		endCycleSignal.dispatch();
-		cycleIndex++;
+            setLastSpawnedBlock(block);
+        }
+    }
 
-		_spawnBlock();
-		_calculatePaths();
-	}
+    function _startNewCycle() {
+        setStarted();
 
-	function _calculatePaths() {
-		if (lastSpawnedBlock?.hasBeenSpawned) {
-			lastSpawnedBlock.moveToNextTile(isFree, 0);
-		}
+        if (flagsState.isStarting || flagsState.hasNotStarted) {
+            return;
+        }
 
-		const _isFree = cycleIndex % 2 === 0 ? true : properties.activeBlocksCount < properties.maxFreeBlocksCount - 1;
+        if (cycle.lastSpawnedBlock) {
+            addBlock(cycle.lastSpawnedBlock);
+        }
+        if (cycle.lastSpawnedBlock?.hasBeenSpawned) {
+            setLastSpawnedBlock(null);
+        }
 
-		blocks.forEach((block, index) => {
-			if (!block.hasBeenEvaluated && block.hasBeenSpawned) {
-				block.moveToNextTile(_isFree, index * 0.2);
-			}
-		});
-	}
+        const isFailResult = flagsState.isFailResult;
+        const isStopped = flagsState.isStopped;
+        if (isFailResult || isStopped) return;
 
-	function resetPostDestroy() {
-		blocks.forEach((block) => block.reset());
-		blocksVisual.reset();
-		board.reset();
+        if (cycle.blocks?.length) {
+            cycle.blocks.forEach((block) => blockStore.getState().resetAfterCycle(block));
+        }
+        animationCycleStore.getState().incCycleIndex();
 
-		blocks = [];
-		lastSpawnedBlock = null;
-		cycleIndex = 0;
-		animationSpeedRatio = 0;
-		firstStartAnimationRatio = 0;
-	}
+        _spawnBlock();
+        _calculatePaths();
+    }
 
-	function reset(isDestroy = false) {
-		blocks.forEach((block) => block.reset());
-		blocksVisual.reset();
-		board.reset();
+    function _calculatePaths() {
+        const cycleIndex = cycle.cycleIndex;
+        const activeBlocksCount = cycle.blocks.length;
 
-		blocks = [];
-		lastSpawnedBlock = null;
-		cycleIndex = 0;
-		animationSpeedRatio = 0;
+        if (cycle.lastSpawnedBlock?.hasBeenSpawned) {
+            moveToNextTile(cycle.lastSpawnedBlock, flagsState.isFree, 0);
+        }
+        const _isFree = cycleIndex % 2 === 0 ? true : activeBlocksCount < MAX_FREE_BLOCKS_COUNT - 1;
 
-		const needsRestart = resetCycleResults.includes(stateResult);
-		sM.reset();
-		_startNewCycle();
+        cycle.blocks.forEach((block, index) => {
+            if (!block.hasBeenEvaluated && block.hasBeenSpawned) {
+                moveToNextTile(block, _isFree, index * 0.2);
+            }
+        });
+    }
 
-		if (needsRestart) {
-			sM.setStart();
-		}
+    function reset(preventRestart = false) {
+        blockStore.getState().reset();
+        heroBlocks.reset();
+        board.reset();
+        animationCycleStore.getState().reset();
 
-		if (isDestroy) {
-			canvasSignal.dispatch();
-			firstStartAnimationRatio = 0;
-		}
+        const stateResult = stateManagerStore.getState().result;
+        const needsRestart = resetCycleResults.includes(stateResult);
+        stateManagerStore.getState().reset();
+        _startNewCycle();
 
-		completeAnimationEndedSignal.remove(() => {
-			sM.setRestart();
-			_startNewCycle();
-			previousSuccessBlocksAnimationRatio = 1;
-		});
-		stopAnimationEndedSignal.remove(() => {
-			sM.setRestart();
-			reset();
-		});
-		errorAnimationEndedSignal.remove(() => {
-			sM.setRestart();
-			_startNewCycle();
-		});
-	}
+        if (!preventRestart && needsRestart) {
+            setStart();
+        }
+    }
 
-	function _updateAnimationRatios(dt: number) {
-		const _isResult = isResult;
-		firstStartAnimationRatio = math.saturate(firstStartAnimationRatio + dt * (properties.showVisual ? 1 : 0));
+    function _updateAnimationRatios(dt: number) {
+        const isResult = flagsState.isResult;
+        const speedRatio = cycle.animationSpeedRatio;
+        const firstStartRatio = cycle.firstStartAnimationRatio;
+        const prevSuccessRatio = cycle.previousSuccessBlocksAnimationRatio;
 
-		animationSpeedRatio = Math.min(1, animationSpeedRatio + dt * (_isResult ? 1 : 0));
-		previousSuccessBlocksAnimationRatio = math.saturate(previousSuccessBlocksAnimationRatio - dt / 1.5);
-	}
+        const animationSpeedRatio = Math.min(1, speedRatio + dt * (isResult ? 1 : 0));
 
-	function _checkCycleCompletion() {
-		let isCycleComplete = true;
-		if (lastSpawnedBlock) {
-			isCycleComplete = Boolean(isCycleComplete && lastSpawnedBlock.hasBeenSpawned);
-		}
+        const previousSuccessBlocksAnimationRatio = math.saturate(prevSuccessRatio - dt / 1.5);
+        const firstStartAnimationRatio = math.saturate(firstStartRatio + dt * (propertiesStore.getState().showVisual ? 1 : 0));
 
-		blocks.forEach((block) => {
-			if (block.lifeCycle > 0) {
-				isCycleComplete = Boolean(isCycleComplete && block.hasBeenEvaluated && block.hasAnimationEnded);
-			} else {
-				isCycleComplete = isCycleComplete && block.spawnAnimationRatio === 1;
-			}
-		});
+        setAnimationRatios({
+            animationSpeedRatio,
+            firstStartAnimationRatio,
+            previousSuccessBlocksAnimationRatio,
+        });
+    }
 
-		return isCycleComplete || isResultAnimation || isFailResult || isStopped;
-	}
+    function _checkCycleCompletion() {
+        let isCycleComplete = true;
+        if (cycle.lastSpawnedBlock) {
+            isCycleComplete = isCycleComplete && cycle.lastSpawnedBlock.hasBeenSpawned;
+        }
+        cycle.blocks.forEach((block) => {
+            if (block.lifeCycle > 0) {
+                isCycleComplete = isCycleComplete && block.hasBeenEvaluated && block.hasAnimationEnded;
+            } else {
+                isCycleComplete = isCycleComplete && block.spawnAnimationRatio === 1;
+            }
+        });
+        const { isStopped, isFailResult, isResult } = flagsState;
+        return isCycleComplete || isResult || isFailResult || isStopped;
+    }
 
-	function update(dt: number) {
-		_updateAnimationRatios(dt);
+    function update(dt: number) {
+        _updateAnimationRatios(dt);
 
-		successAnimationManager.update(dt);
-		stopAnimationManager.update(dt);
-		errorAnimationManager.update(dt);
+        successAnimationManager.update(dt);
+        stopAnimationManager.update(dt);
+        errorAnimationManager.update(dt);
 
-		if (hasNotStarted) {
-			_startNewCycle();
-			return;
-		}
+        if (flagsState.hasNotStarted) {
+            _startNewCycle();
+            return;
+        }
 
-		if (isRestart) {
-			reset();
-			return;
-		}
-		if (isResultAnimation) {
-			sM.setRestartAnimation();
-		}
+        board.preUpdate(dt);
+        if (cycle.lastSpawnedBlock) {
+            updateBlock(cycle.lastSpawnedBlock, dt, 'lastSpawnedBlock');
+        }
+        if (cycle.blocks.length) {
+            cycle.blocks.forEach((block) => updateBlock(block, dt));
+        }
 
-		board.preUpdate(dt);
-		if (lastSpawnedBlock) {
-			lastSpawnedBlock.update(dt);
-		}
-		blocks.forEach((block) => block.update(dt));
-		board.update(dt);
+        board.update(dt);
 
-		const isCycleComplete = _checkCycleCompletion();
+        const isCycleComplete = _checkCycleCompletion();
+        if (isCycleComplete) {
+            _startNewCycle();
+        }
+    }
 
-		if (isCycleComplete) {
-			_startNewCycle();
-		}
-	}
+    async function init() {
+        const stateListener: Parameters<typeof stateManagerStore.subscribe>[0] = ({ flags, animationTypeEnded }) => {
+            flagsState = flags;
+            if (animationTypeEnded) {
+                switch (animationTypeEnded) {
+                    case 'win': {
+                        reset();
+                        setAnimationRatios({ previousSuccessBlocksAnimationRatio: 1 });
 
-	async function init() {
-		sM.init();
-		successAnimationManager.init();
-		stopAnimationManager.init();
-		errorAnimationManager.init();
-		board.init();
+                        _startNewCycle();
+                        break;
+                    }
+                    case 'lose': {
+                        reset();
 
-		completeAnimationEndedSignal.add(() => {
-			sM.setRestart();
-			_startNewCycle();
-			previousSuccessBlocksAnimationRatio = 1;
-		});
-		stopAnimationEndedSignal.add(() => {
-			sM.setRestart();
-			reset();
-		});
-		errorAnimationEndedSignal.add(() => {
-			sM.setRestart();
-			_startNewCycle();
-		});
-		gameEndedSignal.addOnce(() => {
-			reset(true);
-		});
-	}
+                        _startNewCycle();
+                        break;
+                    }
+                    case 'stop':
+                    default:
+                        reset(true);
+                        break;
+                }
+            }
+        };
+        const animationCycleListener: Parameters<typeof animationCycleStore.subscribe>[0] = (s) => (cycle = s);
 
-	return {
-		init,
-		update,
-		reset,
-		resetPostDestroy,
-	};
+        stateManagerStore.subscribe((s) => s, stateListener, { fireImmediately: true });
+        animationCycleStore.subscribe((s) => s, animationCycleListener, { fireImmediately: true });
+
+        successAnimationManager.init();
+        stopAnimationManager.init();
+        errorAnimationManager.init();
+        board.init();
+    }
+
+    return {
+        init,
+        update,
+        reset,
+    };
 };
 const game = SystemManager();
 export default game;
-
-export { firstStartAnimationRatio, blocks, lastSpawnedBlock, previousSuccessBlocksAnimationRatio };

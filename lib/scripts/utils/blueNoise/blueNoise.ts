@@ -1,48 +1,33 @@
-import * as THREE from 'three';
-import loader from '../../core/loader';
-
-import getBlueNoiseShader from './getBlueNoise.glsl?raw';
-import { Uniform } from '../../../types/properties';
+import { NearestFilter, RepeatWrapping, ShaderChunk, Vector2 } from 'three';
 import { ASSETS_PATH } from '../../core/settings';
+import loader from '../../core/loader';
+import { setUniform } from '../../../store/uniformsStore.ts';
+import getBlueNoiseShader from './getBlueNoise.glsl';
 
-export interface BN_Uniforms {
-	u_blueNoiseTexture: Uniform;
-	u_blueNoiseTexelSize: Uniform<THREE.Vector2 | null>;
-	u_blueNoiseCoordOffset: Uniform<THREE.Vector2>;
-}
-const bn_sharedUniforms: BN_Uniforms = {
-	u_blueNoiseTexture: { value: null },
-	u_blueNoiseTexelSize: { value: null },
-	u_blueNoiseCoordOffset: { value: new THREE.Vector2() },
-};
 const BlueNoise = () => {
-	const TEXTURE_SIZE = 128;
+    const TEXTURE_SIZE = 128;
 
-	async function preInit() {
-		loader.loadTexture(`${ASSETS_PATH + 'textures'}/LDR_RGB1_0.png`, (texture) => {
-			texture.generateMipmaps = false;
-			texture.minFilter = texture.magFilter = THREE.NearestFilter;
-			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-			texture.needsUpdate = true;
-			if (bn_sharedUniforms) {
-				bn_sharedUniforms.u_blueNoiseTexture.value = texture;
-				bn_sharedUniforms.u_blueNoiseTexelSize.value = new THREE.Vector2(1 / TEXTURE_SIZE, 1 / TEXTURE_SIZE);
-			}
-		});
-		THREE.ShaderChunk['getBlueNoise'] = getBlueNoiseShader;
-	}
+    async function preInit() {
+        loader.loadTexture(`${ASSETS_PATH}/LDR_RGB1_0.png`, (texture) => {
+            texture.generateMipmaps = false;
+            texture.minFilter = texture.magFilter = NearestFilter;
+            texture.wrapS = texture.wrapT = RepeatWrapping;
+            texture.needsUpdate = true;
+            setUniform({ u_blueNoiseTexture: { value: texture } });
+            setUniform({ u_blueNoiseTexelSize: { value: new Vector2(1 / TEXTURE_SIZE, 1 / TEXTURE_SIZE) } });
+        });
+        ShaderChunk['getBlueNoise'] = getBlueNoiseShader;
+    }
 
-	function update(_dt: number) {
-		bn_sharedUniforms?.u_blueNoiseCoordOffset.value.set(Math.random(), Math.random());
-	}
+    function update(_dt: number) {
+        setUniform({ u_blueNoiseCoordOffset: { value: new Vector2(Math.random(), Math.random()) } });
+    }
 
-	return {
-		update,
-		preInit,
-		TEXTURE_SIZE,
-		bn_sharedUniforms,
-	};
+    return {
+        update,
+        preInit,
+        TEXTURE_SIZE,
+    };
 };
 
 export default BlueNoise;
-export { bn_sharedUniforms };

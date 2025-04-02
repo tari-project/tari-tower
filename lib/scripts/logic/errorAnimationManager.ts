@@ -1,7 +1,7 @@
 import math from '../utils/math';
 
-import { errorAnimationEndedSignal, stateSignal } from './signals';
 import { AnimationResult, AnimationStatus } from '../../types/stateManager';
+import { stateManagerStore } from '../../store/stateManagerStore';
 
 let isActive = false;
 let failRatio = 0;
@@ -12,42 +12,44 @@ let failSpawnRatio = 0;
 let failPushDownRatio = 0;
 
 const ErrorAnimationManager = () => {
-	function init() {
-		stateSignal.add((status, result) => {
-			if (status === AnimationStatus.RESULT && result === AnimationResult.FAILED) {
-				isActive = true;
-			}
-		});
-	}
+    function init() {
+        const listen: Parameters<typeof stateManagerStore.subscribe>[0] = ({ status, result }) => {
+            if (status === AnimationStatus.RESULT && result === AnimationResult.FAILED) {
+                isActive = true;
+            }
+        };
 
-	function resetRatios() {
-		failRatio = 0;
-		failShakeRatio = 0;
-		failFloatingCubesRatio = 0;
-		failPushDownRatio = 0;
-		failSpawnRatio = 0;
-		isActive = false;
-	}
+        stateManagerStore.subscribe((state) => state, listen);
+    }
 
-	function update(dt: number) {
-		failRatio += ((isActive ? 1 : 0) * dt) / errorAnimationDuration;
-		failRatio = math.clamp(failRatio, 0, 1);
+    function resetRatios() {
+        failRatio = 0;
+        failShakeRatio = 0;
+        failFloatingCubesRatio = 0;
+        failPushDownRatio = 0;
+        failSpawnRatio = 0;
+        isActive = false;
+    }
 
-		failShakeRatio = math.fit(failRatio, 0.0, 0.3, 0, 1);
-		failFloatingCubesRatio = math.fit(failRatio, 0.35, 0.65, 0, 1);
-		failSpawnRatio = math.fit(failRatio, 0.3, 0.55, 0, 2.5);
-		failPushDownRatio = math.fit(failRatio, 0.6, 0.8, 0, 1);
-		if (failRatio >= 1) {
-			errorAnimationEndedSignal.dispatch();
-			resetRatios();
-		}
-	}
+    function update(dt: number) {
+        failRatio += ((isActive ? 1 : 0) * dt) / errorAnimationDuration;
+        failRatio = math.clamp(failRatio, 0, 1);
 
-	return {
-		init,
-		resetRatios,
-		update,
-	};
+        failShakeRatio = math.fit(failRatio, 0.0, 0.3, 0, 1);
+        failFloatingCubesRatio = math.fit(failRatio, 0.35, 0.65, 0, 1);
+        failSpawnRatio = math.fit(failRatio, 0.3, 0.55, 0, 2.5);
+        failPushDownRatio = math.fit(failRatio, 0.6, 0.8, 0, 1);
+        if (failRatio >= 1) {
+            stateManagerStore.getState().setAnimationTypeEnded('lose');
+            resetRatios();
+        }
+    }
+
+    return {
+        init,
+        resetRatios,
+        update,
+    };
 };
 const errorAnimationManager = ErrorAnimationManager();
-export { errorAnimationManager, failShakeRatio, failFloatingCubesRatio, failSpawnRatio, failPushDownRatio, errorAnimationDuration };
+export { errorAnimationManager, failShakeRatio, failFloatingCubesRatio, failSpawnRatio, failPushDownRatio };
