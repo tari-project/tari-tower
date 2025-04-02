@@ -34,8 +34,10 @@ export default class Block {
     isErrorBlockFalling: BlockType['isErrorBlockFalling'] = false;
     skipFallAnimation: BlockType['skipFallAnimation'] = false;
 
-    constructor(id) {
+    constructor(id = -1, currentTile) {
+        console.debug(`constructor`, id, currentTile);
         this.id = id;
+        this.currentTile = currentTile;
         this.init();
     }
 
@@ -50,6 +52,7 @@ export default class Block {
     }
 
     updateTile() {
+        console.debug(`this.currentTile=`, this.currentTile);
         if (this.currentTile) {
             this.currentTile.isOccupied = true;
             this.currentTile.willBeOccupied = false;

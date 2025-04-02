@@ -15,8 +15,8 @@ import { MAX_FREE_BLOCKS_COUNT } from '../core/settings.ts';
 import { propertiesStore } from '../../store/propertiesStore.ts';
 
 const SystemManager = () => {
-    let flagsState = stateManagerStore.getInitialState().flags;
-    const animationCycleStoreInitial = animationCycleStore.getInitialState();
+    let flagsState = stateManagerStore.getState().flags;
+    const animationCycleStoreInitial = animationCycleStore.getState();
     let { blocks: blocksState, ...animationCycleState } = animationCycleStoreInitial;
     function _spawnBlock() {
         const { isFailResult, isStopped, isSuccessResult, isReplayResult, isFree } = flagsState;
@@ -38,7 +38,7 @@ const SystemManager = () => {
         for (let i = 0; i < blocksToSpawn; i++) {
             const newTile = board.getRandomFreeTile();
             if (newTile) {
-                const block = new Block(blocksState.length);
+                const block = new Block(blocksState.length, newTile);
                 block.currentTile = newTile;
                 block.init();
                 block.updateTile();
@@ -48,18 +48,17 @@ const SystemManager = () => {
     }
 
     function _spawnSingleBlock() {
-        let block: Block | null | undefined = null;
         const isFree = flagsState.isFree;
         const canAddNewBlock = Boolean(blocksState.length < MAX_FREE_BLOCKS_COUNT && isFree);
         if (canAddNewBlock) {
-            block = new Block(blocksState.length);
-            setLastSpawnedBlock(block);
-        }
-
-        if (block) {
+            const block = new Block(blocksState.length, mainTile);
+            if (block) {
+                console.debug(`block=`, block);
+            }
             block.currentTile = mainTile;
             block.init();
             block.updateTile();
+            setLastSpawnedBlock(block);
         }
     }
 
@@ -71,7 +70,9 @@ const SystemManager = () => {
         if (notStarted) return;
 
         if (animationCycleState.lastSpawnedBlock) {
+            console.debug('addBlock from _startNewCycle', animationCycleState.lastSpawnedBlock);
             addBlock(animationCycleState.lastSpawnedBlock);
+            console.debug('setLastSpawnedBlock to NULL from _startNewCycle');
             setLastSpawnedBlock(null);
         }
         if (isFailResult || isStopped) return;

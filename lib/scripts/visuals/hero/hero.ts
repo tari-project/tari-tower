@@ -44,31 +44,30 @@ import { propertiesStore } from '../../../store/propertiesStore.ts';
 import { sceneStore } from '../../../store/sceneStore.ts';
 import { heroStore, TOTAL_BLOCKS } from 'lib/store/heroStore.ts';
 
-const _v2_0 = new Vector2();
-const _v2_1 = new Vector2();
-
-const _v3_0 = new Vector3();
-const _v3_1 = new Vector3();
-
-const _q_0 = new Quaternion();
-const _q_1 = new Quaternion();
-
-const MAIN_COLOR = new Color();
-const SUCCESS_COLOR = new Color();
-const ERROR_COLOR = new Color();
-const DEFAULT_COLOR = new Color();
-
-const _c = new Color();
-const _c2 = new Color();
-
 export const heroContainer = new Object3D();
 const Hero = () => {
+    const _v2_0 = new Vector2();
+    const _v2_1 = new Vector2();
+
+    const _v3_0 = new Vector3();
+    const _v3_1 = new Vector3();
+
+    const _q_0 = new Quaternion();
+    const _q_1 = new Quaternion();
+
+    const MAIN_COLOR = new Color();
+    const SUCCESS_COLOR = new Color();
+    const ERROR_COLOR = new Color();
+    const DEFAULT_COLOR = new Color();
+
+    const _c = new Color();
+    const _c2 = new Color();
+
     const { animationTotalFrames, blockList, blockRenderList, heroLoseAnimationPositionArray, heroLoseAnimationOrientArray } = heroStore.getState();
-    let propertiesState = propertiesStore.getState();
     let result = stateManagerStore.getState().result;
+    let propertiesState = propertiesStore.getState();
     let sharedUniforms = uniformsStore.getState();
-    const animationCycleStoreInitial = animationCycleStore.getInitialState();
-    let { blocks: blocksState, ...animationCycleState } = animationCycleStoreInitial;
+    let cycle = animationCycleStore.getState();
 
     async function preload() {
         loader.loadBuf(`${ASSETS_PATH}/BASE.buf`, (geometry) => {
@@ -179,20 +178,20 @@ const Hero = () => {
     }
 
     function _initListeners() {
-        const propertiesListener: Parameters<typeof propertiesStore.subscribe>[0] = (state) => (propertiesState = state);
-        const stateListener = (sResult) => {
-            result = sResult;
-        };
-        const animationCycleListener: Parameters<typeof animationCycleStore.subscribe>[0] = ({ blocks, ...rest }) => {
-            blocksState = blocks;
-            animationCycleState = rest;
-        };
-        const uniformsListener = (state) => (sharedUniforms = state);
+        const uniformsListener: Parameters<typeof uniformsStore.subscribe>[0] = (s) => (sharedUniforms = s);
+        const propertiesListener: Parameters<typeof propertiesStore.subscribe>[0] = (s) => (propertiesState = s);
+        const cycleListener: Parameters<typeof animationCycleStore.subscribe>[0] = (s) => (cycle = s);
 
-        stateManagerStore.subscribe((s) => s.result, stateListener);
-        propertiesStore.subscribe((s) => s, propertiesListener);
-        animationCycleStore.subscribe((s) => s, animationCycleListener);
-        uniformsStore.subscribe((s) => s, uniformsListener);
+        propertiesStore.subscribe((s) => s, propertiesListener, { fireImmediately: true });
+        animationCycleStore.subscribe((s) => s, cycleListener, { fireImmediately: true });
+        uniformsStore.subscribe((s) => s, uniformsListener, { fireImmediately: true });
+        stateManagerStore.subscribe(
+            (s) => s.result,
+            (res) => {
+                result = res;
+            },
+            { fireImmediately: true }
+        );
     }
     async function init() {
         const sceneState = sceneStore.getState();
@@ -299,8 +298,8 @@ const Hero = () => {
             const instanceColorArray = heroStore.getState().instanceColorArray;
             const instanceIsActiveArray = heroStore.getState().instanceIsActiveArray;
 
-            const logicBlock = blocksState.filter((block) => block.id === i)[0];
-            const isActive = i < blocksState.length + (animationCycleState.lastSpawnedBlock ? 1 : 0);
+            const logicBlock = cycle.blocks.filter((block) => block.id === i)[0];
+            const isActive = i < cycle.blocks.length + (cycle.lastSpawnedBlock ? 1 : 0);
             const color = isActive ? _c : DEFAULT_COLOR;
 
             if (isActive && logicBlock?.isErrorBlock) {
@@ -330,7 +329,7 @@ const Hero = () => {
 
             baseMesh.material.uniforms.u_prevSuccessColor.value.set(DEFAULT_COLOR).convertSRGBToLinear();
 
-            baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(_c.set(propertiesState.successColor), animationCycleState.previousSuccessBlocksAnimationRatio);
+            baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(_c.set(propertiesState.successColor), cycle.previousSuccessBlocksAnimationRatio);
             baseMesh.material.uniforms.u_prevSuccessColor.value.convertSRGBToLinear();
         }
     }
@@ -365,15 +364,15 @@ const Hero = () => {
     }
 
     function _updateFreeBlocks() {
-        if (animationCycleState.lastSpawnedBlock) {
-            const block = blockList[animationCycleState.lastSpawnedBlock.id];
-            if (animationCycleState.lastSpawnedBlock.currentTile) {
-                block.boardPos.set(animationCycleState.lastSpawnedBlock.currentTile?.row, animationCycleState.lastSpawnedBlock.currentTile?.col);
+        if (cycle.lastSpawnedBlock) {
+            const block = blockList[cycle.lastSpawnedBlock.id];
+            if (cycle.lastSpawnedBlock.currentTile) {
+                block.boardPos.set(cycle.lastSpawnedBlock.currentTile?.row, cycle.lastSpawnedBlock.currentTile?.col);
             }
-            block.showRatio = customEasing(math.saturate(animationCycleState.lastSpawnedBlock.spawnAnimationRatioUnclamped));
+            block.showRatio = customEasing(math.saturate(cycle.lastSpawnedBlock.spawnAnimationRatioUnclamped));
         }
 
-        blocksState?.forEach((logicBlock) => {
+        cycle.blocks?.forEach((logicBlock) => {
             const block = blockList[logicBlock.id];
 
             if (block) {
@@ -506,6 +505,8 @@ const Hero = () => {
 
     function _updateIndividualBlock(logicBlock, block, i) {
         if (result === AnimationResult.FAILED) {
+            // console.debug(`cycle.blocks=`, cycle.blocks);
+            // console.debug(`logicBlock=`, logicBlock.currentTile);
             _updateFailAnimation(logicBlock, block, i);
         }
         if (result === AnimationResult.COMPLETED || result === AnimationResult.REPLAY) {
@@ -527,7 +528,7 @@ const Hero = () => {
         for (let i = 0; i < TOTAL_BLOCKS; i++) {
             const block = blockList[i];
             block.update(dt);
-            const logicBlock = blocksState.find((block) => block.id === i);
+            const logicBlock = cycle.blocks.find((block) => block.id === i);
             if (block.showRatio > 0) {
                 blockRenderList[renderCount++] = block;
             }
