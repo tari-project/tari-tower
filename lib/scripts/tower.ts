@@ -1,7 +1,7 @@
 import { Color, ColorManagement, PCFShadowMap, Scene, WebGLRenderer } from 'three';
 import { DEFAULT_LOOKAT_POSITION, DEFAULT_POSITION, DPR, MAX_PIXEL_COUNT, WEBGL_OPTS } from './core/settings.ts';
 
-import { heroBlocks } from './visuals/hero/hero.ts';
+import { heroBlocks, heroContainer } from './visuals/hero/hero.ts';
 import { coinContainer, Coins } from './visuals/coins/coins.ts';
 import BlueNoise from './utils/blueNoise/blueNoise.ts';
 import { OrbitControls } from './controls/OrbitControls';
@@ -123,7 +123,7 @@ const TariTower = () => {
         }
         coins.init();
         scene.add(coinContainer);
-        scene.add(heroBlocks.heroContainer);
+        scene.add(heroContainer);
         if (background?.container) {
             scene.add(background.container);
         }
