@@ -33,7 +33,16 @@ export const animationCycleStore = createStore<AnimationCycleState>()(
     }))
 );
 
-export const addBlock = (block) => animationCycleStore.setState((s) => ({ blocks: [block, ...s.blocks] }));
+export const addBlock = (block) =>
+    animationCycleStore.setState((s) => {
+        const curr = s.blocks;
+        if (!curr.length) {
+            return { blocks: [block] };
+        }
+        const blocks = [block, ...curr];
+        return { blocks };
+    });
+
 export const setLastSpawnedBlock = (block) => animationCycleStore.setState({ lastSpawnedBlock: block });
 
 export const setAnimationRatios = ({ animationSpeedRatio, firstStartAnimationRatio, previousSuccessBlocksAnimationRatio }: Ratios) =>

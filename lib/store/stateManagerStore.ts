@@ -6,7 +6,7 @@ interface SetWinArgs {
     isReplay?: boolean;
     completeAnimationLevel?: SuccessLevel | null;
 }
-type AnimationType = 'start' | 'stop' | 'lose';
+type AnimationType = 'starting' | 'started' | 'stop' | 'lose';
 
 interface State {
     status: AnimationStatus;
@@ -27,6 +27,7 @@ type ManagerState = State & Actions;
 
 const initialFlags: Flags = {
     hasNotStarted: true,
+    isStarting: false,
     isFree: false,
     isResult: false,
     isReplayResult: false,
@@ -65,8 +66,16 @@ export const stateManagerStore = createStore<ManagerState>()(
                 let animationResult = currentState.result;
 
                 switch (animationType) {
-                    case 'start': {
-                        animationStatus = AnimationStatus.FREE;
+                    case 'starting': {
+                        animationStatus = AnimationStatus.STARTED;
+                        break;
+                    }
+                    case 'started': {
+                        if (currentState.status === AnimationStatus.STARTED) {
+                            animationStatus = AnimationStatus.FREE;
+                        } else {
+                            animationStatus = currentState.status;
+                        }
                         break;
                     }
                     case 'stop': {
@@ -89,6 +98,7 @@ export const stateManagerStore = createStore<ManagerState>()(
                 const newFlags = {
                     isResult,
                     hasNotStarted: animationStatus === AnimationStatus.NOT_STARTED,
+                    isStarting: animationStatus === AnimationStatus.STARTED,
                     isFree: animationStatus === AnimationStatus.FREE,
                     isReplayResult: isResult && animationResult === AnimationResult.REPLAY,
                     isSuccessResult: isResult && animationResult === AnimationResult.COMPLETED,
@@ -107,7 +117,10 @@ export const stateManagerStore = createStore<ManagerState>()(
 );
 
 export const setStart = () => {
-    stateManagerStore.getState().setAnimationState('start');
+    stateManagerStore.getState().setAnimationState('starting');
+};
+export const setStarted = () => {
+    stateManagerStore.getState().setAnimationState('started');
 };
 export const setStop = () => {
     stateManagerStore.getState().setAnimationState('stop');

@@ -8,8 +8,8 @@ if (import.meta.env.MODE === 'development') {
         closeFolders: true,
     });
 
-    const states = gui.addFolder('states');
-    const theme = gui.addFolder('theme')?.open();
+    const states = gui.addFolder('states')?.open();
+    const theme = gui.addFolder('theme');
     const canvas = gui.addFolder('canvas');
 
     const actions = {
