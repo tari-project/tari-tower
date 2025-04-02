@@ -50,6 +50,7 @@ export default class Tile {
     }
 
     shuffleReachableNeighbours() {
+        console.debug(this.reachableNeighbours);
         if (this.reachableNeighbours) {
             for (let i = this.reachableNeighbours.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));

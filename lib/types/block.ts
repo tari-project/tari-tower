@@ -37,7 +37,7 @@ export interface IBlock {
     hasBeenSpawned?: boolean;
     hasAnimationEnded?: boolean;
     hasBeenEvaluated?: boolean;
-    currentTile?: Tile | null;
+    currentTile: Tile | null;
     targetTile: Tile | null;
     moveAnimationRatio: number;
     spawnAnimationRatio: number;
@@ -52,5 +52,5 @@ export interface IBlock {
 
 export interface CreateBlock {
     id: number;
-    currentTile?: Tile;
+    currentTile: Tile | null;
 }
