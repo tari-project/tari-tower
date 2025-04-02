@@ -6,8 +6,8 @@ import { stopAnimationManager } from './stopAnimationManager';
 import { errorAnimationManager } from './errorAnimationManager';
 import { successAnimationManager } from '../logic/successAnimationManager';
 
-import { resetCycleResults } from '../../types/stateManager';
-import { setStart, stateManagerStore } from '../../store/stateManagerStore';
+import { AnimationStatus, resetCycleResults } from '../../types/stateManager';
+import { setStart, setStarted, stateManagerStore } from '../../store/stateManagerStore';
 
 import { addBlock, animationCycleStore, setAnimationRatios, setLastSpawnedBlock } from '../../store/animationCycleStore.ts';
 import { MAX_FREE_BLOCKS_COUNT } from '../core/settings.ts';
@@ -61,18 +61,23 @@ const SystemManager = () => {
     }
 
     function _startNewCycle() {
-        const notStarted = flagsState.hasNotStarted;
-        const isFailResult = flagsState.isFailResult;
-        const isStopped = flagsState.isStopped;
+        setStarted();
 
-        if (notStarted) return;
+        if (flagsState.isStarting || flagsState.hasNotStarted) {
+            return;
+        }
 
         if (cycle.lastSpawnedBlock) {
             addBlock(cycle.lastSpawnedBlock);
+        }
+        if (cycle.lastSpawnedBlock?.hasBeenSpawned) {
             setLastSpawnedBlock(null);
         }
 
+        const isFailResult = flagsState.isFailResult;
+        const isStopped = flagsState.isStopped;
         if (isFailResult || isStopped) return;
+
         if (cycle.blocks?.length) {
             cycle.blocks.forEach((block) => blockStore.getState().resetAfterCycle(block));
         }
@@ -85,6 +90,7 @@ const SystemManager = () => {
     function _calculatePaths() {
         const cycleIndex = cycle.cycleIndex;
         const activeBlocksCount = cycle.blocks.length;
+
         if (cycle.lastSpawnedBlock?.hasBeenSpawned) {
             moveToNextTile(cycle.lastSpawnedBlock, flagsState.isFree, 0);
         }
@@ -161,7 +167,7 @@ const SystemManager = () => {
 
         board.preUpdate(dt);
         if (cycle.lastSpawnedBlock) {
-            updateBlock(cycle.lastSpawnedBlock, dt);
+            updateBlock(cycle.lastSpawnedBlock, dt, 'lastSpawnedBlock');
         }
         if (cycle.blocks.length) {
             cycle.blocks.forEach((block) => updateBlock(block, dt));

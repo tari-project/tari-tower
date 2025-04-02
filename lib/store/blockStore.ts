@@ -88,7 +88,8 @@ export function createBlock({ id, currentTile = null }: CreateBlock): IBlock {
     return newBlock;
 }
 
-export function updateBlock(block: IBlock, dt: number) {
+export function updateBlock(block: IBlock, dt: number, initiator?: string) {
+    console.debug(`initiator=`, initiator);
     const tBlock = block;
     if (!tBlock.hasBeenSpawned) {
         tBlock.spawnAnimationRatioUnclamped += 0.75 * ANIMATION_SPEED * dt;
@@ -131,8 +132,10 @@ export function updateBlock(block: IBlock, dt: number) {
     if (tBlock.targetTile) {
         tBlock.targetTile.activeRatio = clampedMoveAnimationRatio;
     }
+    const updated = { ...block, ...tBlock };
 
-    blockStore.getState().setUpdateBlock({ ...block, ...tBlock });
+    console.debug(updated.id, updated.hasBeenSpawned);
+    blockStore.getState().setUpdateBlock(updated);
 }
 
 function _findBestTile(neighbours, isFree, currentTile): Tile | null {
