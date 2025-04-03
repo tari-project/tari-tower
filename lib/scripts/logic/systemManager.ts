@@ -6,7 +6,7 @@ import { stopAnimationManager } from './stopAnimationManager';
 import { errorAnimationManager } from './errorAnimationManager';
 import { successAnimationManager } from '../logic/successAnimationManager';
 
-import { resetCycleResults } from '../../types/stateManager';
+import { PREVENT_CYCLE_STATES, resetCycleResults } from '../../types/stateManager';
 import { setStart, stateManagerStore, updateAfterCycle } from '../../store/stateManagerStore';
 
 import { addBlock, animationCycleStore, setAnimationRatios, setLastSpawnedBlock } from '../../store/animationCycleStore.ts';
@@ -30,7 +30,6 @@ const SystemManager = () => {
 
     function _spawnBlock() {
         if (_shouldPreventSpawn()) return;
-
         if (flagsState.isSuccessResult || flagsState.isReplayResult) {
             _spawnMultipleBlocks();
         } else {
@@ -39,9 +38,8 @@ const SystemManager = () => {
     }
 
     function _spawnMultipleBlocks() {
-        const activeBlocksCount = animationCycleStore.getState().blocks?.length;
+        const activeBlocksCount = cycle.blocks?.length;
         const blocksToSpawn = TOTAL_TILES - activeBlocksCount;
-
         for (let i = 0; i < blocksToSpawn; i++) {
             const newTile = board.getRandomFreeTile();
             if (newTile) {
@@ -62,9 +60,9 @@ const SystemManager = () => {
 
         if (canAddNewBlock) {
             block = new Block(cycle.blocks.length);
+            setLastSpawnedBlock(block);
         }
         if (block) {
-            setLastSpawnedBlock(block);
             block.currentTile = mainTile;
             block.init();
             block.updateTile();
@@ -73,8 +71,8 @@ const SystemManager = () => {
 
     function _startNewCycle() {
         updateAfterCycle();
-
-        if (flagsState.isStarting || flagsState.hasNotStarted) {
+        const status = stateManagerStore.getState().status;
+        if (PREVENT_CYCLE_STATES.includes(status)) {
             return;
         }
 
@@ -88,7 +86,7 @@ const SystemManager = () => {
         if (cycle.blocks?.length) {
             cycle.blocks.forEach((block) => block.resetAfterCycle());
         }
-        animationCycleStore.getState().incCycleIndex();
+        cycle.incCycleIndex();
 
         _spawnBlock();
         _calculatePaths();
@@ -114,7 +112,7 @@ const SystemManager = () => {
         heroBlocks.reset();
         board.reset();
         cycle.blocks.forEach((b) => b.reset());
-        animationCycleStore.getState().reset();
+        cycle.reset();
 
         const stateResult = stateManagerStore.getState().result;
         const needsRestart = resetCycleResults.includes(stateResult);
@@ -185,33 +183,40 @@ const SystemManager = () => {
     }
 
     async function init() {
-        const stateListener: Parameters<typeof stateManagerStore.subscribe>[0] = ({ flags, animationTypeEnded }) => {
-            flagsState = flags;
-            if (animationTypeEnded) {
-                switch (animationTypeEnded) {
-                    case 'win': {
-                        reset();
-                        setAnimationRatios({ previousSuccessBlocksAnimationRatio: 1 });
-
-                        _startNewCycle();
-                        break;
-                    }
-                    case 'lose': {
-                        reset();
-
-                        _startNewCycle();
-                        break;
-                    }
-                    case 'stop':
-                    default:
-                        reset(true);
-                        break;
-                }
-            }
-        };
         const animationCycleListener: Parameters<typeof animationCycleStore.subscribe>[0] = (s) => (cycle = s);
+        stateManagerStore.subscribe(
+            (s) => s.flags,
+            (flags) => (flagsState = flags),
+            { fireImmediately: true }
+        );
 
-        stateManagerStore.subscribe((s) => s, stateListener, { fireImmediately: true });
+        stateManagerStore.subscribe(
+            (s) => s.animationTypeEnded,
+            (animationTypeEnded) => {
+                if (animationTypeEnded) {
+                    console.debug(`animationTypeEnded=`, animationTypeEnded);
+                    switch (animationTypeEnded) {
+                        case 'win': {
+                            reset();
+                            setAnimationRatios({ previousSuccessBlocksAnimationRatio: 1 });
+                            _startNewCycle();
+                            break;
+                        }
+                        case 'lose': {
+                            reset();
+                            _startNewCycle();
+                            break;
+                        }
+                        case 'stop':
+                        default:
+                            reset(true);
+                            break;
+                    }
+                }
+            },
+            { fireImmediately: true }
+        );
+
         animationCycleStore.subscribe((s) => s, animationCycleListener, { fireImmediately: true });
 
         successAnimationManager.init();
