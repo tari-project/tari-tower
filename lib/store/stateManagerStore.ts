@@ -6,7 +6,7 @@ interface SetWinArgs {
     isReplay?: boolean;
     completeAnimationLevel?: SuccessLevel | null;
 }
-type AnimationType = 'starting' | 'free' | 'result' | 'stop' | 'lose';
+type AnimationType = 'starting' | 'restart' | 'free' | 'result' | 'stop' | 'lose';
 
 interface State {
     status: AnimationStatus;
@@ -29,6 +29,7 @@ const initialFlags: Flags = {
     hasNotStarted: true,
     isStarting: false,
     isFree: false,
+    isRestarting: false,
     isResult: false,
     isReplayResult: false,
     isSuccessResult: false,
@@ -71,6 +72,10 @@ export const stateManagerStore = createStore<ManagerState>()(
                         animationStatus = AnimationStatus.STARTED;
                         break;
                     }
+                    case 'restart': {
+                        animationStatus = AnimationStatus.RESTARTING;
+                        break;
+                    }
                     case 'free': {
                         animationStatus = AnimationStatus.FREE;
                         break;
@@ -97,10 +102,10 @@ export const stateManagerStore = createStore<ManagerState>()(
                 const isResult = animationStatus === AnimationStatus.RESULT;
                 const isResultAnimation = animationStatus === AnimationStatus.RESULT_ANIMATION;
                 const isAnyResult = isResult || isResultAnimation;
-
                 const newFlags = {
                     isResult,
                     isResultAnimation,
+                    isRestarting: animationStatus === AnimationStatus.RESTARTING,
                     hasNotStarted: animationStatus === AnimationStatus.NOT_STARTED,
                     isStarting: animationStatus === AnimationStatus.STARTED,
                     isFree: animationStatus === AnimationStatus.FREE,
@@ -116,14 +121,13 @@ export const stateManagerStore = createStore<ManagerState>()(
                     flags: { ...currentState.flags, ...newFlags },
                 };
             }),
-        reset: () => set((c) => ({ ...initialState, status: c.status })),
+        reset: () => set(initialState),
     }))
 );
 
 export const updateAfterCycle = () => {
     const status = stateManagerStore.getState().status;
     const isResult = stateManagerStore.getState().flags.isResult;
-
     if (status === AnimationStatus.STARTED) {
         setFree();
     } else if (isResult) {
@@ -132,7 +136,16 @@ export const updateAfterCycle = () => {
 };
 
 export const setStart = () => {
-    stateManagerStore.getState().setAnimationState('starting');
+    const isRestart = stateManagerStore.getState().flags.isRestarting;
+    if (isRestart) {
+        setFree();
+    } else {
+        stateManagerStore.getState().setAnimationState('starting');
+    }
+};
+
+export const setRestart = () => {
+    stateManagerStore.getState().setAnimationState('restart');
 };
 
 export const setFree = () => {

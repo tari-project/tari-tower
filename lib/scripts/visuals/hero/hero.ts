@@ -522,7 +522,6 @@ const Hero = () => {
 
     function update(dt: number) {
         const sceneState = sceneStore.getState();
-
         _updateFreeBlocks();
         _updateColors(dt);
 
@@ -531,7 +530,8 @@ const Hero = () => {
         for (let i = 0; i < TOTAL_BLOCKS; i++) {
             const block = heroStore.getState().blockList[i];
             block.update(dt);
-            const logicBlock = cycle.blocks.find((block) => block.id === i);
+            const logicBlock = cycle.blocks.find((b) => block.id === b.id);
+
             if (block.showRatio > 0) {
                 heroStore.getState().blockRenderList[renderCount++] = block;
             }

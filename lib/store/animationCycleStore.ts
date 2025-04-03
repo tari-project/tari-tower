@@ -29,7 +29,7 @@ export const animationCycleStore = createStore<AnimationCycleState>()(
     subscribeWithSelector((set) => ({
         ...initialState,
         incCycleIndex: () => set((state) => ({ cycleIndex: state.cycleIndex + 1 })),
-        reset: () => set((c) => ({ ...initialState, blocks: c.blocks })),
+        reset: () => set(initialState),
     }))
 );
 
@@ -39,6 +39,7 @@ export const setLastSpawnedBlock = (block) => animationCycleStore.setState({ las
 
 export const setAnimationRatios = ({ animationSpeedRatio, firstStartAnimationRatio, previousSuccessBlocksAnimationRatio }: Ratios) =>
     animationCycleStore.setState((curr) => ({
+        ...curr,
         animationSpeedRatio: animationSpeedRatio ?? curr.animationSpeedRatio,
         firstStartAnimationRatio: firstStartAnimationRatio ?? curr.firstStartAnimationRatio,
         previousSuccessBlocksAnimationRatio: previousSuccessBlocksAnimationRatio ?? curr.previousSuccessBlocksAnimationRatio,

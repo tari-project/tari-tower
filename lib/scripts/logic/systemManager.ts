@@ -6,8 +6,8 @@ import { stopAnimationManager } from './stopAnimationManager';
 import { errorAnimationManager } from './errorAnimationManager';
 import { successAnimationManager } from '../logic/successAnimationManager';
 
-import { PREVENT_CYCLE_STATES, resetCycleResults } from '../../types/stateManager';
-import { setStart, stateManagerStore, updateAfterCycle } from '../../store/stateManagerStore';
+import { PREVENT_CYCLE_STATES, RESTART_CYCLE_STATES } from '../../types/stateManager';
+import { setRestart, setStart, stateManagerStore, updateAfterCycle } from '../../store/stateManagerStore';
 
 import { addBlock, animationCycleStore, setAnimationRatios, setLastSpawnedBlock } from '../../store/animationCycleStore.ts';
 import { MAX_FREE_BLOCKS_COUNT } from '../core/settings.ts';
@@ -20,12 +20,11 @@ const SystemManager = () => {
     let cycle = animationCycleStore.getState();
 
     function _shouldPreventSpawn() {
-        return (
-            flagsState.isFailResult ||
-            flagsState.isStopped ||
-            cycle.blocks.length >= TOTAL_TILES ||
-            (mainTile && mainTile.isOccupied && !flagsState.isSuccessResult && !flagsState.isReplayResult)
-        );
+        const mainTileOccupied = !!mainTile?.isOccupied;
+        const isFull = cycle.blocks.length >= TOTAL_TILES;
+        const isFailOrStop = flagsState.isFailResult || flagsState.isStopped;
+        const isWinState = flagsState.isSuccessResult || flagsState.isReplayResult;
+        return !isWinState ? mainTileOccupied : isFailOrStop || isFull;
     }
 
     function _spawnBlock() {
@@ -35,6 +34,8 @@ const SystemManager = () => {
         } else {
             _spawnSingleBlock();
         }
+
+        if (cycle.blocks.length === MAX_FREE_BLOCKS_COUNT && flagsState.isFree) return;
     }
 
     function _spawnMultipleBlocks() {
@@ -109,13 +110,14 @@ const SystemManager = () => {
     }
 
     function reset(preventRestart = false) {
+        cycle.blocks.forEach((b) => b.reset());
         heroBlocks.reset();
         board.reset();
-        cycle.blocks.forEach((b) => b.reset());
-        cycle.reset();
+
+        animationCycleStore.getState().reset();
 
         const stateResult = stateManagerStore.getState().result;
-        const needsRestart = resetCycleResults.includes(stateResult);
+        const needsRestart = RESTART_CYCLE_STATES.includes(stateResult);
         stateManagerStore.getState().reset();
         _startNewCycle();
 
@@ -169,6 +171,13 @@ const SystemManager = () => {
             _startNewCycle();
             return;
         }
+        if (flagsState.isRestarting) {
+            reset();
+            return;
+        }
+        if (flagsState.isResultAnimation) {
+            setRestart();
+        }
 
         board.preUpdate(dt);
         cycle.lastSpawnedBlock?.update(dt);
@@ -183,46 +192,44 @@ const SystemManager = () => {
     }
 
     async function init() {
+        successAnimationManager.init();
+        stopAnimationManager.init();
+        errorAnimationManager.init();
+        board.init();
         const animationCycleListener: Parameters<typeof animationCycleStore.subscribe>[0] = (s) => (cycle = s);
         stateManagerStore.subscribe(
             (s) => s.flags,
             (flags) => (flagsState = flags),
             { fireImmediately: true }
         );
-
         stateManagerStore.subscribe(
             (s) => s.animationTypeEnded,
             (animationTypeEnded) => {
                 if (animationTypeEnded) {
-                    console.debug(`animationTypeEnded=`, animationTypeEnded);
                     switch (animationTypeEnded) {
                         case 'win': {
-                            reset();
+                            setRestart();
                             setAnimationRatios({ previousSuccessBlocksAnimationRatio: 1 });
                             _startNewCycle();
                             break;
                         }
                         case 'lose': {
-                            reset();
+                            setRestart();
                             _startNewCycle();
                             break;
                         }
                         case 'stop':
-                        default:
+                            setRestart();
                             reset(true);
                             break;
+                        default:
+                            return;
                     }
                 }
-            },
-            { fireImmediately: true }
+            }
         );
 
         animationCycleStore.subscribe((s) => s, animationCycleListener, { fireImmediately: true });
-
-        successAnimationManager.init();
-        stopAnimationManager.init();
-        errorAnimationManager.init();
-        board.init();
     }
 
     return {

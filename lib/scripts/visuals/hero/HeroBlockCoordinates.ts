@@ -4,6 +4,7 @@ const HALF_PI = Math.PI / 2;
 const _v0 = new Vector3();
 
 export default class HeroBlockCoordinates {
+    id = -1;
     animation = 0;
     boardDir: Vector2 = new Vector2();
     boardPos: Vector2 = new Vector2();
@@ -13,7 +14,8 @@ export default class HeroBlockCoordinates {
     spinPivot: Vector3 = new Vector3();
     spinOrient: Quaternion = new Quaternion();
 
-    constructor() {
+    constructor(id = 0) {
+        this.id = id;
         this.animation = 0;
         this.boardDir = new Vector2();
         this.boardPos = new Vector2();
@@ -25,6 +27,7 @@ export default class HeroBlockCoordinates {
     }
 
     reset() {
+        this.id = -1;
         this.animation = 0;
         this.boardDir.set(0, 0);
         this.boardPos.set(0, 0);
