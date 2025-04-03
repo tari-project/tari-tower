@@ -13,6 +13,7 @@ interface Actions {
 type HeroState = State & Actions;
 
 const blockListInitial = Array.from({ length: TOTAL_BLOCKS }).map((_, i) => new HeroBlockCoordinates(i));
+
 const initialState: State = {
     animationTotalFrames: 0,
     blockList: blockListInitial,

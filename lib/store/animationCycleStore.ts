@@ -22,7 +22,6 @@ const initialState: SystemManagerState = {
     cycleIndex: 0,
     animationSpeedRatio: 0,
     previousSuccessBlocksAnimationRatio: 0,
-    activeBlocksCount: 0,
 };
 
 export const animationCycleStore = createStore<AnimationCycleState>()(

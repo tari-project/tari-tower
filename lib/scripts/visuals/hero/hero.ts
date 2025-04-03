@@ -366,15 +366,17 @@ const Hero = () => {
 
     function _updateFreeBlocks() {
         if (cycle.lastSpawnedBlock) {
-            const block = heroStore.getState().blockList[cycle.lastSpawnedBlock.id];
+            const block = heroStore.getState().blockList.find((b) => b.id === cycle.lastSpawnedBlock?.id);
             if (cycle.lastSpawnedBlock.currentTile) {
-                block.boardPos.set(cycle.lastSpawnedBlock.currentTile?.row, cycle.lastSpawnedBlock.currentTile?.col);
+                block?.boardPos.set(cycle.lastSpawnedBlock.currentTile?.row, cycle.lastSpawnedBlock.currentTile?.col);
             }
-            block.showRatio = customEasing(math.saturate(cycle.lastSpawnedBlock.spawnAnimationRatioUnclamped));
+            if (block) {
+                block.showRatio = customEasing(math.saturate(cycle.lastSpawnedBlock.spawnAnimationRatioUnclamped));
+            }
         }
 
         cycle.blocks?.forEach((logicBlock) => {
-            const block = heroStore.getState().blockList[logicBlock.id];
+            const block = heroStore.getState().blockList.find((b) => b.id === logicBlock.id);
 
             if (block) {
                 block.showRatio = customEasing(math.saturate(logicBlock.spawnAnimationRatioUnclamped));

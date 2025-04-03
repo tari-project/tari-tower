@@ -25,13 +25,6 @@ export default class Block {
 
     lifeCycle: BlockType['lifeCycle'] = 0;
     easingFunction: BlockType['easingFunction'] = null;
-    errorLifeCycle: BlockType['errorLifeCycle'] = 0;
-    isErrorBlock: BlockType['isErrorBlock'] = false;
-    errorPreFallAnimationTime: BlockType['errorPreFallAnimationTime'] = 0;
-    errorPreFallAnimationTimeScale: BlockType['errorPreFallAnimationTimeScale'] = 0;
-    errorFallAnimationTime: BlockType['errorFallAnimationTime'] = 0;
-    isErrorBlockFalling: BlockType['isErrorBlockFalling'] = false;
-    skipFallAnimation: BlockType['skipFallAnimation'] = false;
 
     constructor(id) {
         this.id = id;
@@ -64,14 +57,9 @@ export default class Block {
 
     moveToNextTile(isFree = false, animationDelay = 0) {
         this.hasBeenEvaluated = true;
-        this.moveAnimationRatio = -animationDelay * (this.isErrorBlock ? 0 : 1);
+        this.moveAnimationRatio = -animationDelay;
 
         if (!this.currentTile) return;
-        if (this.isErrorBlock) {
-            this.isMoving = true;
-            this.targetTile = this.currentTile;
-            return;
-        }
 
         this.currentTile.shuffleReachableNeighbours();
         const neighbours = isFree ? this.currentTile.reachableNeighbours : this.currentTile.prioritySortedReachableNeighbours;
@@ -102,20 +90,8 @@ export default class Block {
         this.updateTile();
     }
 
-    reset(keepId = false) {
-        if (this.isErrorBlock) {
-            this.errorLifeCycle = 0;
-            this.isErrorBlock = false;
-            this.currentTile?.reset();
-            this.targetTile?.reset();
-            this.errorFallAnimationTime = 0;
-            this.isErrorBlockFalling = false;
-            this.errorPreFallAnimationTime = 0;
-            this.errorPreFallAnimationTimeScale = 0;
-            this.errorFallAnimationTime = 0;
-            this.skipFallAnimation = false;
-        }
-        this.id = keepId ? this.id : -1;
+    reset() {
+        this.id = -1;
         this.isMoving = false;
         this.hasBeenSpawned = false;
         this.hasAnimationEnded = false;
@@ -153,7 +129,7 @@ export default class Block {
 
     _updateMovement(dt: number) {
         if ((this.isMoving && !this.hasAnimationEnded) || stateManagerStore.getState().flags.isResultAnimation) {
-            this.moveAnimationRatio = Math.min(1, this.moveAnimationRatio + ANIMATION_SPEED * dt * (this.isErrorBlock ? 0.7 : 1));
+            this.moveAnimationRatio = Math.min(1, this.moveAnimationRatio + ANIMATION_SPEED * dt * 0.95);
             this.easedAnimationRatio = this.easingFunction?.(Math.max(0, this.moveAnimationRatio)) || 0;
 
             if (this.easedAnimationRatio === 1 && (stateManagerStore.getState().flags.isFree || stateManagerStore.getState().flags.isResult)) {
@@ -171,15 +147,6 @@ export default class Block {
         if (this.targetTile) {
             this.targetTile.activeRatio = clampedMoveAnimationRatio;
         }
-
-        if (this.isErrorBlock && this.isErrorBlockFalling) {
-            if (this.currentTile) {
-                this.currentTile.activeRatio = 0;
-            }
-            if (this.targetTile) {
-                this.targetTile.activeRatio = 0;
-            }
-        }
     }
 
     update(dt: number) {
@@ -187,19 +154,6 @@ export default class Block {
             this._updateSpawnAnimation(dt);
         } else {
             this._updateMovement(dt);
-        }
-
-        if (this.isErrorBlockFalling) {
-            this.errorFallAnimationTime = this.errorFallAnimationTime + 3 * ANIMATION_SPEED * dt;
-        }
-        if (this.isErrorBlock) {
-            this.errorPreFallAnimationTimeScale = this.errorPreFallAnimationTimeScale + 3 * dt;
-            this.errorPreFallAnimationTimeScale = Math.min(20, this.errorPreFallAnimationTimeScale);
-            this.errorPreFallAnimationTime = this.errorPreFallAnimationTime + this.errorPreFallAnimationTimeScale * dt;
-            if (this.skipFallAnimation) {
-                this.errorPreFallAnimationTime = 0;
-                this.errorPreFallAnimationTimeScale = 0;
-            }
         }
 
         this._updateTileRatios();

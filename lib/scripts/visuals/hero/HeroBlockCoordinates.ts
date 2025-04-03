@@ -32,10 +32,10 @@ export default class HeroBlockCoordinates {
         this.boardDir.set(0, 0);
         this.boardPos.set(0, 0);
         this.pos.set(0, 0, 0);
-        this.orient.identity();
+        this.orient = new Quaternion();
         this.showRatio = 0;
         this.spinPivot.set(0, 0, 0);
-        this.spinOrient.identity();
+        this.spinOrient = new Quaternion();
     }
 
     update(_dt: number) {

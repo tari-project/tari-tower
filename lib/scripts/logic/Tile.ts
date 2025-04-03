@@ -41,7 +41,6 @@ export default class Tile {
 
     init() {
         this.reachableNeighbours = this.neighbours?.filter((neighbour) => neighbour?.row === this.row || neighbour?.col === this.col) || null;
-
         this._sortPriorityNeighbours();
     }
 
@@ -68,9 +67,5 @@ export default class Tile {
         this.isOccupied = false;
         this.willBeOccupied = false;
         this.activeRatio = 0;
-    }
-
-    update(_dt: number) {
-        // TODO: check this update flow
     }
 }

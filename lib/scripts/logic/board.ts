@@ -56,17 +56,12 @@ const Board = () => {
         tiles.flat().forEach((tile) => tile.preUpdate(dt));
     }
 
-    function update(dt: number) {
-        tiles.flat().forEach((tile) => tile.update(dt));
-    }
-
     return {
         init,
         getTile,
         getRandomFreeTile,
         reset,
         preUpdate,
-        update,
     };
 };
 const board = Board();

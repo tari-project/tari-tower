@@ -118,9 +118,10 @@ const SystemManager = () => {
 
         const stateResult = stateManagerStore.getState().result;
         const needsRestart = RESTART_CYCLE_STATES.includes(stateResult);
-        stateManagerStore.getState().reset();
-        _startNewCycle();
 
+        stateManagerStore.getState().reset();
+
+        _startNewCycle();
         if (!preventRestart && needsRestart) {
             setStart();
         }
@@ -179,11 +180,10 @@ const SystemManager = () => {
             setRestart();
         }
 
-        board.preUpdate(dt);
         cycle.lastSpawnedBlock?.update(dt);
         cycle.blocks.forEach((block) => block.update(dt));
 
-        board.update(dt);
+        board.preUpdate(dt);
 
         const isCycleComplete = _checkCycleCompletion();
         if (isCycleComplete) {
@@ -226,7 +226,8 @@ const SystemManager = () => {
                             return;
                     }
                 }
-            }
+            },
+            { fireImmediately: true }
         );
 
         animationCycleStore.subscribe((s) => s, animationCycleListener, { fireImmediately: true });

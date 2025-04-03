@@ -126,9 +126,9 @@ export const stateManagerStore = createStore<ManagerState>()(
 );
 
 export const updateAfterCycle = () => {
-    const status = stateManagerStore.getState().status;
     const isResult = stateManagerStore.getState().flags.isResult;
-    if (status === AnimationStatus.STARTED) {
+    const isStarting = stateManagerStore.getState().flags.isStarting;
+    if (isStarting) {
         setFree();
     } else if (isResult) {
         stateManagerStore.getState().setAnimationState('result');
