@@ -42,8 +42,6 @@ const SystemManager = () => {
         const activeBlocksCount = animationCycleStore.getState().blocks?.length;
         const blocksToSpawn = TOTAL_TILES - activeBlocksCount;
 
-        let blocks = cycle.blocks;
-
         for (let i = 0; i < blocksToSpawn; i++) {
             const newTile = board.getRandomFreeTile();
             if (newTile) {
@@ -51,10 +49,10 @@ const SystemManager = () => {
                 block.currentTile = newTile;
                 block.init();
                 block.updateTile();
-                blocks = [block, ...blocks];
+
+                addBlock(block);
             }
         }
-        animationCycleStore.setState({ blocks });
     }
 
     function _spawnSingleBlock() {
