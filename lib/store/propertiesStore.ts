@@ -5,7 +5,6 @@ import type { IPropertiesState, IPropertyPair } from '../types/properties.ts';
 
 import { setUniform } from './uniformsStore.ts';
 import { Color, ColorRepresentation } from 'three';
-import { IBlock } from '../types/block.ts';
 
 const initialState: IPropertiesState = {
     time: 0,
@@ -43,10 +42,6 @@ export const propertiesStore = createStore<PropertiesState>()(
     }))
 );
 
-const setErrorBlock = (errorBlock?: IBlock | null): void => {
-    propertiesStore.setState({ errorBlock });
-};
-
 const setAnimationProperties = (properties: Record<string, unknown>[]) => {
     const propertyPairs: IPropertyPair[] = properties as unknown as IPropertyPair[];
     for (const property of propertyPairs) {
@@ -65,4 +60,4 @@ const setAnimationProperties = (properties: Record<string, unknown>[]) => {
         propertiesStore.getState().setProperty(property);
     }
 };
-export { setErrorBlock, setAnimationProperties };
+export { setAnimationProperties };

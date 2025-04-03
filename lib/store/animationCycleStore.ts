@@ -17,7 +17,7 @@ interface Ratios {
 
 const initialState: SystemManagerState = {
     blocks: [],
-    firstStartAnimationRatio: 0,
+    firstStartAnimationRatio: 1,
     lastSpawnedBlock: null,
     cycleIndex: 0,
     animationSpeedRatio: 0,
@@ -29,19 +29,11 @@ export const animationCycleStore = createStore<AnimationCycleState>()(
     subscribeWithSelector((set) => ({
         ...initialState,
         incCycleIndex: () => set((state) => ({ cycleIndex: state.cycleIndex + 1 })),
-        reset: () => set(initialState),
+        reset: () => set((c) => ({ ...initialState, blocks: c.blocks })),
     }))
 );
 
-export const addBlock = (block) =>
-    animationCycleStore.setState((s) => {
-        const curr = s.blocks;
-        if (!curr.length) {
-            return { blocks: [block] };
-        }
-        const blocks = [block, ...curr];
-        return { blocks };
-    });
+export const addBlock = (block) => animationCycleStore.setState((s) => ({ blocks: [block, ...s.blocks] }));
 
 export const setLastSpawnedBlock = (block) => animationCycleStore.setState({ lastSpawnedBlock: block });
 

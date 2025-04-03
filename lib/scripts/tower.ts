@@ -129,18 +129,21 @@ const TariTower = () => {
         }
     }
 
-    function render(time: number, dt: number) {
+    function render(dt: number) {
         if (!canvas) {
             dt *= 0;
         }
 
+        let time = propertiesStore.getState().time;
+
         dt = Math.min(dt, 1 / 15);
+        time += dt;
 
         const cameraOffsetX = propertiesStore.getState().cameraOffsetX;
         let offsetX = propertiesStore.getState().offsetX;
 
-        propertiesStore.getState().setProperty({ propertyName: 'time', value: time });
-        propertiesStore.getState().setProperty({ propertyName: 'deltaTime', value: dt });
+        propertiesStore.setState({ time: time });
+        propertiesStore.setState({ deltaTime: dt });
 
         setTimes(time, dt);
 

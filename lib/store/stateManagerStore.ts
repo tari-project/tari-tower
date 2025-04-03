@@ -6,7 +6,7 @@ interface SetWinArgs {
     isReplay?: boolean;
     completeAnimationLevel?: SuccessLevel | null;
 }
-type AnimationType = 'starting' | 'started' | 'stop' | 'lose';
+type AnimationType = 'starting' | 'free' | 'result' | 'stop' | 'lose';
 
 interface State {
     status: AnimationStatus;
@@ -32,6 +32,7 @@ const initialFlags: Flags = {
     isResult: false,
     isReplayResult: false,
     isSuccessResult: false,
+    isResultAnimation: false,
     isFailResult: false,
     isStopped: false,
 };
@@ -70,12 +71,12 @@ export const stateManagerStore = createStore<ManagerState>()(
                         animationStatus = AnimationStatus.STARTED;
                         break;
                     }
-                    case 'started': {
-                        if (currentState.status === AnimationStatus.STARTED) {
-                            animationStatus = AnimationStatus.FREE;
-                        } else {
-                            animationStatus = currentState.status;
-                        }
+                    case 'free': {
+                        animationStatus = AnimationStatus.FREE;
+                        break;
+                    }
+                    case 'result': {
+                        animationStatus = AnimationStatus.RESULT_ANIMATION;
                         break;
                     }
                     case 'stop': {
@@ -94,16 +95,19 @@ export const stateManagerStore = createStore<ManagerState>()(
                 }
 
                 const isResult = animationStatus === AnimationStatus.RESULT;
+                const isResultAnimation = animationStatus === AnimationStatus.RESULT_ANIMATION;
+                const isAnyResult = isResult || isResultAnimation;
 
                 const newFlags = {
                     isResult,
+                    isResultAnimation,
                     hasNotStarted: animationStatus === AnimationStatus.NOT_STARTED,
                     isStarting: animationStatus === AnimationStatus.STARTED,
                     isFree: animationStatus === AnimationStatus.FREE,
-                    isReplayResult: isResult && animationResult === AnimationResult.REPLAY,
-                    isSuccessResult: isResult && animationResult === AnimationResult.COMPLETED,
-                    isFailResult: isResult && animationResult === AnimationResult.FAILED,
-                    isStopped: isResult && animationResult === AnimationResult.STOP,
+                    isReplayResult: isAnyResult && animationResult === AnimationResult.REPLAY,
+                    isSuccessResult: isAnyResult && animationResult === AnimationResult.COMPLETED,
+                    isFailResult: isAnyResult && animationResult === AnimationResult.FAILED,
+                    isStopped: isAnyResult && animationResult === AnimationResult.STOP,
                 };
 
                 return {
@@ -116,11 +120,23 @@ export const stateManagerStore = createStore<ManagerState>()(
     }))
 );
 
+export const updateAfterCycle = () => {
+    const status = stateManagerStore.getState().status;
+    const isResult = stateManagerStore.getState().flags.isResult;
+
+    if (status === AnimationStatus.STARTED) {
+        setFree();
+    } else if (isResult) {
+        stateManagerStore.getState().setAnimationState('result');
+    }
+};
+
 export const setStart = () => {
     stateManagerStore.getState().setAnimationState('starting');
 };
-export const setStarted = () => {
-    stateManagerStore.getState().setAnimationState('started');
+
+export const setFree = () => {
+    stateManagerStore.getState().setAnimationState('free');
 };
 export const setStop = () => {
     stateManagerStore.getState().setAnimationState('stop');

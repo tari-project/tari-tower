@@ -99,4 +99,14 @@ const SuccessAnimationManager = () => {
 };
 
 const successAnimationManager = SuccessAnimationManager();
-export { successAnimationManager, successRatio, towerRotationRatio, floatingCoinsRatio, floatingCubesRatio, vortexCoinsRatio, successPushDownRatio, successColorTowerRatio, floatingCubesDisplacement };
+export {
+    successAnimationManager,
+    successRatio,
+    towerRotationRatio,
+    floatingCoinsRatio,
+    floatingCubesRatio,
+    vortexCoinsRatio,
+    successPushDownRatio,
+    successColorTowerRatio,
+    floatingCubesDisplacement,
+};

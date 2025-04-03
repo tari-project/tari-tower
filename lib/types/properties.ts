@@ -1,5 +1,5 @@
 import { ColorRepresentation } from 'three';
-import { IBlock } from './block.ts';
+import { BlockType } from './block.ts';
 
 export interface IPropertiesState {
     time: number;
@@ -21,7 +21,7 @@ export interface IPropertiesState {
     particlesColor?: ColorRepresentation;
     goboIntensity: number;
     showVisual: boolean;
-    errorBlock?: IBlock | null;
+    errorBlock?: BlockType | null;
 }
 export interface IScene {
     lightPositionX: number;

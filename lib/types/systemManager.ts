@@ -1,10 +1,10 @@
-import { IBlock } from './block.ts';
+import Block from '../scripts/logic/Block.ts';
 
 export interface SystemManagerState {
     firstStartAnimationRatio: number;
     activeBlocksCount: number;
-    blocks: IBlock[];
-    lastSpawnedBlock?: IBlock | null;
+    blocks: Block[];
+    lastSpawnedBlock?: Block | null;
     cycleIndex: number;
     animationSpeedRatio: number;
     previousSuccessBlocksAnimationRatio: number;

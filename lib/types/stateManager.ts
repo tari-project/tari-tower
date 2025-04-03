@@ -2,6 +2,7 @@ export enum AnimationStatus {
     NOT_STARTED = 'not-started',
     STARTED = 'starting',
     FREE = 'free',
+    RESULT_ANIMATION = 'result_animation',
     RESULT = 'result',
 }
 export enum AnimationResult {
@@ -20,7 +21,7 @@ export enum SuccessLevel {
 
 export const resetCycleResults = [AnimationResult.FAILED, AnimationResult.COMPLETED];
 
-const _FLAG_TYPES = ['hasNotStarted', 'isStarting', 'isFree', 'isResult', 'isReplayResult', 'isSuccessResult', 'isFailResult', 'isStopped'] as const;
+const _FLAG_TYPES = ['hasNotStarted', 'isStarting', 'isFree', 'isResultAnimation', 'isResult', 'isReplayResult', 'isSuccessResult', 'isFailResult', 'isStopped'] as const;
 
 type FlagTypeTuple = typeof _FLAG_TYPES;
 type FlagType = FlagTypeTuple[number];

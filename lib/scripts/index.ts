@@ -17,7 +17,7 @@ function animate() {
     const dt = newTime - time;
     if (newTime - lastRender >= frameInterval) {
         lastRender = newTime;
-        tower?.render(time, dt);
+        tower?.render(dt);
         time = newTime;
     }
     cancelAnimationFrame(frame);
@@ -26,13 +26,9 @@ function animate() {
 
 function initCallback() {
     tower.init();
-
     time = performance.now() / 1000;
-
     lastRender = time;
-
     window.addEventListener('resize', tower.onResize);
-
     tower.onResize();
     animate();
 }
