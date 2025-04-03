@@ -139,9 +139,17 @@ export const setFree = () => {
     stateManagerStore.getState().setAnimationState('free');
 };
 export const setStop = () => {
+    const isFree = stateManagerStore.getState().flags.isFree;
+    if (!isFree) return;
     stateManagerStore.getState().setAnimationState('stop');
 };
 export const setLose = () => {
+    const isFree = stateManagerStore.getState().flags.isFree;
+    if (!isFree) return;
     stateManagerStore.getState().setAnimationState('lose');
 };
-export const setWin = ({ isReplay, completeAnimationLevel }: SetWinArgs) => stateManagerStore.getState().setWinAnimation({ isReplay, completeAnimationLevel });
+export const setWin = ({ isReplay, completeAnimationLevel }: SetWinArgs) => {
+    const isFree = stateManagerStore.getState().flags.isFree;
+    if (!isReplay && !isFree) return;
+    stateManagerStore.getState().setWinAnimation({ isReplay, completeAnimationLevel });
+};
