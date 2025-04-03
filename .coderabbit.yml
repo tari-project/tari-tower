@@ -1,13 +1,18 @@
 language: 'en-GB'
+knowledge_base:
+    learnings:
+        scope: 'global'
+    issues:
+        scope: 'global'
 reviews:
     poem: false
     review_status: false
     collapse_walkthrough: true
     high_level_summary: true
     path_filters:
+        - 'lib'
         - '!**/src/**/*'
         - '!dist/'
-        - 'lib'
     auto_review:
         enabled: true
         drafts: true
