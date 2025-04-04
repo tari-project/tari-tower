@@ -18817,7 +18817,7 @@ const Im = () => {
     l({ status: $A.NOT_STARTED, result: WA.NONE });
   }
   function w() {
-    e.length !== 0 && (e = []), l({ status: $A.STARTED });
+    e = [], l({ status: $A.STARTED });
   }
   function P() {
     l({ status: $A.FREE });

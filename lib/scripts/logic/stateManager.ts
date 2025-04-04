@@ -143,9 +143,7 @@ const StateManager = () => {
 	}
 
 	function setStart() {
-		if (statusUpdateQueue.length !== 0) {
-			statusUpdateQueue = [];
-		}
+		statusUpdateQueue = [];
 		_queueStatusUpdate({ status: AnimationStatus.STARTED });
 	}
 
