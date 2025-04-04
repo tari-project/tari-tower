@@ -30,7 +30,8 @@ const StateManager = () => {
 	let statusIndex = 0;
 	let removeCanvas = false;
 
-	const statusUpdateQueue: StatusManagerState['statusUpdateQueue'] = [];
+	let statusUpdateQueue: StatusManagerState['statusUpdateQueue'] = [];
+
 	function updateAfterCycle() {
 		if (properties.errorBlock) {
 			if (properties.errorBlock.isErrorBlockFalling || properties.errorBlock.errorLifeCycle < properties.errorBlockMaxLifeCycle) {
@@ -42,7 +43,6 @@ const StateManager = () => {
 		} else if (isResult) {
 			setResultAnimation();
 		}
-
 		const callback = statusUpdateQueue.shift();
 		callback?.();
 	}
@@ -143,7 +143,9 @@ const StateManager = () => {
 	}
 
 	function setStart() {
-		status = AnimationStatus.NOT_STARTED;
+		if (statusUpdateQueue.length !== 0) {
+			statusUpdateQueue = [];
+		}
 		_queueStatusUpdate({ status: AnimationStatus.STARTED });
 	}
 
