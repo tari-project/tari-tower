@@ -1,7 +1,7 @@
 import { properties } from '../core/properties';
 import math from '../utils/math';
 import { customEasing } from '../utils/ease';
-import { isFree, isResult, isResultAnimation } from './stateManager';
+import { stateFlags } from './stateManager';
 import { BlockType } from '../../types/block';
 
 export default class Block {
@@ -54,7 +54,7 @@ export default class Block {
 		}
 	}
 
-	_findBestTile(neighbours, isFree) {
+	_findBestTile(neighbours, isFree: boolean) {
 		return neighbours.find((tile) => {
 			if (tile.isOccupied || tile.willBeOccupied || tile.isMain) return false;
 			return isFree || (this.currentTile?.priority ?? 0) >= tile.priority;
@@ -102,7 +102,13 @@ export default class Block {
 			this.isErrorBlockFalling = this.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 1;
 		}
 
-		if (this.currentTile?.isBorder && !properties.errorBlock && Math.random() < 0.5 && properties.activeBlocksCount >= properties.minSpawnedBlocksForTheErrorBlock && isFree) {
+		if (
+			this.currentTile?.isBorder &&
+			!properties.errorBlock &&
+			Math.random() < 0.5 &&
+			properties.activeBlocksCount >= properties.minSpawnedBlocksForTheErrorBlock &&
+			stateFlags.isFree
+		) {
 			properties.errorBlock = this;
 			this.isErrorBlock = true;
 		}
@@ -164,11 +170,11 @@ export default class Block {
 	}
 
 	_updateMovement(dt: number) {
-		if ((this.isMoving && !this.hasAnimationEnded) || isResultAnimation) {
+		if ((this.isMoving && !this.hasAnimationEnded) || stateFlags.isResultAnimation) {
 			this.moveAnimationRatio = Math.min(1, this.moveAnimationRatio + properties.animationSpeed * dt * (this.isErrorBlock ? 0.7 : 1));
 			this.easedAnimationRatio = this.easingFunction?.(Math.max(0, this.moveAnimationRatio)) || 0;
 
-			if (this.easedAnimationRatio === 1 && (isFree || isResult)) {
+			if (this.easedAnimationRatio === 1 && (stateFlags.isFree || stateFlags.isResult)) {
 				this._onMovementEnd();
 			}
 		}

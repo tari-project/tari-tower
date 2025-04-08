@@ -1,15 +1,15 @@
 import GUI from 'lil-gui';
 
-// import { loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState } from '../lib';
-import { loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState } from '@tari-project/tari-tower';
+import { loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState } from '../lib';
+// import { loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState } from '@tari-project/tari-tower';
 
 if (import.meta.env.MODE === 'development') {
 	const gui = new GUI();
 	gui.add(document, 'title');
 
 	const actions = {
-		removeCanvas: () => removeTowerAnimation({ canvasId: 'canvas-id' }),
-		initCanvas: () => loadTowerAnimation({ canvasId: 'canvas-id', offset: 0 }),
+		removeCanvas: () => removeTowerAnimation({ canvasId: 'canvas_id' }),
+		initCanvas: () => loadTowerAnimation({ canvasId: 'canvas_id', offset: 0 }),
 		showVisual: () => setAnimationState('showVisual'),
 		start: () => setAnimationState('start'),
 		stopVis: () => setAnimationState('stop'),
@@ -40,7 +40,7 @@ if (import.meta.env.MODE === 'development') {
 	gui.add(actions, 'initCanvas');
 
 	function handleLoad() {
-		loadTowerAnimation({ canvasId: 'canvas-id', offset: 0 });
+		loadTowerAnimation({ canvasId: 'canvas_id', offset: 0 });
 	}
 
 	document.addEventListener('DOMContentLoaded', handleLoad);
