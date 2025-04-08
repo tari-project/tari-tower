@@ -2,6 +2,7 @@ import TariTower from './tower.ts';
 import { stateManager, status } from './logic/stateManager.ts';
 import { gameEndedSignal } from './logic/signals.ts';
 import { properties } from './core/properties.ts';
+import setupLogger from './utils/logger.ts';
 
 const tower = TariTower();
 
@@ -45,7 +46,9 @@ async function initCallback() {
 	}
 }
 
+
 export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: string; offset?: number }) {
+	setupLogger()
 	properties.offsetX = offset;
 	properties.cameraOffsetX = properties.offsetX / window.innerWidth;
 	const canvasEl = document.getElementById(canvasId);

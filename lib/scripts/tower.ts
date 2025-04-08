@@ -173,7 +173,6 @@ const TariTower = () => {
 		renderer.render(properties.scene, camera);
 	}
 	function destroy() {
-		canvas?.remove();
 		game.resetPostDestroy();
 		
 		// Clean up Three.js resources
