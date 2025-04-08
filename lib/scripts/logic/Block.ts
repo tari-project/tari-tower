@@ -102,7 +102,13 @@ export default class Block {
 			this.isErrorBlockFalling = this.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 1;
 		}
 
-		if (this.currentTile?.isBorder && !properties.errorBlock && Math.random() < 0.5 && properties.activeBlocksCount >= properties.minSpawnedBlocksForTheErrorBlock && stateFlags.isFree) {
+		if (
+			this.currentTile?.isBorder &&
+			!properties.errorBlock &&
+			Math.random() < 0.5 &&
+			properties.activeBlocksCount >= properties.minSpawnedBlocksForTheErrorBlock &&
+			stateFlags.isFree
+		) {
 			properties.errorBlock = this;
 			this.isErrorBlock = true;
 		}
