@@ -9,8 +9,12 @@ let time = 0;
 let lastRender = 0;
 const targetFPS = 50;
 const frameInterval = 1 / targetFPS;
-let frame: number;
+let _frame: number;
 
+/**
+ * Main animation loop that controls rendering at a fixed frame rate
+ * Uses requestAnimationFrame but limits actual renders to targetFPS
+ */
 function animate() {
 	const newTime = performance.now() / 1000;
 	const dt = newTime - time;
@@ -19,27 +23,37 @@ function animate() {
 		tower.render(dt);
 		time = newTime;
 	}
-	cancelAnimationFrame(frame);
-	frame = requestAnimationFrame(animate);
+
+	// Schedule next frame
+	// Note: cancelAnimationFrame is not needed here since requestAnimationFrame 
+	// automatically cancels the previous frame
+	_frame = requestAnimationFrame(animate);
 }
 
-function initCallback() {
-	void tower.init();
+async function initCallback() {
+	try {
+		await tower.init();
 
-	time = performance.now() / 1000;
-	lastRender = time;
+		time = performance.now() / 1000;
+		lastRender = time;
 
-	window.addEventListener('resize', () => tower.onResize());
-	tower.onResize();
-	animate();
+		window.addEventListener('resize', tower.onResize);
+		tower.onResize();
+		animate();
+	} catch (error) {
+		console.error('Error in initCallback:', error);
+	}
 }
 
 export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: string; offset?: number }) {
-	if (document.getElementById(canvasId)) return;
 	properties.offsetX = offset;
 	properties.cameraOffsetX = properties.offsetX / window.innerWidth;
+	const canvasEl = document.getElementById(canvasId);
+
 	try {
-		await tower.preload({ canvasId, initCallback });
+		if (canvasEl) {
+			await tower.preload({ canvasEl, initCallback });
+		}
 	} catch (e) {
 		console.error('loadTowerAnimation', e);
 	}

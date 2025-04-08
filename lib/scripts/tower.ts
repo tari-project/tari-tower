@@ -14,15 +14,13 @@ import { canvasSignal } from './logic/signals.ts';
 THREE.ColorManagement.enabled = false;
 
 const TariTower = () => {
-	const renderer = new THREE.WebGLRenderer(WEBGL_OPTS);
 	const background = Background();
 	const blueNoise = BlueNoise();
 	const coins = Coins();
 
-	let canvas: HTMLCanvasElement;
 	let orbitControls: OrbitControls;
-	let _canvasId: string | undefined = undefined;
 
+	let canvas: HTMLCanvasElement | null;
 	const aspect = window.innerWidth / window.innerHeight;
 	const viewHeight = 15;
 	const viewWidth = viewHeight * aspect;
@@ -31,12 +29,10 @@ const TariTower = () => {
 
 	let orbitCamera: OrthographicCamera;
 
-	async function _handleRenderer() {
-		if (_canvasId && renderer) {
-			renderer.domElement.id = _canvasId;
-			canvas = renderer.domElement;
-			document.body.appendChild(canvas);
+	let renderer: THREE.WebGLRenderer;
 
+	async function _handleRenderer() {
+		if (renderer) {
 			renderer.shadowMap.enabled = true;
 			renderer.shadowMap.type = THREE.PCFShadowMap;
 
@@ -73,19 +69,23 @@ const TariTower = () => {
 		camera.updateProjectionMatrix();
 
 		renderer.setSize(dprWidth, dprHeight);
-		canvas.style.width = viewportWidth + 'px';
-		canvas.style.height = viewportHeight + 'px';
+
+		if (canvas) {
+			canvas.style.width = viewportWidth + 'px';
+			canvas.style.height = viewportHeight + 'px';
+		}
 	}
 
 	function onResize() {
 		_handleResize(window.innerWidth, window.innerHeight);
 	}
 
-	async function preload({ canvasId, initCallback }: { canvasId: string; initCallback: () => void }) {
+	async function preload({ canvasEl, initCallback }: { canvasEl: HTMLElement; initCallback: () => void }) {
+		canvas = canvasEl as HTMLCanvasElement;
+		renderer = new THREE.WebGLRenderer({ ...WEBGL_OPTS, canvas });
 		canvasSignal.addOnce(() => {
 			destroy();
 		});
-		_canvasId = canvasId;
 		await _handleRenderer();
 
 		await heroBlocks.preload();
@@ -100,9 +100,11 @@ const TariTower = () => {
 		camera.position.fromArray(settings.DEFAULT_POSITION);
 		camera.updateProjectionMatrix();
 		orbitCamera = camera.clone();
-		orbitControls = new OrbitControls(orbitCamera, canvas);
-		orbitControls.target0.fromArray(settings.DEFAULT_LOOKAT_POSITION);
-		orbitControls.reset();
+		if (canvas) {
+			orbitControls = new OrbitControls(orbitCamera, canvas);
+			orbitControls.target0.fromArray(settings.DEFAULT_LOOKAT_POSITION);
+			orbitControls.reset();
+		}
 	}
 	async function init() {
 		await _initScene();
@@ -171,14 +173,26 @@ const TariTower = () => {
 		renderer.render(properties.scene, camera);
 	}
 	function destroy() {
-		canvas.remove();
+		canvas?.remove();
 		game.resetPostDestroy();
-
+		
+		// Clean up Three.js resources
+		renderer.dispose();
+		renderer.forceContextLoss();
 		renderer.state.reset();
+		
+		// Clean up scene resources
+		properties.scene.traverse((object) => {
+			if (object instanceof THREE.Mesh) {
+				object.geometry?.dispose();
+				if (object.material.dispose) {
+					object.material.dispose();
+				}
+			}
+		});
 	}
 	return {
 		preload,
-		renderer,
 		init,
 		coins,
 		blueNoise,
