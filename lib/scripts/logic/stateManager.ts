@@ -309,6 +309,7 @@ const StateManager = () => {
     removeCanvas = remove;
   }
   function setRestart() {
+    console.log("setRestart", removeCanvas);
     if (removeCanvas) {
       gameEndedSignal.dispatch();
       return;

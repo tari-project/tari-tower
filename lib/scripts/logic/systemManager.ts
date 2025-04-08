@@ -169,17 +169,17 @@ const SystemManager = () => {
     cycleIndex = 0;
     animationSpeedRatio = 0;
 
+    if (isDestroy) {
+      canvasSignal.dispatch();
+      firstStartAnimationRatio = 0;
+    }
+
     const needsRestart = resetCycleResults.includes(stateResult);
     sM.reset();
     _startNewCycle();
 
-    if (needsRestart) {
+    if (needsRestart && !isDestroy) {
       sM.setStart();
-    }
-
-    if (isDestroy) {
-      canvasSignal.dispatch();
-      firstStartAnimationRatio = 0;
     }
 
     completeAnimationEndedSignal.remove(() => {
