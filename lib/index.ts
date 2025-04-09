@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { properties } from './scripts/core/properties';
 import { stateManager, status as animationStatus } from './scripts/logic/stateManager';
 import { loadTowerAnimation, removeTowerAnimation } from './scripts/index';
+import { getTowerLogPrefix } from './scripts/utils/logger';
 
 interface Property {
 	property: string;
@@ -25,4 +26,4 @@ function setAnimationProperties(newProps: Property[]) {
 	}
 }
 
-export { animationStatus, loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState };
+export { animationStatus, loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState, getTowerLogPrefix };

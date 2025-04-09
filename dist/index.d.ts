@@ -10,6 +10,8 @@ declare enum AnimationStatus {
 
 export declare let animationStatus: AnimationStatus;
 
+export declare const getTowerLogPrefix: (level: any) => string;
+
 export declare function loadTowerAnimation({ canvasId, offset }: {
     canvasId: string;
     offset?: number;

@@ -1,14 +1,5 @@
 import * as THREE from 'three';
 
-import BASE from 'public/assets/BASE.buf?url&inline';
-import BOX from 'public/assets/BOX.buf?url&inline';
-import COIN from 'public/assets/COIN.buf?url&inline';
-import COIN_PLACEMENT from 'public/assets/COIN_PLACEMENT.buf?url&inline';
-import LOSE_ANIMATION from 'public/assets/LOSE_ANIMATION.buf?url&inline';
-
-import gobo from 'public/assets/gobo.jpg';
-import LDR_RGB1_0 from 'public/assets/LDR_RGB1_0.png';
-import matcap_gold from 'public/assets/matcap_gold.jpg';
 import { logError } from '../utils/logger';
 
 interface LoaderItems {
@@ -18,29 +9,20 @@ interface LoaderItems {
 }
 
 const Loader = () => {
-	const assets = {
-		'models/BASE.buf': BASE,
-		'models/BOX.buf': BOX,
-		'models/COIN.buf': COIN,
-		'models/COIN_PLACEMENT.buf': COIN_PLACEMENT,
-		'models/LOSE_ANIMATION.buf': LOSE_ANIMATION,
-		'textures/gobo.jpg': gobo,
-		'textures/LDR_RGB1_0.png': LDR_RGB1_0,
-		'textures/matcap_gold.jpg': matcap_gold,
-	};
+
 	let list: LoaderItems['list'] = [];
 	let loadedCount: LoaderItems['loadedCount'] = 0;
 	let onLoadCallback: LoaderItems['onLoadCallback'] = null;
 
-	function loadBuf(file, cb) {
-		const url = assets[file];
+	function loadBuf(assetUrl, cb) {
+
 		list.push(async () => {
 			let attempts = 0;
 			const maxAttempts = 3;
 
 			while (attempts < maxAttempts) {
 				try {
-					const response = await fetch(url);
+					const response = await fetch(assetUrl);
 					const buffer = await response.arrayBuffer();
 					const schematicJsonSize = new Uint32Array(buffer, 0, 1)[0];
 					const schematic = JSON.parse(new TextDecoder().decode(new Uint8Array(buffer, 4, schematicJsonSize)));
@@ -81,9 +63,9 @@ const Loader = () => {
 				} catch (error) {
 					attempts++;
 					if (attempts >= maxAttempts) {
-						logError(`Failed to load buffer: ${file} after ${maxAttempts} attempts`, error);
+						logError(`Failed to load buffer: ${assetUrl} after ${maxAttempts} attempts`, error);
 					} else {
-						logError(`Failed to load buffer: ${file}, attempt ${attempts}/${maxAttempts}, retrying...`, error);
+						logError(`Failed to load buffer: ${assetUrl}, attempt ${attempts}/${maxAttempts}, retrying...`, error);
 						await new Promise((resolve) => setTimeout(resolve, 100));
 					}
 				}
@@ -109,11 +91,11 @@ const Loader = () => {
 		return outArr;
 	}
 
-	function loadTexture(file, cb) {
-		const url = assets[file];
+	function loadTexture(assetUrl, cb) {
+
 		list.push(() => {
 			new THREE.TextureLoader().load(
-				url,
+				assetUrl,
 				(texture) => {
 					texture.minFilter = THREE.LinearMipMapLinearFilter;
 					texture.magFilter = THREE.LinearFilter;
@@ -124,7 +106,7 @@ const Loader = () => {
 					_onLoad();
 				},
 				undefined,
-				(error) => logError(`Failed to load texture: ${file}`, error),
+				(error) => logError(`Failed to load texture: ${assetUrl}`, error),
 			);
 		});
 	}

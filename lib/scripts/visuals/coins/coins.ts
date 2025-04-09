@@ -36,17 +36,15 @@ const Coins = () => {
 	};
 
 	async function preload() {
-		const modelPath = ASSETS_PATH + 'models';
-		const texturePath = ASSETS_PATH + 'textures';
 
-		loader.loadTexture(`${texturePath}/matcap_gold.jpg`, (texture) => {
+		loader.loadTexture(`${ASSETS_PATH}/matcap_gold.jpg`, (texture) => {
 			matcapTexture = texture;
 			matcapTexture.needsUpdate = true;
 		});
-		loader.loadBuf(`${modelPath}/COIN.buf`, (geometry) => {
+		loader.loadBuf(`${ASSETS_PATH}/COIN.buf`, (geometry) => {
 			refGeometry = geometry;
 		});
-		loader.loadBuf(`${modelPath}/COIN_PLACEMENT.buf`, (geometry) => {
+		loader.loadBuf(`${ASSETS_PATH}/COIN_PLACEMENT.buf`, (geometry) => {
 			const { position, aoN, aoP, curveu, orient } = geometry.attributes;
 			positionsArray = position.array;
 			aoNArray = aoN.array;
