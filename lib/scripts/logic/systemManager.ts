@@ -10,7 +10,6 @@ import { SystemManagerState } from '../../types/systemManager';
 import { AnimationStatus } from '../../types';
 import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
 import math from '../utils/math';
-import { log } from '../utils/logger';
 
 let firstStartAnimationRatio: SystemManagerState['firstStartAnimationRatio'] = 0;
 let blocks: SystemManagerState['blocks'] = [];

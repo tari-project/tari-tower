@@ -1,8 +1,8 @@
 import { properties } from '../core/properties';
 import settings from '../core/settings';
-import { gameEndedSignal, stateSignal } from './signals';
+import { gameEndedSignal, stateSignal, winAnimationSignal } from './signals';
 import { AnimationResult, AnimationStatus, QueueItem, StatusManagerState, SuccessLevel } from '../../types/stateManager';
-import { log, logInfo, logWarn } from '../utils/logger';
+import { logInfo, logWarn } from '../utils/logger';
 
 export const PREVENT_CYCLE_STATES = [AnimationStatus.NOT_STARTED, AnimationStatus.RESTART_ANIMATION, AnimationStatus.RESTART, AnimationStatus.STARTED];
 export const resetCycleResults = [AnimationResult.FAILED, AnimationResult.COMPLETED];
@@ -28,7 +28,6 @@ interface QueueArgs {
 
 let status: AnimationStatus = AnimationStatus.NOT_STARTED;
 let result: AnimationResult = AnimationResult.NONE;
-
 let statusUpdateQueue: StatusManagerState['statusUpdateQueue'] = [];
 const MAX_QUEUE_LENGTH = 7; // amount of statuses
 
@@ -122,6 +121,7 @@ const StateManager = () => {
 	}
 
 	function _updateStatusAndResult({ status: newStatus, result: newResult, animationStyle }: QueueArgs) {
+
 		if (_canUpdateStatus(newStatus, newResult)) {
 			if (properties.errorBlock && !properties.errorBlock.isErrorBlockFalling) {
 				properties.errorBlock.preventErrorBlockFallAnimation();
@@ -132,7 +132,12 @@ const StateManager = () => {
 			}
 
 			updateFlags();
-			stateSignal.dispatch(status, result, animationStyle);
+
+			if (animationStyle) {
+				winAnimationSignal.dispatch(animationStyle);
+				return;
+			}
+			stateSignal.dispatch(status, result);
 		}
 	}
 
