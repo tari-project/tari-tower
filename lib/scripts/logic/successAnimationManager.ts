@@ -1,7 +1,7 @@
 import math from '../utils/math';
 
-import { completeAnimationEndedSignal, stateSignal } from './signals';
-import { AnimationResult, AnimationStatus, SuccessLevel } from '../../types/stateManager';
+import { completeAnimationEndedSignal, winAnimationSignal } from './signals';
+import { SuccessLevel } from '../../types/stateManager';
 
 let currentAnimationStyle: SuccessLevel | null;
 let successRatio = 0;
@@ -16,8 +16,8 @@ let floatingCubesDisplacement = 1;
 
 const SuccessAnimationManager = () => {
 	function init() {
-		stateSignal.add((status, result, completeAnimationLevel) => {
-			if (status === AnimationStatus.RESULT && (result === AnimationResult.COMPLETED || result === AnimationResult.REPLAY)) {
+		winAnimationSignal.add((completeAnimationLevel) => {
+			if (completeAnimationLevel) {
 				_triggerNewAnimation(completeAnimationLevel);
 			}
 		});

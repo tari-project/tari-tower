@@ -9,6 +9,7 @@ import LOSE_ANIMATION from 'public/assets/LOSE_ANIMATION.buf?url&inline';
 import gobo from 'public/assets/gobo.jpg';
 import LDR_RGB1_0 from 'public/assets/LDR_RGB1_0.png';
 import matcap_gold from 'public/assets/matcap_gold.jpg';
+import { logError } from '../utils/logger';
 
 interface LoaderItems {
 	list: (() => void | Promise<void>)[];
@@ -80,9 +81,9 @@ const Loader = () => {
 				} catch (error) {
 					attempts++;
 					if (attempts >= maxAttempts) {
-						console.error(`Tower animation | error loading buffer: ${file} after ${maxAttempts} attempts`, error);
+						logError(`Failed to load buffer: ${file} after ${maxAttempts} attempts`, error);
 					} else {
-						console.warn(`Tower animation | error loading buffer: ${file}, attempt ${attempts}/${maxAttempts}, retrying...`, error);
+						logError(`Failed to load buffer: ${file}, attempt ${attempts}/${maxAttempts}, retrying...`, error);
 						await new Promise((resolve) => setTimeout(resolve, 100));
 					}
 				}
@@ -123,7 +124,7 @@ const Loader = () => {
 					_onLoad();
 				},
 				undefined,
-				(error) => console.error(`Tower animation | error loading texture: ${file}`, error),
+				(error) => logError(`Failed to load texture: ${file}`, error),
 			);
 		});
 	}

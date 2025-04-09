@@ -1,7 +1,8 @@
 import { properties } from '../core/properties';
 import settings from '../core/settings';
-import { gameEndedSignal, stateSignal } from './signals';
+import { gameEndedSignal, stateSignal, winAnimationSignal } from './signals';
 import { AnimationResult, AnimationStatus, QueueItem, StatusManagerState, SuccessLevel } from '../../types/stateManager';
+import { logInfo, logWarn } from '../utils/logger';
 
 export const PREVENT_CYCLE_STATES = [AnimationStatus.NOT_STARTED, AnimationStatus.RESTART_ANIMATION, AnimationStatus.RESTART, AnimationStatus.STARTED];
 export const resetCycleResults = [AnimationResult.FAILED, AnimationResult.COMPLETED];
@@ -27,7 +28,6 @@ interface QueueArgs {
 
 let status: AnimationStatus = AnimationStatus.NOT_STARTED;
 let result: AnimationResult = AnimationResult.NONE;
-
 let statusUpdateQueue: StatusManagerState['statusUpdateQueue'] = [];
 const MAX_QUEUE_LENGTH = 7; // amount of statuses
 
@@ -38,7 +38,7 @@ const StateManager = () => {
 
 	function updateAfterCycle() {
 		if (properties.errorBlock) {
-			console.log(
+			logInfo(
 				'errorBlock in updateAfterCycle | ',
 				`falling: ${properties.errorBlock?.isErrorBlockFalling}, lifecycle: ${properties.errorBlock?.errorLifeCycle}/${properties.errorBlockMaxLifeCycle}`,
 			);
@@ -53,10 +53,7 @@ const StateManager = () => {
 		}
 
 		if (statusUpdateQueue.length !== 0) {
-			console.log(
-				`statusUpdateQueue ${statusUpdateQueue.length}:`,
-				statusUpdateQueue.map((q) => q.status),
-			);
+			logInfo(`statusUpdateQueue (${statusUpdateQueue.length}):`, statusUpdateQueue.map((q) => q.status).join(' | '));
 			const callback = statusUpdateQueue.shift()?.callback;
 			callback?.();
 		}
@@ -107,7 +104,6 @@ const StateManager = () => {
 		// Calculate if the transition is valid
 		const newStateIndex = statusOrder.indexOf(newStatus);
 		const isNextState = (statusIndex + 1) % statusOrder.length === newStateIndex;
-
 		if (isNextState) {
 			statusIndex = newStateIndex;
 			status = statusOrder[statusIndex];
@@ -125,6 +121,7 @@ const StateManager = () => {
 	}
 
 	function _updateStatusAndResult({ status: newStatus, result: newResult, animationStyle }: QueueArgs) {
+
 		if (_canUpdateStatus(newStatus, newResult)) {
 			if (properties.errorBlock && !properties.errorBlock.isErrorBlockFalling) {
 				properties.errorBlock.preventErrorBlockFallAnimation();
@@ -135,12 +132,17 @@ const StateManager = () => {
 			}
 
 			updateFlags();
-			stateSignal.dispatch(status, result, animationStyle);
+
+			if (animationStyle) {
+				winAnimationSignal.dispatch(animationStyle);
+				return;
+			}
+			stateSignal.dispatch(status, result);
 		}
 	}
 
 	function set(id: string, isReplay = false) {
-		console.log(`stateManager.set - id: ${id} ${isReplay ? 'replay' : ''}`);
+		logInfo(`stateManager.set - id: ${id} ${isReplay ? 'replay' : ''}`);
 		const actions = {
 			start: () => setStart(),
 			stop: () => setStop(),
@@ -167,20 +169,20 @@ const StateManager = () => {
 	function _queueStatusUpdate({ status, result = null, animationStyle = null }: QueueArgs) {
 		// Clear queue if it's getting too long
 		if (statusUpdateQueue.length >= MAX_QUEUE_LENGTH) {
-			console.warn('State update queue too long, clearing to prevent backlog');
+			logWarn('State update queue too long, clearing to prevent backlog');
 			statusUpdateQueue = [];
 		}
 
 		// Clear queue for result states to ensure immediate processing
-		if (result) {
+		if (result || status === AnimationStatus.STARTED) {
 			statusUpdateQueue = [];
 		}
 
 		const queueItem: QueueItem = result
 			? {
-					status,
-					callback: () => _updateStatusAndResult({ status, result, animationStyle }),
-			  }
+				status,
+				callback: () => _updateStatusAndResult({ status, result, animationStyle }),
+			}
 			: { status, callback: () => _canUpdateStatus(status) };
 
 		statusUpdateQueue.push(queueItem);
@@ -190,6 +192,7 @@ const StateManager = () => {
 		if (removeCanvas) {
 			status = AnimationStatus.NOT_STARTED;
 			result = AnimationResult.NONE;
+			statusIndex = 0;
 
 			setRemove(false);
 
@@ -263,7 +266,6 @@ const StateManager = () => {
 		removeCanvas = remove;
 	}
 	function setRestart() {
-		console.log('setRestart', removeCanvas);
 		if (removeCanvas) {
 			gameEndedSignal.dispatch();
 			return;
