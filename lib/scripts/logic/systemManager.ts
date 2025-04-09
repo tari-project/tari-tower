@@ -10,6 +10,7 @@ import { SystemManagerState } from '../../types/systemManager';
 import { AnimationStatus } from '../../types';
 import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
 import math from '../utils/math';
+import { log } from '../utils/logger';
 
 let firstStartAnimationRatio: SystemManagerState['firstStartAnimationRatio'] = 0;
 let blocks: SystemManagerState['blocks'] = [];
@@ -21,7 +22,6 @@ let previousSuccessBlocksAnimationRatio: SystemManagerState['previousSuccessBloc
 const SystemManager = () => {
 	function _spawnBlock() {
 		if (_shouldPreventSpawn()) {
-			console.log('prevent spawn was true');
 			return;
 		}
 		if (stateFlags.isSuccessResult || stateFlags.isReplayResult) {
@@ -85,6 +85,7 @@ const SystemManager = () => {
 
 	function _startNewCycle() {
 		sM.updateAfterCycle();
+
 		if (PREVENT_CYCLE_STATES.includes(stateStatus)) return;
 		if (lastSpawnedBlock) {
 			blocks = [lastSpawnedBlock, ...blocks];
@@ -147,7 +148,7 @@ const SystemManager = () => {
 		sM.reset();
 		_startNewCycle();
 
-		if (needsRestart && !isDestroy) {
+		if (needsRestart) {
 			sM.setStart();
 		}
 

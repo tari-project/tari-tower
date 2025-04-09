@@ -2,7 +2,7 @@ import TariTower from './tower.ts';
 import { stateManager, status } from './logic/stateManager.ts';
 import { gameEndedSignal } from './logic/signals.ts';
 import { properties } from './core/properties.ts';
-import setupLogger from './utils/logger.ts';
+import { log, logError } from './utils/logger.ts';
 
 const tower = TariTower();
 
@@ -42,12 +42,11 @@ async function initCallback() {
 		tower.onResize();
 		animate();
 	} catch (error) {
-		console.error('Error in initCallback:', error);
+		logError('initCallback:', error);
 	}
 }
 
 export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: string; offset?: number }) {
-	setupLogger();
 	properties.offsetX = offset;
 	properties.cameraOffsetX = properties.offsetX / window.innerWidth;
 	const canvasEl = document.getElementById(canvasId);
@@ -57,18 +56,18 @@ export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: s
 			await tower.preload({ canvasEl, initCallback });
 		}
 	} catch (e) {
-		console.error('loadTowerAnimation', e);
+		logError('loadTowerAnimation', e);
 	}
 }
 
 export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 	if (!document.getElementById(canvasId)) return;
-
+	log(`removeTowerAnimation intialted, current status: ${status}`);
 	if (status === 'not-started') {
 		gameEndedSignal.dispatch();
 	} else {
-		stateManager.set('stop');
 		stateManager.setRemove(true);
+		stateManager.set('stop');
 	}
 	time = 0;
 	lastRender = 0;

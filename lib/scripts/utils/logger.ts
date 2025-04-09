@@ -1,30 +1,26 @@
-// Override console functions
+// Add tower prefix to logs
 
-const originalConsole = {
-  log: console.log,
-  error: console.error,
-  info: console.info,
-  warn: console.warn,
-  debug: console.debug,
-};
+const getPrefix = (level) => `%c tari-tower ${level} | `;
+const COMMON_STYLE = 'font-weight:900; font-size:12px;';
 
-const getOptions = (args, level) => {
-  const message = `%c tari-tower ${level} | `;
+function logError(...args) {
+	return console.error(getPrefix('error'), `${COMMON_STYLE} color:red;`, ...args);
+}
 
-  return originalConsole[level](
-    message,
-    "font-weight:900; font-size:12px",
-    ...args
-  );
-};
+function logInfo(...args) {
+	return console.info(getPrefix('info'), `${COMMON_STYLE} color:rgb(105, 139, 219);`, ...args);
+}
 
-const setupLogger = () => {
-  // Override
-  console.log = (...args) => getOptions(args, "log");
-  console.info = (...args) => getOptions(args, "info");
-  console.error = (...args) => getOptions(args, "error");
-  console.warn = (...args) => getOptions(args, "warn");
-  console.debug = (...args) => getOptions(args, "debug");
-};
+function logWarn(...args) {
+	return console.warn(getPrefix('warn'), `${COMMON_STYLE} color:orange;`, ...args);
+}
 
-export default setupLogger;
+function logDebug(...args) {
+	return console.debug(getPrefix('debug'), `${COMMON_STYLE} color:green;`, ...args);
+}
+
+function log(...args) {
+	return console.log(getPrefix('log'), `${COMMON_STYLE} color:hotpink`, ...args);
+}
+
+export { logError, logInfo, logWarn, logDebug, log };
