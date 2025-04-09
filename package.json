@@ -1,12 +1,16 @@
 {
 	"name": "@tari-project/tari-tower",
 	"type": "module",
-	"version": "0.0.27",
+	"version": "0.0.28",
 	"private": false,
 	"description": "the tower animation used in Tari Universe",
 	"homepage": "https://github.com/tari-project/tari-tower#readme",
 	"bugs": {
 		"url": "https://github.com/tari-project/tari-tower/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/tari-project/tari-tower.git"
 	},
 	"author": "Tari Labs",
 	"license": "ISC",
@@ -17,16 +21,27 @@
 		"preview": "vite preview",
 		"lint": "eslint lib src"
 	},
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"files": [
+		"dist",
+		"public/assets"
+	],
+	"sideEffects": [
+		"**/*.css",
+		"**/*.glsl"
+	],
+	"peerDependencies": {
+		"three": "^0.175.0",
+		"min-signal": "^1.0.2"
+	},
 	"exports": {
 		".": {
 			"assets": "./public/assets/",
 			"types": "./dist/index.d.ts",
 			"default": "./dist/index.js"
 		}
-	},
-	"dependencies": {
-		"min-signal": "^1.0.2",
-		"three": "^0.175.0"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.19.0",

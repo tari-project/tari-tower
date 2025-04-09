@@ -33,7 +33,7 @@ export default defineConfig({
 			formats: ['es'],
 		},
 		rollupOptions: {
-			external: ['lil-gui'],
+			external: ['lil-gui', 'min-signal', 'three'],
 			input: resolve(__dirname, 'lib/index.ts'),
 			output: {
 				compact: true,
@@ -42,6 +42,8 @@ export default defineConfig({
 				interop: 'auto',
 				validate: true,
 				globals: {
+					'three': 'THREE',
+					'min-signal': 'minSignal',
 					'lil-gui': 'Lil-GUI',
 				},
 			},
