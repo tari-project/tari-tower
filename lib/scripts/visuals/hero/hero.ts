@@ -22,7 +22,6 @@ import { lightCameraHelperSignal, lightCameraUpdateSignal } from '../../logic/si
 import { InstancedBufferAttribute } from 'three';
 import { HeroSharedUniforms, HeroType } from '../../../types/hero';
 import { AnimationResult } from '../../../types';
-import { ASSETS_PATH } from '../../core/settings';
 
 const TOTAL_BLOCKS = 2 * TOTAL_TILES;
 const _v2_0 = new THREE.Vector2();
@@ -80,19 +79,19 @@ const Hero = () => {
 		heroState._blockRenderList = [...heroState._blockList];
 
 
-		loader.loadBuf(`${ASSETS_PATH}/BASE.buf`, (geometry) => {
+		loader.loadBuf(`BASE.buf`, (geometry) => {
 			_onBaseBlocksLoaded(geometry);
 		});
-		loader.loadBuf(`${ASSETS_PATH}/BOX.buf`, (geometry) => {
+		loader.loadBuf(`BOX.buf`, (geometry) => {
 			_onBoxLoaded(geometry);
 		});
-		loader.loadBuf(`${ASSETS_PATH}/LOSE_ANIMATION.buf`, (geometry) => {
+		loader.loadBuf(`LOSE_ANIMATION.buf`, (geometry) => {
 			const { position, orient } = geometry.attributes;
 			heroState.animationTotalFrames = position.count / TOTAL_TILES;
 			heroState.heroLoseAnimationPositionArray = position.array;
 			heroState.heroLoseAnimationOrientArray = orient.array;
 		});
-		loader.loadTexture(`${ASSETS_PATH}/gobo.jpg`, (texture) => {
+		loader.loadTexture(`gobo.jpg`, (texture) => {
 			texture.flipY = false;
 			texture.needsUpdate = true;
 			if (heroSharedUniforms) {

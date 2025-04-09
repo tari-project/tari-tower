@@ -16,17 +16,10 @@ export default defineConfig({
 	plugins: [
 		glsl(),
 		tsconfigPaths(),
-		dts({
-			include: ['lib'],
-			exclude: ['src'],
-			rollupTypes: true,
-			staticImport: true,
-			tsconfigPath: 'tsconfig.lib.json',
-		}),
 		eslint({ eslintOptions: { cache: false, fix: true } }),
+		dts({ include: ['lib'], exclude: ['src'], rollupTypes: true, tsconfigPath: resolve(__dirname, 'tsconfig.app.json') }),
 	],
 	build: {
-		emptyOutDir: true,
 		lib: {
 			entry: resolve(__dirname, 'lib/index.ts'),
 			name: '@tari-project/tari-tower',
@@ -36,11 +29,8 @@ export default defineConfig({
 			external: ['lil-gui', 'min-signal', 'three'],
 			input: resolve(__dirname, 'lib/index.ts'),
 			output: {
-				compact: true,
 				entryFileNames: '[name].js',
 				assetFileNames: 'assets/[name][extname]',
-				interop: 'auto',
-				validate: true,
 				globals: {
 					'three': 'THREE',
 					'min-signal': 'minSignal',

@@ -10,7 +10,6 @@ import frag from './coins.frag?raw';
 import fragDepth from './coinsDepth.frag?raw';
 import { floatingCoinsRatio, vortexCoinsRatio } from '../../logic/successAnimationManager';
 import { BufferGeometry, InstancedBufferGeometry, Mesh, ShaderMaterial } from 'three';
-import { ASSETS_PATH } from '../../core/settings';
 const coinContainer = new THREE.Object3D();
 
 const Coins = () => {
@@ -37,14 +36,14 @@ const Coins = () => {
 
 	async function preload() {
 
-		loader.loadTexture(`${ASSETS_PATH}/matcap_gold.jpg`, (texture) => {
+		loader.loadTexture(`matcap_gold.jpg`, (texture) => {
 			matcapTexture = texture;
 			matcapTexture.needsUpdate = true;
 		});
-		loader.loadBuf(`${ASSETS_PATH}/COIN.buf`, (geometry) => {
+		loader.loadBuf(`COIN.buf`, (geometry) => {
 			refGeometry = geometry;
 		});
-		loader.loadBuf(`${ASSETS_PATH}/COIN_PLACEMENT.buf`, (geometry) => {
+		loader.loadBuf(`COIN_PLACEMENT.buf`, (geometry) => {
 			const { position, aoN, aoP, curveu, orient } = geometry.attributes;
 			positionsArray = position.array;
 			aoNArray = aoN.array;
