@@ -184,10 +184,7 @@ const TariTower = () => {
 		freshCanvas.setAttribute('id', id);
 		canvas?.replaceWith(freshCanvas);
 
-		// Clean up Three.js resources
-		renderer.clear();
 		renderer.state.reset();
-		renderer.dispose();
 	}
 	return {
 		preload,
