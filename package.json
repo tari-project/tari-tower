@@ -21,8 +21,8 @@
 		"**/*.glsl"
 	],
 	"peerDependencies": {
-		"three": "^0.175.0",
-		"min-signal": "^1.0.2"
+		"min-signal": "^1.0.2",
+		"three": "^0.175.0"
 	},
 	"exports": {
 		".": {
@@ -52,5 +52,8 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"dependencies": {
+		"xstate": "^5.19.2"
 	}
 }
