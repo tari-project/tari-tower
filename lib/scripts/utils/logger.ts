@@ -1,26 +1,25 @@
 // Add tower prefix to logs
 
-const getTowerLogPrefix = (level) => `%c tari-tower ${level} | `;
-const COMMON_STYLE = 'font-weight:900; font-size:12px;';
+const getTowerLogPrefix = (level) => `tari-tower ${level} | `;
 
 function logError(...args) {
-	return console.error(getTowerLogPrefix('error'), `${COMMON_STYLE} color:red;`, ...args);
+	return console.error(getTowerLogPrefix('error'), ...args);
 }
 
 function logInfo(...args) {
-	return console.info(getTowerLogPrefix('info'), `${COMMON_STYLE} color:rgb(105, 139, 219);`, ...args);
+	return console.info(getTowerLogPrefix('info'), ...args);
 }
 
 function logWarn(...args) {
-	return console.warn(getTowerLogPrefix('warn'), `${COMMON_STYLE} color:orange;`, ...args);
+	return console.warn(getTowerLogPrefix('warn'), ...args);
 }
 
 function logDebug(...args) {
-	return console.debug(getTowerLogPrefix('debug'), `${COMMON_STYLE} color:green;`, ...args);
+	return console.debug(getTowerLogPrefix('debug'), ...args);
 }
 
 function log(...args) {
-	return console.log(getTowerLogPrefix('log'), `${COMMON_STYLE} color:hotpink`, ...args);
+	return console.log(getTowerLogPrefix('log'), ...args);
 }
 
 export { logError, logInfo, logWarn, logDebug, log, getTowerLogPrefix };

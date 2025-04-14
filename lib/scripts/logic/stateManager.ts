@@ -38,10 +38,12 @@ const StateManager = () => {
 
 	function updateAfterCycle() {
 		if (properties.errorBlock) {
+			if (properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 2) {
 			logInfo(
-				'errorBlock in updateAfterCycle | ',
+				'long block in updateAfterCycle | ',
 				`falling: ${properties.errorBlock?.isErrorBlockFalling}, lifecycle: ${properties.errorBlock?.errorLifeCycle}/${properties.errorBlockMaxLifeCycle}`,
 			);
+		}
 			if (properties.errorBlock.isErrorBlockFalling || properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 1) {
 				return;
 			}
