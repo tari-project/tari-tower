@@ -22,7 +22,8 @@
 	],
 	"peerDependencies": {
 		"min-signal": "^1.0.2",
-		"three": "^0.175.0"
+		"three": "^0.175.0",
+		"xstate": "^5.19.2"
 	},
 	"exports": {
 		".": {
@@ -52,8 +53,5 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"dependencies": {
-		"xstate": "^5.19.2"
 	}
 }
