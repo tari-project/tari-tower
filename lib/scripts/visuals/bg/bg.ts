@@ -74,9 +74,11 @@ const Background = () => {
 	}
 
 	function update(_dt: number) {
-		particles.material.uniforms.u_size.value = properties.particlesSize;
-		particles.material.uniforms.u_color.value.set(properties.particlesColor);
-		particles.material.uniforms.u_opacity.value = properties.particlesOpacity;
+		if (particles.material.uniforms) {
+			particles.material.uniforms.u_size.value = properties.particlesSize;
+			particles.material.uniforms.u_color.value.set(properties.particlesColor);
+			particles.material.uniforms.u_opacity.value = properties.particlesOpacity;
+		}
 	}
 
 	return { init, update };

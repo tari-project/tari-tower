@@ -18,7 +18,7 @@ const BlueNoise = () => {
 	const TEXTURE_SIZE = 128;
 
 	async function preInit() {
-		loader.loadTexture(`LDR_RGB1_0.png`, (texture) => {
+		await loader.loadTexture(`LDR_RGB1_0.png`, (texture) => {
 			texture.generateMipmaps = false;
 			texture.minFilter = texture.magFilter = THREE.NearestFilter;
 			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;

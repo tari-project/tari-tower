@@ -19,7 +19,6 @@ interface LoaderItems {
 }
 
 const Loader = () => {
-
 	let list: LoaderItems['list'] = [];
 	let loadedCount: LoaderItems['loadedCount'] = 0;
 	let onLoadCallback: LoaderItems['onLoadCallback'] = null;
@@ -35,7 +34,7 @@ const Loader = () => {
 		'matcap_gold.jpg': matcap_gold,
 	};
 
-	function loadBuf(assetName, cb) {
+	async function loadBuf(assetName, cb) {
 		const url = assets[assetName];
 
 		list.push(async () => {
@@ -83,7 +82,7 @@ const Loader = () => {
 					if (cb) cb(geometry);
 					_onLoad();
 
-					log(`Loaded ${assetName}`)
+					log(`Loaded ${assetName}`);
 					break;
 				} catch (error) {
 					attempts++;
@@ -116,7 +115,7 @@ const Loader = () => {
 		return outArr;
 	}
 
-	function loadTexture(assetName, cb) {
+	async function loadTexture(assetName, cb) {
 		const url = assets[assetName];
 
 		list.push(() => {
@@ -130,7 +129,7 @@ const Loader = () => {
 					texture.flipY = true;
 					if (cb) cb(texture);
 					_onLoad();
-					log(`Loaded ${assetName}`)
+					log(`Loaded ${assetName}`);
 				},
 				undefined,
 				(error) => logError(`Failed to load texture: ${assetName}`, error),
@@ -146,7 +145,6 @@ const Loader = () => {
 
 	function _onLoad() {
 		loadedCount++;
-
 		if (loadedCount === list.length) {
 			list = [];
 			onLoadCallback?.();
@@ -159,7 +157,6 @@ const Loader = () => {
 		start,
 		list,
 		loadedCount,
-		onLoadCallback,
 	};
 };
 

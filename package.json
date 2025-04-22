@@ -1,7 +1,7 @@
 {
 	"name": "@tari-project/tari-tower",
 	"type": "module",
-	"version": "0.0.31",
+	"version": "0.0.32",
 	"private": false,
 	"description": "the tower animation used in Tari Universe",
 	"homepage": "https://github.com/tari-project/tari-tower#readme",
