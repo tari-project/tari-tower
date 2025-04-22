@@ -78,26 +78,30 @@ const Hero = () => {
 		heroState._blockList = arr.map((_) => new HeroBlockCoordinates());
 		heroState._blockRenderList = [...heroState._blockList];
 
-
-		loader.loadBuf(`BASE.buf`, (geometry) => {
+		const base = await loader.loadBuf(`BASE.buf`, (geometry) => {
 			_onBaseBlocksLoaded(geometry);
 		});
-		loader.loadBuf(`BOX.buf`, (geometry) => {
+		const box = await loader.loadBuf(`BOX.buf`, (geometry) => {
 			_onBoxLoaded(geometry);
 		});
-		loader.loadBuf(`LOSE_ANIMATION.buf`, (geometry) => {
+		const lose = await loader.loadBuf(`LOSE_ANIMATION.buf`, (geometry) => {
 			const { position, orient } = geometry.attributes;
 			heroState.animationTotalFrames = position.count / TOTAL_TILES;
 			heroState.heroLoseAnimationPositionArray = position.array;
 			heroState.heroLoseAnimationOrientArray = orient.array;
 		});
-		loader.loadTexture(`gobo.jpg`, (texture) => {
+		const gobo = await loader.loadTexture(`gobo.jpg`, (texture) => {
 			texture.flipY = false;
 			texture.needsUpdate = true;
 			if (heroSharedUniforms) {
 				heroSharedUniforms.u_goboTexture.value = texture;
 			}
 		});
+		try {
+			await Promise.all([base, box, lose, gobo]);
+		} catch (e) {
+			console.error('hero preload error:', e);
+		}
 	}
 
 	function _onBaseBlocksLoaded(geometry) {

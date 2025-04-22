@@ -35,15 +35,14 @@ const Coins = () => {
 	};
 
 	async function preload() {
-
-		loader.loadTexture(`matcap_gold.jpg`, (texture) => {
+		const t = await loader.loadTexture(`matcap_gold.jpg`, (texture) => {
 			matcapTexture = texture;
 			matcapTexture.needsUpdate = true;
 		});
-		loader.loadBuf(`COIN.buf`, (geometry) => {
+		const b = await loader.loadBuf(`COIN.buf`, (geometry) => {
 			refGeometry = geometry;
 		});
-		loader.loadBuf(`COIN_PLACEMENT.buf`, (geometry) => {
+		const b1 = await loader.loadBuf(`COIN_PLACEMENT.buf`, (geometry) => {
 			const { position, aoN, aoP, curveu, orient } = geometry.attributes;
 			positionsArray = position.array;
 			aoNArray = aoN.array;
@@ -53,6 +52,11 @@ const Coins = () => {
 
 			coinsCount = position.count;
 		});
+		try {
+			await Promise.all([t, b, b1]);
+		} catch (err) {
+			console.error('coin preload error:', err);
+		}
 	}
 
 	function init() {
@@ -65,27 +69,29 @@ const Coins = () => {
 	}
 
 	function _setupGeometry() {
-		refGeometry.computeVertexNormals();
-		const geometry = new THREE.InstancedBufferGeometry();
-		geometry.index = refGeometry.index;
-		Object.entries(refGeometry.attributes).forEach(([id, attr]) => geometry.setAttribute(id, attr));
+		if (refGeometry) {
+			refGeometry.computeVertexNormals();
+			const geometry = new THREE.InstancedBufferGeometry();
+			geometry.index = refGeometry.index;
+			Object.entries(refGeometry.attributes).forEach(([id, attr]) => geometry.setAttribute(id, attr));
 
-		randsArray = new Float32Array(coinsCount * 3).map(() => Math.random() * 2 - 1);
+			randsArray = new Float32Array(coinsCount * 3).map(() => Math.random() * 2 - 1);
 
-		const instanceAttributes = [
-			['a_instancePosition', positionsArray, 3],
-			['a_instanceQuaternion', orientArray, 4],
-			['a_instanceCurveUV', curveuArray, 1],
-			['a_instanceAoN', aoNArray, 3],
-			['a_instanceAoP', aoPArray, 3],
-			['a_instanceRand', randsArray, 3],
-		];
+			const instanceAttributes = [
+				['a_instancePosition', positionsArray, 3],
+				['a_instanceQuaternion', orientArray, 4],
+				['a_instanceCurveUV', curveuArray, 1],
+				['a_instanceAoN', aoNArray, 3],
+				['a_instanceAoP', aoPArray, 3],
+				['a_instanceRand', randsArray, 3],
+			];
 
-		instanceAttributes.forEach(([name, array, itemSize]) => {
-			geometry.setAttribute(name, new THREE.InstancedBufferAttribute(array, itemSize));
-		});
+			instanceAttributes.forEach(([name, array, itemSize]) => {
+				geometry.setAttribute(name, new THREE.InstancedBufferAttribute(array, itemSize));
+			});
 
-		coinGeometry = geometry;
+			coinGeometry = geometry;
+		}
 	}
 
 	function _setupMaterial() {
