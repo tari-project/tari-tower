@@ -49,7 +49,7 @@ export const propertiesInitialState: PropertiesType = {
 	lightCameraNear: 3,
 	lightCameraFar: 16,
 	errorBlock: null,
-	errorBlockMaxLifeCycle: 4,
+	errorBlockMaxLifeCycle: 6,
 	minSpawnedBlocksForTheErrorBlock: maxFreeBlocksCount - 2,
 	bgColor1: '#ffffff',
 	bgColor2: '#d0d0d0',
