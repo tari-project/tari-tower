@@ -2,7 +2,8 @@ import { properties } from '../core/properties';
 import settings from '../core/settings';
 import { gameEndedSignal, stateSignal, winAnimationSignal } from './signals';
 import { AnimationResult, AnimationStatus, QueueItem, StatusManagerState, SuccessLevel } from '../../types/stateManager';
-import { logDebug, logInfo, logWarn } from '../utils/logger';
+import { logInfo, logWarn } from '../utils/logger';
+import { heroBlocks as blocksVisual } from '../visuals/hero/hero.ts';
 
 export const PREVENT_CYCLE_STATES = [AnimationStatus.NOT_STARTED, AnimationStatus.RESTART_ANIMATION, AnimationStatus.RESTART, AnimationStatus.STARTED];
 export const resetCycleResults = [AnimationResult.FAILED, AnimationResult.COMPLETED];
@@ -29,7 +30,7 @@ interface QueueArgs {
 let status: AnimationStatus = AnimationStatus.NOT_STARTED;
 let result: AnimationResult = AnimationResult.NONE;
 let statusUpdateQueue: StatusManagerState['statusUpdateQueue'] = [];
-const MAX_QUEUE_LENGTH = 7; // amount of statuses
+const MAX_QUEUE_LENGTH = 4;
 
 const StateManager = () => {
 	const statusOrder = Object.values(AnimationStatus);
@@ -37,7 +38,7 @@ const StateManager = () => {
 	let removeCanvas = false;
 
 	function updateAfterCycle() {
-		if (properties.errorBlock && properties.errorBlock.isErrorBlockFalling && !stateFlags.isResult) {
+		if (properties.errorBlock && properties.errorBlock.isErrorBlockFalling && status === AnimationStatus.FREE) {
 			logInfo(`long block lifecycle: ${properties.errorBlock?.errorLifeCycle}/${properties.errorBlockMaxLifeCycle}`);
 			return;
 		}
@@ -117,7 +118,6 @@ const StateManager = () => {
 
 	function _updateStatusAndResult({ status: newStatus, result: newResult, animationStyle }: QueueArgs) {
 		const canUpdateStatus = _canUpdateStatus(newStatus, newResult);
-		logDebug('canUpdateStatus', canUpdateStatus);
 		if (canUpdateStatus) {
 			if (properties.errorBlock && !properties.errorBlock.isErrorBlockFalling) {
 				properties.errorBlock.preventErrorBlockFallAnimation();
@@ -135,12 +135,12 @@ const StateManager = () => {
 			}
 			stateSignal.dispatch(status, result);
 		} else {
-			logWarn('Invalid state transition', status, newStatus, result, newResult);
+			logWarn('Invalid state transition in _updateStatusAndResult', status, newStatus, result, newResult);
 		}
 	}
 
 	function set(id: string, isReplay = false) {
-		logInfo(`stateManager.set - id: ${id} ${isReplay ? 'replay' : ''}`);
+		logInfo(`stateManager called with id: ${id} ${isReplay ? 'replay' : ''}`);
 		const actions = {
 			start: () => setStart(),
 			stop: () => setStop(),
@@ -167,11 +167,12 @@ const StateManager = () => {
 	function _queueStatusUpdate({ status, result = null, animationStyle = null }: QueueArgs) {
 		// Clear queue if it's getting too long
 		if (statusUpdateQueue.length >= MAX_QUEUE_LENGTH) {
-			logWarn('State update queue too long, clearing to prevent backlog');
+			logWarn(`State update queue too long (${statusUpdateQueue.length}), clearing to prevent backlog`);
 			statusUpdateQueue = [];
 			if (properties.errorBlock) {
 				logWarn(`Current block lifecycle: ${properties.errorBlock.errorLifeCycle}, resetting with queue clearing`);
-				properties.errorBlock.errorLifeCycle = 0;
+				properties.errorBlock?.reset(true);
+				blocksVisual.resetBlockFromLogicBlock(properties.errorBlock);
 			}
 		}
 
@@ -181,10 +182,6 @@ const StateManager = () => {
 					callback: () => _updateStatusAndResult({ status, result, animationStyle }),
 				}
 			: { status, callback: () => _canUpdateStatus(status) };
-
-		if (status === AnimationStatus.RESULT) {
-			logDebug('is result _queueStatusUpdate', result, queueItem);
-		}
 
 		statusUpdateQueue.push(queueItem);
 	}

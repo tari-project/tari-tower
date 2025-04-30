@@ -432,7 +432,7 @@ const Hero = () => {
 		}
 	}
 
-	function _updateLongBlockAnimation(logicBlock, block) {
+	function _updateFailAnimation(logicBlock, block, i) {
 		if (logicBlock && logicBlock.isErrorBlock && logicBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 1) {
 			const tile = logicBlock.currentTile;
 			const animationRatio = logicBlock.errorFallAnimationTime;
@@ -450,8 +450,6 @@ const Hero = () => {
 			block.update(properties.deltaTime);
 			block.addsFallAnimation(Math.max(0, animationRatio - 0.8));
 		}
-	}
-	function _updateFailAnimation(logicBlock, block, i) {
 		if (stateResult === AnimationResult.FAILED) {
 			if (logicBlock) {
 				const tile = logicBlock.currentTile;
@@ -543,7 +541,6 @@ const Hero = () => {
 			}
 
 			_updateFailAnimation(logicBlock, block, i);
-			_updateLongBlockAnimation(logicBlock, block);
 			_updateStopAnimation(block, i);
 			_updateFloatAnimation(logicBlock, block);
 		}
