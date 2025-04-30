@@ -134,8 +134,6 @@ const StateManager = () => {
 				return;
 			}
 			stateSignal.dispatch(status, result);
-		} else {
-			logWarn('Invalid state transition in _updateStatusAndResult', status, newStatus, result, newResult);
 		}
 	}
 
@@ -169,11 +167,12 @@ const StateManager = () => {
 		if (statusUpdateQueue.length >= MAX_QUEUE_LENGTH) {
 			logWarn(`State update queue too long (${statusUpdateQueue.length}), clearing to prevent backlog`);
 			statusUpdateQueue = [];
-			if (properties.errorBlock) {
-				logWarn(`Current block lifecycle: ${properties.errorBlock.errorLifeCycle}, resetting with queue clearing`);
-				properties.errorBlock?.reset(true);
-				blocksVisual.resetBlockFromLogicBlock(properties.errorBlock);
-			}
+		}
+
+		if (!!result && properties.errorBlock && properties.errorBlock.errorLifeCycle > properties.errorBlockMaxLifeCycle) {
+			logWarn(`Long block lifecycle (${properties.errorBlock.errorLifeCycle}) exceeded max, resetting in queue update`);
+			properties.errorBlock?.reset(true);
+			blocksVisual.resetBlockFromLogicBlock(properties.errorBlock);
 		}
 
 		const queueItem: QueueItem = result

@@ -78,19 +78,19 @@ const Hero = () => {
 		heroState._blockList = arr.map((_) => new HeroBlockCoordinates());
 		heroState._blockRenderList = [...heroState._blockList];
 
-		const base = await loader.loadBuf(`BASE.buf`, (geometry) => {
+		const base = await loader.loadBuf(`buf_base`, (geometry) => {
 			_onBaseBlocksLoaded(geometry);
 		});
-		const box = await loader.loadBuf(`BOX.buf`, (geometry) => {
+		const box = await loader.loadBuf(`buf_box`, (geometry) => {
 			_onBoxLoaded(geometry);
 		});
-		const lose = await loader.loadBuf(`LOSE_ANIMATION.buf`, (geometry) => {
+		const lose = await loader.loadBuf(`buf_lose`, (geometry) => {
 			const { position, orient } = geometry.attributes;
 			heroState.animationTotalFrames = position.count / TOTAL_TILES;
 			heroState.heroLoseAnimationPositionArray = position.array;
 			heroState.heroLoseAnimationOrientArray = orient.array;
 		});
-		const gobo = await loader.loadTexture(`gobo.jpg`, (texture) => {
+		const gobo = await loader.loadTexture(`gobo`, (texture) => {
 			texture.flipY = false;
 			texture.needsUpdate = true;
 			if (heroSharedUniforms) {
