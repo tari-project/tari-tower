@@ -14,8 +14,12 @@ function logWarn(...args) {
 	return console.warn(getTowerLogPrefix('warn'), ...args);
 }
 
+function logDebug(...args) {
+	return console.debug(getTowerLogPrefix('debug'), ...args);
+}
+
 function log(...args) {
 	return console.log(getTowerLogPrefix('log'), ...args);
 }
 
-export { logError, logInfo, logWarn, log, getTowerLogPrefix };
+export { logError, logInfo, logWarn, logDebug, log, getTowerLogPrefix };

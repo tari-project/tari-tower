@@ -1,5 +1,3 @@
-
-
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
@@ -20,6 +18,7 @@ export default defineConfig({
 		dts({ include: ['lib'], exclude: ['src'], rollupTypes: true, tsconfigPath: resolve(__dirname, 'tsconfig.app.json') }),
 	],
 	build: {
+		emptyOutDir: true,
 		lib: {
 			entry: resolve(__dirname, 'lib/index.ts'),
 			name: '@tari-project/tari-tower',

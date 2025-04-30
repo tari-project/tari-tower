@@ -2,7 +2,7 @@ import { properties } from '../core/properties';
 import settings from '../core/settings';
 import { gameEndedSignal, stateSignal, winAnimationSignal } from './signals';
 import { AnimationResult, AnimationStatus, QueueItem, StatusManagerState, SuccessLevel } from '../../types/stateManager';
-import { logInfo, logWarn } from '../utils/logger';
+import { logDebug, logInfo, logWarn } from '../utils/logger';
 
 export const PREVENT_CYCLE_STATES = [AnimationStatus.NOT_STARTED, AnimationStatus.RESTART_ANIMATION, AnimationStatus.RESTART, AnimationStatus.STARTED];
 export const resetCycleResults = [AnimationResult.FAILED, AnimationResult.COMPLETED];
@@ -37,7 +37,7 @@ const StateManager = () => {
 	let removeCanvas = false;
 
 	function updateAfterCycle() {
-		if (properties.errorBlock && properties.errorBlock.isErrorBlockFalling) {
+		if (properties.errorBlock && properties.errorBlock.isErrorBlockFalling && !stateFlags.isResult) {
 			logInfo(`long block lifecycle: ${properties.errorBlock?.errorLifeCycle}/${properties.errorBlockMaxLifeCycle}`);
 			return;
 		}
@@ -116,7 +116,9 @@ const StateManager = () => {
 	}
 
 	function _updateStatusAndResult({ status: newStatus, result: newResult, animationStyle }: QueueArgs) {
-		if (_canUpdateStatus(newStatus, newResult)) {
+		const canUpdateStatus = _canUpdateStatus(newStatus, newResult);
+		logDebug('canUpdateStatus', canUpdateStatus);
+		if (canUpdateStatus) {
 			if (properties.errorBlock && !properties.errorBlock.isErrorBlockFalling) {
 				properties.errorBlock.preventErrorBlockFallAnimation();
 				properties.errorBlock = null;
@@ -132,6 +134,8 @@ const StateManager = () => {
 				return;
 			}
 			stateSignal.dispatch(status, result);
+		} else {
+			logWarn('Invalid state transition', status, newStatus, result, newResult);
 		}
 	}
 
@@ -165,11 +169,10 @@ const StateManager = () => {
 		if (statusUpdateQueue.length >= MAX_QUEUE_LENGTH) {
 			logWarn('State update queue too long, clearing to prevent backlog');
 			statusUpdateQueue = [];
-		}
-
-		// Clear queue for result states to ensure immediate processing
-		if (result || status === AnimationStatus.STARTED) {
-			statusUpdateQueue = [];
+			if (properties.errorBlock) {
+				logWarn(`Current block lifecycle: ${properties.errorBlock.errorLifeCycle}, resetting with queue clearing`);
+				properties.errorBlock.errorLifeCycle = 0;
+			}
 		}
 
 		const queueItem: QueueItem = result
@@ -178,6 +181,10 @@ const StateManager = () => {
 					callback: () => _updateStatusAndResult({ status, result, animationStyle }),
 				}
 			: { status, callback: () => _canUpdateStatus(status) };
+
+		if (status === AnimationStatus.RESULT) {
+			logDebug('is result _queueStatusUpdate', result, queueItem);
+		}
 
 		statusUpdateQueue.push(queueItem);
 	}

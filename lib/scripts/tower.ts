@@ -113,7 +113,11 @@ const TariTower = () => {
 		try {
 			// first the logic
 			await game.init();
+		} catch (error) {
+			logError('init tower : ', error);
+		}
 
+		try {
 			// then the visuals
 			heroBlocks.init();
 			coins.init();
@@ -123,7 +127,7 @@ const TariTower = () => {
 			properties.scene.add(bgContainer);
 			properties.scene.add(heroContainer);
 		} catch (error) {
-			logError('init tower : ', error);
+			logError('visuals init : ', error);
 		}
 	}
 
@@ -183,7 +187,9 @@ const TariTower = () => {
 		const freshCanvas = document.createElement('canvas');
 		freshCanvas.setAttribute('id', id);
 		canvas?.replaceWith(freshCanvas);
-
+		// Clean up Three.js resources
+		renderer.dispose();
+		renderer.forceContextLoss();
 		renderer.state.reset();
 	}
 	return {
