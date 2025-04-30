@@ -104,7 +104,7 @@ export default class Block {
 			}
 
 			if (this.errorLifeCycle >= properties.errorBlockMaxLifeCycle + 3) {
-				this.reset(true);
+				this.errorLifeCycle = 0;
 			}
 		}
 

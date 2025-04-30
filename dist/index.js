@@ -643,7 +643,7 @@ class Lw {
   }
   resetAfterCycle() {
     var w;
-    this.hasBeenEvaluated = !1, this.hasAnimationEnded = !1, this.moveAnimationRatio = 0, this.easedAnimationRatio = 0, this.isMoving = !1, this.lifeCycle++, this.isErrorBlock && (this.skipFallAnimation || (this.errorLifeCycle++, this.isErrorBlockFalling = this.errorLifeCycle >= C.errorBlockMaxLifeCycle - 1), this.errorLifeCycle >= C.errorBlockMaxLifeCycle + 3 && this.reset(!0)), (w = this.currentTile) != null && w.isBorder && !C.errorBlock && Math.random() < 0.5 && C.activeBlocksCount >= C.minSpawnedBlocksForTheErrorBlock && K.isFree && (C.errorBlock = this, this.isErrorBlock = !0), this._setNewEasingFunction(), this.updateTile();
+    this.hasBeenEvaluated = !1, this.hasAnimationEnded = !1, this.moveAnimationRatio = 0, this.easedAnimationRatio = 0, this.isMoving = !1, this.lifeCycle++, this.isErrorBlock && (this.skipFallAnimation || (this.errorLifeCycle++, this.isErrorBlockFalling = this.errorLifeCycle >= C.errorBlockMaxLifeCycle - 1), this.errorLifeCycle >= C.errorBlockMaxLifeCycle + 3 && (this.errorLifeCycle = 0)), (w = this.currentTile) != null && w.isBorder && !C.errorBlock && Math.random() < 0.5 && C.activeBlocksCount >= C.minSpawnedBlocksForTheErrorBlock && K.isFree && (C.errorBlock = this, this.isErrorBlock = !0), this._setNewEasingFunction(), this.updateTile();
   }
   reset(w = !1) {
     var v, A;
