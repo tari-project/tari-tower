@@ -29,7 +29,7 @@ interface QueueArgs {
 let status: AnimationStatus = AnimationStatus.NOT_STARTED;
 let result: AnimationResult = AnimationResult.NONE;
 let statusUpdateQueue: StatusManagerState['statusUpdateQueue'] = [];
-const MAX_QUEUE_LENGTH = 7; // number of statuses
+const MAX_QUEUE_LENGTH = 7; // amount of statuses
 
 const StateManager = () => {
 	const statusOrder = Object.values(AnimationStatus);
@@ -37,13 +37,9 @@ const StateManager = () => {
 	let removeCanvas = false;
 
 	function updateAfterCycle() {
-		if (properties.errorBlock) {
-			if (properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 2) {
-				logInfo('long block in updateAfterCycle | ', `lifecycle: ${properties.errorBlock?.errorLifeCycle}/${properties.errorBlockMaxLifeCycle}`);
-			}
-			if (properties.errorBlock.isErrorBlockFalling) {
-				return;
-			}
+		if (properties.errorBlock && properties.errorBlock.isErrorBlockFalling) {
+			logInfo(`long block lifecycle: ${properties.errorBlock?.errorLifeCycle}/${properties.errorBlockMaxLifeCycle}`);
+			return;
 		}
 		if (stateFlags.isStart) {
 			setFree();
@@ -52,7 +48,7 @@ const StateManager = () => {
 		}
 
 		if (statusUpdateQueue.length !== 0) {
-			logInfo(`statusUpdateQueue (${statusUpdateQueue.length}):`, statusUpdateQueue.map((q) => q.status).join(' | '));
+			logInfo(`queue (${statusUpdateQueue.length}):`, statusUpdateQueue.map((q) => q.status).join(' | '));
 			const callback = statusUpdateQueue.shift()?.callback;
 			callback?.();
 		}

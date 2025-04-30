@@ -189,8 +189,12 @@ const p8 = 7, X8 = () => {
   let w = 0, v = !1;
   function A() {
     var f, s;
-    if (!(C.errorBlock && (C.errorBlock.errorLifeCycle >= C.errorBlockMaxLifeCycle - 2 && vw("long block in updateAfterCycle | ", `lifecycle: ${(f = C.errorBlock) == null ? void 0 : f.errorLifeCycle}/${C.errorBlockMaxLifeCycle}`), C.errorBlock.isErrorBlockFalling)) && (K.isStart ? t() : K.isResult && e(), DA.length !== 0)) {
-      vw(`statusUpdateQueue (${DA.length}):`, DA.map((X) => X.status).join(" | "));
+    if (C.errorBlock && C.errorBlock.isErrorBlockFalling) {
+      vw(`long block lifecycle: ${(f = C.errorBlock) == null ? void 0 : f.errorLifeCycle}/${C.errorBlockMaxLifeCycle}`);
+      return;
+    }
+    if (K.isStart ? t() : K.isResult && e(), DA.length !== 0) {
+      vw(`queue (${DA.length}):`, DA.map((X) => X.status).join(" | "));
       const k = (s = DA.shift()) == null ? void 0 : s.callback;
       k == null || k();
     }
