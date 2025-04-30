@@ -180,13 +180,13 @@ const TariTower = () => {
 	}
 
 	function destroy() {
+		if (!canvas || !canvas?.id) return;
 		properties.showVisual = false;
 		game.resetPostDestroy();
 
-		const id = canvas?.id || 'canvas_id';
 		const freshCanvas = document.createElement('canvas');
-		freshCanvas.setAttribute('id', id);
-		canvas?.replaceWith(freshCanvas);
+		freshCanvas.setAttribute('id', canvas.id);
+		canvas.replaceWith(freshCanvas);
 		// Clean up Three.js resources
 		renderer.dispose();
 		renderer.forceContextLoss();

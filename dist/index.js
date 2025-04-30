@@ -190,12 +190,12 @@ const u8 = "data:application/octet-stream;base64,jAEAAHsidmVydGV4Q291bnQiOjQ0NDQ
       for (; U < a; )
         try {
           const x = await (await fetch(T)).arrayBuffer(), t = new Uint32Array(x, 0, 1)[0], e = JSON.parse(new TextDecoder().decode(new Uint8Array(x, 4, t))), { vertexCount: E, indexCount: H, attributes: Q } = e;
-          let P = 4 + t;
+          let D = 4 + t;
           const r = new z.BufferGeometry(), n = {};
           Q.forEach((m) => {
-            const { id: O, componentSize: K, storageType: X, needsPack: Y, packedComponents: tA } = m, fA = O === "indices" ? H : E, lA = window[X], kA = new lA(x, P, fA * K), Mw = lA.BYTES_PER_ELEMENT;
+            const { id: O, componentSize: K, storageType: X, needsPack: Y, packedComponents: tA } = m, fA = O === "indices" ? H : E, lA = window[X], kA = new lA(x, D, fA * K), Mw = lA.BYTES_PER_ELEMENT;
             let eA;
-            Y ? eA = v(kA, fA, K, tA, X) : (n[O] = P, eA = kA), O === "indices" ? r.setIndex(new z.BufferAttribute(eA, 1)) : r.setAttribute(O, new z.BufferAttribute(eA, K)), P += fA * K * Mw;
+            Y ? eA = v(kA, fA, K, tA, X) : (n[O] = D, eA = kA), O === "indices" ? r.setIndex(new z.BufferAttribute(eA, 1)) : r.setAttribute(O, new z.BufferAttribute(eA, K)), D += fA * K * Mw;
           }), I && I(r), i(), rw(`Loaded ${c}`);
           break;
         } catch (g) {
@@ -205,10 +205,10 @@ const u8 = "data:application/octet-stream;base64,jAEAAHsidmVydGV4Q291bnQiOjQ0NDQ
   }
   function v(c, I, T, U, a) {
     const g = U.length, x = a.indexOf("Int") === 0, t = 1 << c.BYTES_PER_ELEMENT * 8, e = x ? t * 0.5 : 0, E = 1 / t, H = new Float32Array(I * T);
-    for (let Q = 0, P = 0; Q < I; Q++)
+    for (let Q = 0, D = 0; Q < I; Q++)
       for (let r = 0; r < g; r++) {
         const { delta: n, from: m } = U[r];
-        H[P] = (c[P] + e) * E * n + m, P++;
+        H[D] = (c[D] + e) * E * n + m, D++;
       }
     return H;
   }
@@ -1116,21 +1116,21 @@ const hA = 2 * _, V = new z.Vector2(), Aw = new z.Vector2(), nA = new z.Vector3(
 }, BP = () => {
   async function B() {
     const t = Array.from({ length: hA });
-    M._blockList = t.map((P) => new QP()), M._blockRenderList = [...M._blockList];
-    const e = await MA.loadBuf("buf_base", (P) => {
-      w(P);
-    }), E = await MA.loadBuf("buf_box", (P) => {
-      o(P);
-    }), H = await MA.loadBuf("buf_lose", (P) => {
-      const { position: r, orient: n } = P.attributes;
+    M._blockList = t.map((D) => new QP()), M._blockRenderList = [...M._blockList];
+    const e = await MA.loadBuf("buf_base", (D) => {
+      w(D);
+    }), E = await MA.loadBuf("buf_box", (D) => {
+      o(D);
+    }), H = await MA.loadBuf("buf_lose", (D) => {
+      const { position: r, orient: n } = D.attributes;
       M.animationTotalFrames = r.count / _, M.heroLoseAnimationPositionArray = r.array, M.heroLoseAnimationOrientArray = n.array;
-    }), Q = await MA.loadTexture("gobo", (P) => {
-      P.flipY = !1, P.needsUpdate = !0, q && (q.u_goboTexture.value = P);
+    }), Q = await MA.loadTexture("gobo", (D) => {
+      D.flipY = !1, D.needsUpdate = !0, q && (q.u_goboTexture.value = D);
     });
     try {
       await Promise.all([e, E, H, Q]);
-    } catch (P) {
-      console.error("hero preload error:", P);
+    } catch (D) {
+      console.error("hero preload error:", D);
     }
   }
   function w(t) {
@@ -1164,9 +1164,9 @@ const hA = 2 * _, V = new z.Vector2(), Aw = new z.Vector2(), nA = new z.Vector3(
     e.index = t.index, Object.keys(t.attributes).forEach((Q) => {
       e.setAttribute(Q, t.attributes[Q]);
     }), e.instanceCount = hA;
-    const E = (Q, P) => {
-      const r = new Float32Array(hA * P);
-      return e.setAttribute(Q, new z.InstancedBufferAttribute(r, P, P !== 4, 1).setUsage(z.DynamicDrawUsage)), r;
+    const E = (Q, D) => {
+      const r = new Float32Array(hA * D);
+      return e.setAttribute(Q, new z.InstancedBufferAttribute(r, D, D !== 4, 1).setUsage(z.DynamicDrawUsage)), r;
     };
     M._instancePosArray = E("instancePos", 3), M._instanceOrientArray = E("instanceOrient", 4), M._instanceShowRatioArray = E("instanceShowRatio", 1), M._instanceSpinPivotArray = E("instanceSpinPivot", 3), M._instanceSpinOrientArray = E("instanceSpinOrient", 4), M._instanceColorArray = E("instanceColor", 3), M._instanceIsActiveArray = E("instanceIsActive", 1), M._instanceNextDirectionArray = E("instanceNextDirection", 2);
     const H = new z.ShaderMaterial({
@@ -1198,7 +1198,7 @@ const hA = 2 * _, V = new z.Vector2(), Aw = new z.Vector2(), nA = new z.Vector3(
     }), v();
     const t = new Float32Array(x8 * 4);
     for (let H = 0, Q = 0; H < QA; H++)
-      for (let P = 0; P < QA; P++, Q += 4)
+      for (let D = 0; D < QA; D++, Q += 4)
         t[Q] = 0, t[Q + 1] = 0, t[Q + 2] = 1, t[Q + 3] = 1;
     M.infoTexture = new z.DataTexture(t, QA, QA, z.RGBAFormat, z.FloatType), M.infoTextureLinear = new z.DataTexture(
       t,
@@ -1217,12 +1217,12 @@ const hA = 2 * _, V = new z.Vector2(), Aw = new z.Vector2(), nA = new z.Vector3(
   function v() {
     BA.forEach((t, e) => {
       t.forEach((E, H) => {
-        var P, r;
+        var D, r;
         const Q = e * d + H;
         E.loseAnimationPositionArray = new Float32Array(M.animationTotalFrames * 3), E.loseAnimationOrientArray = new Float32Array(M.animationTotalFrames * 4);
         for (let n = 0; n < M.animationTotalFrames; n++) {
           const m = (n * _ + Q) * 3, O = (n * _ + Q) * 4;
-          E.loseAnimationPositionArray.set(((P = M.heroLoseAnimationPositionArray) == null ? void 0 : P.subarray(m, m + 3)) || [], n * 3), E.loseAnimationOrientArray.set(((r = M.heroLoseAnimationOrientArray) == null ? void 0 : r.subarray(O, O + 4)) || [], n * 4);
+          E.loseAnimationPositionArray.set(((D = M.heroLoseAnimationPositionArray) == null ? void 0 : D.subarray(m, m + 3)) || [], n * 3), E.loseAnimationOrientArray.set(((r = M.heroLoseAnimationOrientArray) == null ? void 0 : r.subarray(O, O + 4)) || [], n * 4);
         }
       });
     });
@@ -1237,13 +1237,13 @@ const hA = 2 * _, V = new z.Vector2(), Aw = new z.Vector2(), nA = new z.Vector3(
     var e, E;
     Jw.set(C.mainColor), ww.set(C.successColor), ew.set(C.failColor), sA.set(C.neutralColor).convertSRGBToLinear(), oA.copy(Jw), W === l.FAILED && aA > 0 && oA.copy(ew), (W === l.COMPLETED || W === l.REPLAY) && (M.successColorRatio = Math.min(1, M.successColorRatio + 0.5 * t), oA.lerp(ww, M.successColorRatio)), W !== l.REPLAY && W !== l.COMPLETED && oA.lerp(sA, N.saturate(LA + WA)), oA.convertSRGBToLinear(), sA.convertSRGBToLinear(), ww.convertSRGBToLinear();
     for (let H = 0; H < hA; H++) {
-      const Q = h.filter((n) => n.id === H)[0], P = H < h.length + (p ? 1 : 0), r = P ? oA : sA;
-      if (P && (Q != null && Q.isErrorBlock)) {
+      const Q = h.filter((n) => n.id === H)[0], D = H < h.length + (p ? 1 : 0), r = D ? oA : sA;
+      if (D && (Q != null && Q.isErrorBlock)) {
         let n = N.saturate(0.5 * (1 - Math.cos(Q.errorPreFallAnimationTime)));
         Q.errorFallAnimationTime > 0 && (n = N.saturate(0.5 * (1 - Math.cos(14 * Q.errorFallAnimationTime)))), Pw.lerpColors(r, ew, n), (e = M._instanceColorArray) == null || e.set([Pw.r, Pw.g, Pw.b], H * 3);
       } else
         (E = M._instanceColorArray) == null || E.set([r.r, r.g, r.b], H * 3);
-      M._instanceIsActiveArray && (M._instanceIsActiveArray[H] = P ? 1 : 0);
+      M._instanceIsActiveArray && (M._instanceIsActiveArray[H] = D ? 1 : 0);
     }
     M._baseMesh && (M._baseMesh.material.uniforms.u_color.value.set(sA).convertSRGBToLinear(), M._baseMesh.material.uniforms.u_blocksColor.value.copy(oA), M._baseMesh.material.uniforms.u_successColor.value.copy(ww), M._baseMesh.material.uniforms.u_prevSuccessColor.value.set(sA).convertSRGBToLinear(), M._baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(oA.set(C.successColor), RA), M._baseMesh.material.uniforms.u_prevSuccessColor.value.convertSRGBToLinear());
   }
@@ -1251,8 +1251,8 @@ const hA = 2 * _, V = new z.Vector2(), Aw = new z.Vector2(), nA = new z.Vector3(
     BA.forEach((t) => {
       t.forEach((e) => {
         const E = e.id % d + 1, Q = ((Math.floor(e.id / d) + 1) * QA + E) * 4;
-        let P = 0.5 * bA * N.fit(jA, 0, 0.1, 1, 0);
-        P += (aA > 0 ? 1 : 0) * N.fit(WA, 0, 0.1, 1, 0), P += qA * N.fit(LA, 0, 0.1, 1, 0), P = Math.min(1, P), M.infoTexture && (M.infoTexture.image.data[Q] = e.activeRatio * (1 - P), M.infoTexture.image.data[Q + 1] = e.isOccupied || e.willBeOccupied ? 1 : 0, M.infoTexture.image.data[Q + 2] = e.isMain ? 1 : 0, M.infoTexture.image.data[Q + 3] = e.isBorder ? 1 : 0);
+        let D = 0.5 * bA * N.fit(jA, 0, 0.1, 1, 0);
+        D += (aA > 0 ? 1 : 0) * N.fit(WA, 0, 0.1, 1, 0), D += qA * N.fit(LA, 0, 0.1, 1, 0), D = Math.min(1, D), M.infoTexture && (M.infoTexture.image.data[Q] = e.activeRatio * (1 - D), M.infoTexture.image.data[Q + 1] = e.isOccupied || e.willBeOccupied ? 1 : 0, M.infoTexture.image.data[Q + 2] = e.isMain ? 1 : 0, M.infoTexture.image.data[Q + 3] = e.isBorder ? 1 : 0);
       });
     }), M.infoTexture && M.infoTextureLinear && (M.infoTexture.needsUpdate = !0, M.infoTextureLinear.needsUpdate = !0);
   }
@@ -1263,32 +1263,32 @@ const hA = 2 * _, V = new z.Vector2(), Aw = new z.Vector2(), nA = new z.Vector3(
       p.currentTile && E.boardPos.set((t = p.currentTile) == null ? void 0 : t.row, (e = p.currentTile) == null ? void 0 : e.col), E.showRatio = UA(N.saturate(p.spawnAnimationRatioUnclamped));
     }
     h.forEach((E) => {
-      var Q, P, r, n;
+      var Q, D, r, n;
       const H = M._blockList[E.id];
-      H && (H.showRatio = UA(N.saturate(E.spawnAnimationRatioUnclamped)), E.currentTile && H.boardPos.set((Q = E.currentTile) == null ? void 0 : Q.row, (P = E.currentTile) == null ? void 0 : P.col), E.targetTile && H.boardDir.set(E.targetTile.row - (((r = E.currentTile) == null ? void 0 : r.row) || 0), E.targetTile.col - (((n = E.currentTile) == null ? void 0 : n.col) || 0)), H.animation = E.hasAnimationEnded ? 0 : E.easedAnimationRatio);
+      H && (H.showRatio = UA(N.saturate(E.spawnAnimationRatioUnclamped)), E.currentTile && H.boardPos.set((Q = E.currentTile) == null ? void 0 : Q.row, (D = E.currentTile) == null ? void 0 : D.col), E.targetTile && H.boardDir.set(E.targetTile.row - (((r = E.currentTile) == null ? void 0 : r.row) || 0), E.targetTile.col - (((n = E.currentTile) == null ? void 0 : n.col) || 0)), H.animation = E.hasAnimationEnded ? 0 : E.easedAnimationRatio);
     });
   }
   function T(t) {
     var E, H;
     for (let Q = 0; Q < t; Q++) {
-      const P = M._blockRenderList[Q];
-      P.pos.toArray(M._instancePosArray || [], Q * 3), P.orient.toArray(M._instanceOrientArray || [], Q * 4), M._instanceShowRatioArray && (M._instanceShowRatioArray[Q] = KA.quartInOut(P.showRatio)), P.spinPivot.toArray(M._instanceSpinPivotArray || [], Q * 3), P.spinOrient.toArray(M._instanceSpinOrientArray || [], Q * 4), (E = M._instanceNextDirectionArray) == null || E.set([P.boardDir.x, P.boardDir.y], Q * 2);
+      const D = M._blockRenderList[Q];
+      D.pos.toArray(M._instancePosArray || [], Q * 3), D.orient.toArray(M._instanceOrientArray || [], Q * 4), M._instanceShowRatioArray && (M._instanceShowRatioArray[Q] = KA.quartInOut(D.showRatio)), D.spinPivot.toArray(M._instanceSpinPivotArray || [], Q * 3), D.spinOrient.toArray(M._instanceSpinOrientArray || [], Q * 4), (E = M._instanceNextDirectionArray) == null || E.set([D.boardDir.x, D.boardDir.y], Q * 2);
     }
     const e = (H = M._blocksMesh) == null ? void 0 : H.geometry;
     if (e) {
       for (const Q in e.attributes) {
-        const P = e.attributes[Q];
-        P.isBufferAttribute && (P.addUpdateRange(0, t * P.itemSize), P.needsUpdate = !0);
+        const D = e.attributes[Q];
+        D.isBufferAttribute && (D.addUpdateRange(0, t * D.itemSize), D.needsUpdate = !0);
       }
       e.instanceCount = t;
     }
   }
   function U(t, e) {
     if (W === l.STOP && e >= _) {
-      const E = e - _, H = E % d - y, Q = Math.floor(E / d) - y, P = vA.getTile(Q, H);
-      if (!P.isOccupied) {
-        const r = N.saturate(qA - P.randomDelay);
-        P.activeRatio = r, t.showRatio = UA(r), t.boardPos.set(Q, H);
+      const E = e - _, H = E % d - y, Q = Math.floor(E / d) - y, D = vA.getTile(Q, H);
+      if (!D.isOccupied) {
+        const r = N.saturate(qA - D.randomDelay);
+        D.activeRatio = r, t.showRatio = UA(r), t.boardPos.set(Q, H);
       }
     }
   }
@@ -1301,38 +1301,38 @@ const hA = 2 * _, V = new z.Vector2(), Aw = new z.Vector2(), nA = new z.Vector3(
       if (t) {
         const H = t.currentTile;
         if (aA > 0) {
-          const Q = Math.floor(aA * M.animationTotalFrames), P = Math.min(Q + 1, M.animationTotalFrames - 1), r = aA * M.animationTotalFrames - Q;
-          nA.fromArray(H.loseAnimationPositionArray, Q * 3), Yw.fromArray(H.loseAnimationPositionArray, P * 3), nA.lerp(Yw, r), nA.y *= 0.5, e.pos.set(nA.z, nA.y, -nA.x), fw.fromArray(H.loseAnimationOrientArray, Q * 4), Sw.fromArray(H.loseAnimationOrientArray, P * 4), fw.slerp(Sw, r), e.orient.copy(fw);
+          const Q = Math.floor(aA * M.animationTotalFrames), D = Math.min(Q + 1, M.animationTotalFrames - 1), r = aA * M.animationTotalFrames - Q;
+          nA.fromArray(H.loseAnimationPositionArray, Q * 3), Yw.fromArray(H.loseAnimationPositionArray, D * 3), nA.lerp(Yw, r), nA.y *= 0.5, e.pos.set(nA.z, nA.y, -nA.x), fw.fromArray(H.loseAnimationOrientArray, Q * 4), Sw.fromArray(H.loseAnimationOrientArray, D * 4), fw.slerp(Sw, r), e.orient.copy(fw);
         }
         if (xA > 0) {
           const Q = N.fit(xA, 0, 1, 0, 1, KA.sineOut);
           if (V.set(H.row, H.col), V.normalize(), V.multiplyScalar(0.1 * Q), e.pos.x += V.x, e.pos.z -= V.y, xA < 1) {
-            const P = Q * N.fit(xA, 0.5, 0.8, 1, 0);
-            V.set(t.randomVector.x, t.randomVector.y), V.normalize(), V.multiplyScalar(P), Aw.set(0, 0), Aw.addScaledVector(V, 0.08 * P * Math.sin(P * 80)), e.pos.x += Aw.x, e.pos.z += Aw.y;
+            const D = Q * N.fit(xA, 0.5, 0.8, 1, 0);
+            V.set(t.randomVector.x, t.randomVector.y), V.normalize(), V.multiplyScalar(D), Aw.set(0, 0), Aw.addScaledVector(V, 0.08 * D * Math.sin(D * 80)), e.pos.x += Aw.x, e.pos.z += Aw.y;
           }
         }
       }
       if (E >= _) {
-        const H = E - _, Q = H % d - y, P = Math.floor(H / d) - y, r = vA.getTile(P, Q), n = N.saturate(Cw - r.randomDelay);
-        r.isOccupied || (r.activeRatio = n), e.showRatio = UA(n), e.boardPos.set(P, Q);
+        const H = E - _, Q = H % d - y, D = Math.floor(H / d) - y, r = vA.getTile(D, Q), n = N.saturate(Cw - r.randomDelay);
+        r.isOccupied || (r.activeRatio = n), e.showRatio = UA(n), e.boardPos.set(D, Q);
       }
     }
   }
   function g(t, e) {
     if ((W === l.COMPLETED || W === l.REPLAY) && t) {
       const H = 0.1 * t.currentTile.randomDelay, Q = bA - H;
-      let P = N.fit(Q, 0, 0.5, 0, 1, (r) => 1 - Math.pow(1 - r, 5));
-      P = N.fit(Q, 0.7, 1, P, 0, (r) => Math.pow(r, 5)), e.pos.y += VA * P;
+      let D = N.fit(Q, 0, 0.5, 0, 1, (r) => 1 - Math.pow(1 - r, 5));
+      D = N.fit(Q, 0.7, 1, D, 0, (r) => Math.pow(r, 5)), e.pos.y += VA * D;
     }
   }
   function x(t) {
     I(), i(t);
     let e = 0;
-    for (let P = 0; P < hA; P++) {
-      const r = M._blockList[P];
+    for (let D = 0; D < hA; D++) {
+      const r = M._blockList[D];
       r.update(t);
-      const n = h.filter((m) => m.id === P)[0];
-      r.showRatio > 0 && (M._blockRenderList[e++] = r), a(n, r, P), U(r, P), g(n, r);
+      const n = h.filter((m) => m.id === D)[0];
+      r.showRatio > 0 && (M._blockRenderList[e++] = r), a(n, r, D), U(r, D), g(n, r);
     }
     c(), T(e);
     const E = Math.min(1, LA + WA + jA), H = KA.backOut(E, 3), Q = 1 - UA(ZA);
@@ -1438,7 +1438,7 @@ const oP = 4, vP = () => {
   }
   function T() {
     if (o) {
-      R = j.NOT_STARTED, W = l.NONE, w = 0, P(!1);
+      R = j.NOT_STARTED, W = l.NONE, w = 0, D(!1);
       return;
     }
     I({
@@ -1494,7 +1494,7 @@ const oP = 4, vP = () => {
   function Q() {
     I({ status: j.RESTART_ANIMATION });
   }
-  function P(m) {
+  function D(m) {
     o = m;
   }
   function r() {
@@ -1516,7 +1516,7 @@ const oP = 4, vP = () => {
     setStart: U,
     setRestartAnimation: Q,
     setRestart: r,
-    setRemove: P,
+    setRemove: D,
     statusIndex: w
   };
 }, L = vP(), _w = `uniform float u_time;
@@ -1765,7 +1765,7 @@ void main() {
     u_isFloating: { value: 1 }
   };
   async function x() {
-    const P = await MA.loadTexture("gold", (m) => {
+    const D = await MA.loadTexture("gold", (m) => {
       U = m, U.needsUpdate = !0;
     }), r = await MA.loadBuf("buf_coin", (m) => {
       B = m;
@@ -1774,7 +1774,7 @@ void main() {
       v = O.array, i = K.array, c = X.array, b = Y.array, f = tA.array, I = O.count;
     });
     try {
-      await Promise.all([P, r, n]);
+      await Promise.all([D, r, n]);
     } catch (m) {
       console.error("coin preload error:", m);
     }
@@ -1785,8 +1785,8 @@ void main() {
   function e() {
     if (B) {
       B.computeVertexNormals();
-      const P = new z.InstancedBufferGeometry();
-      P.index = B.index, Object.entries(B.attributes).forEach(([n, m]) => P.setAttribute(n, m)), a = new Float32Array(I * 3).map(() => Math.random() * 2 - 1), [
+      const D = new z.InstancedBufferGeometry();
+      D.index = B.index, Object.entries(B.attributes).forEach(([n, m]) => D.setAttribute(n, m)), a = new Float32Array(I * 3).map(() => Math.random() * 2 - 1), [
         ["a_instancePosition", v, 3],
         ["a_instanceQuaternion", f, 4],
         ["a_instanceCurveUV", b, 1],
@@ -1794,8 +1794,8 @@ void main() {
         ["a_instanceAoP", c, 3],
         ["a_instanceRand", a, 3]
       ].forEach(([n, m, O]) => {
-        P.setAttribute(n, new z.InstancedBufferAttribute(m, O));
-      }), o = P;
+        D.setAttribute(n, new z.InstancedBufferAttribute(m, O));
+      }), o = D;
     }
   }
   function E() {
@@ -1821,9 +1821,9 @@ void main() {
       defines: { IS_DEPTH: !0 }
     }));
   }
-  function Q(P) {
+  function Q(D) {
     const r = FA === 0;
-    T = r ? XA : FA, g.u_ratio.value = T, g.u_time.value += P, g.u_isFloating.value = r ? 1 : 0, w && (w.rotation.y = 0 * T, w.visible = T > 0 && T < 1);
+    T = r ? XA : FA, g.u_ratio.value = T, g.u_time.value += D, g.u_isFloating.value = r ? 1 : 0, w && (w.rotation.y = 0 * T, w.visible = T > 0 && T < 1);
   }
   return {
     preload: x,
@@ -1836,14 +1836,14 @@ class eP extends g8 {
     super(), o === void 0 && OA('THREE.OrbitControls: The second parameter "domElement" is now mandatory.'), o === document && cA('THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.'), this.object = w, this.domElement = o, this.domElement.style.touchAction = "none", this.enabled = !0, this.target = new zA(), this.minDistance = 0, this.maxDistance = 1 / 0, this.minZoom = 0, this.maxZoom = 1 / 0, this.minPolarAngle = Math.PI * 0.2, this.maxPolarAngle = Math.PI * 0.45, this.minAzimuthAngle = -1 / 0, this.maxAzimuthAngle = 1 / 0, this.enableDamping = !0, this.dampingFactor = 0.15, this.enableZoom = !1, this.zoomSpeed = 1, this.enableRotate = !0, this.rotateSpeed = 0.5, this.enablePan = !1, this.panSpeed = 1, this.screenSpacePanning = !0, this.autoRotate = !1, this.autoRotateSpeed = 2, this.keys = { LEFT: "ArrowLeft", UP: "ArrowUp", RIGHT: "ArrowRight", BOTTOM: "ArrowDown" }, this.mouseButtons = { LEFT: gA.ROTATE, MIDDLE: gA.DOLLY, RIGHT: gA.PAN }, this.touches = { ONE: mA.ROTATE, TWO: mA.DOLLY_PAN }, this.target0 = this.target.clone(), this.position0 = this.object.position.clone(), this.zoom0 = this.object.zoom, this.scale = 1, this.reset = function() {
       A.target.copy(A.target0), A.object.position.copy(A.position0), A.object.zoom = A.zoom0, A.scale = 1, A.object.updateProjectionMatrix(), A.dispatchEvent($w), A.update(), f = v.NONE;
     }, this.update = function() {
-      const D = new zA(), F = new uw().setFromUnitVectors(w.up, new zA(0, 1, 0)), G = F.clone().invert(), Z = new zA(), J = new uw(), IA = 2 * Math.PI;
+      const P = new zA(), F = new uw().setFromUnitVectors(w.up, new zA(0, 1, 0)), G = F.clone().invert(), Z = new zA(), J = new uw(), IA = 2 * Math.PI;
       return function() {
         const Kw = A.object.position;
-        D.copy(Kw).sub(A.target), D.applyQuaternion(F), i.setFromVector3(D), A.autoRotate && f === v.NONE && O(n()), A.enableDamping ? (i.theta += c.theta * A.dampingFactor, i.phi += c.phi * A.dampingFactor) : (i.theta += c.theta, i.phi += c.phi);
+        P.copy(Kw).sub(A.target), P.applyQuaternion(F), i.setFromVector3(P), A.autoRotate && f === v.NONE && O(n()), A.enableDamping ? (i.theta += c.theta * A.dampingFactor, i.phi += c.phi * A.dampingFactor) : (i.theta += c.theta, i.phi += c.phi);
         let wA = A.minAzimuthAngle, PA = A.maxAzimuthAngle;
         isFinite(wA) && isFinite(PA) && (wA < -Math.PI ? wA += IA : wA > Math.PI && (wA -= IA), PA < -Math.PI ? PA += IA : PA > Math.PI && (PA -= IA), wA <= PA ? i.theta = Math.max(wA, Math.min(PA, i.theta)) : i.theta = i.theta > (wA + PA) / 2 ? Math.max(wA, i.theta) : Math.min(PA, i.theta)), i.phi = Math.max(A.minPolarAngle, Math.min(A.maxPolarAngle, i.phi)), i.makeSafe();
         let hw = A.enableDamping ? (A.scale - 1) * A.dampingFactor + 1 : A.scale;
-        return i.radius *= hw, i.radius = Math.max(A.minDistance, Math.min(A.maxDistance, i.radius)), A.enableDamping === !0 ? A.target.addScaledVector(I, A.dampingFactor) : A.target.add(I), D.setFromSpherical(i), D.applyQuaternion(G), Kw.copy(A.target).add(D), A.object.lookAt(A.target), A.enableDamping === !0 ? (c.theta *= 1 - A.dampingFactor, c.phi *= 1 - A.dampingFactor, I.multiplyScalar(1 - A.dampingFactor)) : (c.set(0, 0, 0), I.set(0, 0, 0)), A.scale = A.scale / hw, T || Z.distanceToSquared(A.object.position) > b || 8 * (1 - J.dot(A.object.quaternion)) > b ? (A.dispatchEvent($w), Z.copy(A.object.position), J.copy(A.object.quaternion), T = !1, !0) : !1;
+        return i.radius *= hw, i.radius = Math.max(A.minDistance, Math.min(A.maxDistance, i.radius)), A.enableDamping === !0 ? A.target.addScaledVector(I, A.dampingFactor) : A.target.add(I), P.setFromSpherical(i), P.applyQuaternion(G), Kw.copy(A.target).add(P), A.object.lookAt(A.target), A.enableDamping === !0 ? (c.theta *= 1 - A.dampingFactor, c.phi *= 1 - A.dampingFactor, I.multiplyScalar(1 - A.dampingFactor)) : (c.set(0, 0, 0), I.set(0, 0, 0)), A.scale = A.scale / hw, T || Z.distanceToSquared(A.object.position) > b || 8 * (1 - J.dot(A.object.quaternion)) > b ? (A.dispatchEvent($w), Z.copy(A.object.position), J.copy(A.object.quaternion), T = !1, !0) : !1;
       };
     }();
     const A = this, v = {
@@ -1859,88 +1859,88 @@ class eP extends g8 {
     let f = v.NONE;
     const b = 1e-6, i = new pw(), c = new pw(), I = new zA();
     let T = !1;
-    const U = new AA(), a = new AA(), g = new AA(), x = new AA(), t = new AA(), e = new AA(), E = new AA(), H = new AA(), Q = new AA(), P = [], r = {};
+    const U = new AA(), a = new AA(), g = new AA(), x = new AA(), t = new AA(), e = new AA(), E = new AA(), H = new AA(), Q = new AA(), D = [], r = {};
     function n() {
       return 2 * Math.PI / 60 / 60 * A.autoRotateSpeed;
     }
     function m() {
       return Math.pow(0.95, A.zoomSpeed);
     }
-    function O(D) {
-      c.theta -= D;
+    function O(P) {
+      c.theta -= P;
     }
-    function K(D) {
-      c.phi -= D;
+    function K(P) {
+      c.phi -= P;
     }
     const X = function() {
-      const D = new zA();
+      const P = new zA();
       return function(G, Z) {
-        D.setFromMatrixColumn(Z, 0), D.multiplyScalar(-G), I.add(D);
+        P.setFromMatrixColumn(Z, 0), P.multiplyScalar(-G), I.add(P);
       };
     }(), Y = function() {
-      const D = new zA();
+      const P = new zA();
       return function(G, Z) {
-        A.screenSpacePanning === !0 ? D.setFromMatrixColumn(Z, 1) : (D.setFromMatrixColumn(Z, 0), D.crossVectors(A.object.up, D)), D.multiplyScalar(G), I.add(D);
+        A.screenSpacePanning === !0 ? P.setFromMatrixColumn(Z, 1) : (P.setFromMatrixColumn(Z, 0), P.crossVectors(A.object.up, P)), P.multiplyScalar(G), I.add(P);
       };
     }(), tA = function() {
-      const D = new zA();
+      const P = new zA();
       return function(G, Z) {
         const J = A.domElement;
         if (A.object.isPerspectiveCamera) {
           const IA = A.object.position;
-          D.copy(IA).sub(A.target);
-          let YA = D.length();
+          P.copy(IA).sub(A.target);
+          let YA = P.length();
           YA *= Math.tan(A.object.fov / 2 * Math.PI / 180), X(2 * G * YA / J.clientHeight, A.object.matrix), Y(2 * Z * YA / J.clientHeight, A.object.matrix);
         } else A.object.isOrthographicCamera ? (X(G * (A.object.right - A.object.left) / A.object.zoom / J.clientWidth, A.object.matrix), Y(Z * (A.object.top - A.object.bottom) / A.object.zoom / J.clientHeight, A.object.matrix)) : (OA("WARNING: OrbitControls.js encountered an unknown camera type - pan disabled."), A.enablePan = !1);
       };
     }();
-    function fA(D) {
-      A.object.isPerspectiveCamera ? A.scale /= D : A.object.isOrthographicCamera ? (A.object.zoom = Math.max(A.minZoom, Math.min(A.maxZoom, A.object.zoom * D)), A.object.updateProjectionMatrix(), T = !0) : (OA("WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled."), A.enableZoom = !1);
+    function fA(P) {
+      A.object.isPerspectiveCamera ? A.scale /= P : A.object.isOrthographicCamera ? (A.object.zoom = Math.max(A.minZoom, Math.min(A.maxZoom, A.object.zoom * P)), A.object.updateProjectionMatrix(), T = !0) : (OA("WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled."), A.enableZoom = !1);
     }
-    function lA(D) {
-      A.object.isPerspectiveCamera ? A.scale *= D : A.object.isOrthographicCamera ? (A.object.zoom = Math.max(A.minZoom, Math.min(A.maxZoom, A.object.zoom / D)), A.object.updateProjectionMatrix(), T = !0) : (OA("WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled."), A.enableZoom = !1);
+    function lA(P) {
+      A.object.isPerspectiveCamera ? A.scale *= P : A.object.isOrthographicCamera ? (A.object.zoom = Math.max(A.minZoom, Math.min(A.maxZoom, A.object.zoom / P)), A.object.updateProjectionMatrix(), T = !0) : (OA("WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled."), A.enableZoom = !1);
     }
-    function kA(D) {
-      U.set(D.clientX, D.clientY);
+    function kA(P) {
+      U.set(P.clientX, P.clientY);
     }
-    function Mw(D) {
-      E.set(D.clientX, D.clientY);
+    function Mw(P) {
+      E.set(P.clientX, P.clientY);
     }
-    function eA(D) {
-      x.set(D.clientX, D.clientY);
+    function eA(P) {
+      x.set(P.clientX, P.clientY);
     }
-    function Q8(D) {
-      a.set(D.clientX, D.clientY), g.subVectors(a, U).multiplyScalar(A.rotateSpeed);
+    function Q8(P) {
+      a.set(P.clientX, P.clientY), g.subVectors(a, U).multiplyScalar(A.rotateSpeed);
       const F = A.domElement;
       O(2 * Math.PI * g.x / F.clientHeight), K(2 * Math.PI * g.y / F.clientHeight), U.copy(a), A.update();
     }
-    function B8(D) {
-      H.set(D.clientX, D.clientY), Q.subVectors(H, E), Q.y > 0 ? fA(m()) : Q.y < 0 && lA(m()), E.copy(H), A.update();
+    function B8(P) {
+      H.set(P.clientX, P.clientY), Q.subVectors(H, E), Q.y > 0 ? fA(m()) : Q.y < 0 && lA(m()), E.copy(H), A.update();
     }
-    function M8(D) {
-      t.set(D.clientX, D.clientY), e.subVectors(t, x).multiplyScalar(A.panSpeed), tA(e.x, e.y), x.copy(t), A.update();
+    function M8(P) {
+      t.set(P.clientX, P.clientY), e.subVectors(t, x).multiplyScalar(A.panSpeed), tA(e.x, e.y), x.copy(t), A.update();
     }
-    function z8(D) {
-      D.deltaY < 0 ? lA(m()) : D.deltaY > 0 && fA(m()), A.update();
+    function z8(P) {
+      P.deltaY < 0 ? lA(m()) : P.deltaY > 0 && fA(m()), A.update();
     }
     function mw() {
-      if (P.length === 1)
-        U.set(P[0].pageX, P[0].pageY);
+      if (D.length === 1)
+        U.set(D[0].pageX, D[0].pageY);
       else {
-        const D = 0.5 * (P[0].pageX + P[1].pageX), F = 0.5 * (P[0].pageY + P[1].pageY);
-        U.set(D, F);
+        const P = 0.5 * (D[0].pageX + D[1].pageX), F = 0.5 * (D[0].pageY + D[1].pageY);
+        U.set(P, F);
       }
     }
     function Tw() {
-      if (P.length === 1)
-        x.set(P[0].pageX, P[0].pageY);
+      if (D.length === 1)
+        x.set(D[0].pageX, D[0].pageY);
       else {
-        const D = 0.5 * (P[0].pageX + P[1].pageX), F = 0.5 * (P[0].pageY + P[1].pageY);
-        x.set(D, F);
+        const P = 0.5 * (D[0].pageX + D[1].pageX), F = 0.5 * (D[0].pageY + D[1].pageY);
+        x.set(P, F);
       }
     }
     function nw() {
-      const D = P[0].pageX - P[1].pageX, F = P[0].pageY - P[1].pageY, G = Math.sqrt(D * D + F * F);
+      const P = D[0].pageX - D[1].pageX, F = D[0].pageY - D[1].pageY, G = Math.sqrt(P * P + F * F);
       E.set(0, G);
     }
     function o8() {
@@ -1949,51 +1949,51 @@ class eP extends g8 {
     function v8() {
       A.enableZoom && nw(), A.enableRotate && mw();
     }
-    function sw(D) {
-      if (P.length === 1)
-        a.set(D.pageX, D.pageY);
+    function sw(P) {
+      if (D.length === 1)
+        a.set(P.pageX, P.pageY);
       else {
-        const G = zw(D), Z = 0.5 * (D.pageX + G.x), J = 0.5 * (D.pageY + G.y);
+        const G = zw(P), Z = 0.5 * (P.pageX + G.x), J = 0.5 * (P.pageY + G.y);
         a.set(Z, J);
       }
       g.subVectors(a, U).multiplyScalar(A.rotateSpeed);
       const F = A.domElement;
       O(2 * Math.PI * g.x / F.clientHeight), K(2 * Math.PI * g.y / F.clientHeight), U.copy(a);
     }
-    function Uw(D) {
-      if (P.length === 1)
-        t.set(D.pageX, D.pageY);
+    function Uw(P) {
+      if (D.length === 1)
+        t.set(P.pageX, P.pageY);
       else {
-        const F = zw(D), G = 0.5 * (D.pageX + F.x), Z = 0.5 * (D.pageY + F.y);
+        const F = zw(P), G = 0.5 * (P.pageX + F.x), Z = 0.5 * (P.pageY + F.y);
         t.set(G, Z);
       }
       e.subVectors(t, x).multiplyScalar(A.panSpeed), tA(e.x, e.y), x.copy(t);
     }
-    function Nw(D) {
-      const F = zw(D), G = D.pageX - F.x, Z = D.pageY - F.y, J = Math.sqrt(G * G + Z * Z);
+    function Nw(P) {
+      const F = zw(P), G = P.pageX - F.x, Z = P.pageY - F.y, J = Math.sqrt(G * G + Z * Z);
       H.set(0, J), Q.set(0, Math.pow(H.y / E.y, A.zoomSpeed)), fA(Q.y), E.copy(H);
     }
-    function c8(D) {
-      A.enableZoom && Nw(D), A.enablePan && Uw(D);
+    function c8(P) {
+      A.enableZoom && Nw(P), A.enablePan && Uw(P);
     }
-    function t8(D) {
-      A.enableZoom && Nw(D), A.enableRotate && sw(D);
+    function t8(P) {
+      A.enableZoom && Nw(P), A.enableRotate && sw(P);
     }
-    function f8(D) {
-      A.enabled !== !1 && (P.length === 0 && (A.domElement.setPointerCapture(D.pointerId), A.domElement.addEventListener("pointermove", Ow), A.domElement.addEventListener("pointerup", xw)), E8(D), D.pointerType === "touch" ? i8(D) : e8(D));
+    function f8(P) {
+      A.enabled !== !1 && (D.length === 0 && (A.domElement.setPointerCapture(P.pointerId), A.domElement.addEventListener("pointermove", Ow), A.domElement.addEventListener("pointerup", xw)), E8(P), P.pointerType === "touch" ? i8(P) : e8(P));
     }
-    function Ow(D) {
-      A.enabled !== !1 && (D.pointerType === "touch" ? a8(D) : H8(D));
+    function Ow(P) {
+      A.enabled !== !1 && (P.pointerType === "touch" ? a8(P) : H8(P));
     }
-    function xw(D) {
-      lw(D), P.length === 0 && (A.domElement.releasePointerCapture(D.pointerId), A.domElement.removeEventListener("pointermove", Ow), A.domElement.removeEventListener("pointerup", xw)), A.dispatchEvent(A8), f = v.NONE;
+    function xw(P) {
+      lw(P), D.length === 0 && (A.domElement.releasePointerCapture(P.pointerId), A.domElement.removeEventListener("pointermove", Ow), A.domElement.removeEventListener("pointerup", xw)), A.dispatchEvent(A8), f = v.NONE;
     }
-    function bw(D) {
-      lw(D);
+    function bw(P) {
+      lw(P);
     }
-    function e8(D) {
+    function e8(P) {
       let F;
-      switch (D.button) {
+      switch (P.button) {
         case 0:
           F = A.mouseButtons.LEFT;
           break;
@@ -2009,24 +2009,24 @@ class eP extends g8 {
       switch (F) {
         case gA.DOLLY:
           if (A.enableZoom === !1) return;
-          Mw(D), f = v.DOLLY;
+          Mw(P), f = v.DOLLY;
           break;
         case gA.ROTATE:
-          if (D.ctrlKey || D.metaKey || D.shiftKey) {
+          if (P.ctrlKey || P.metaKey || P.shiftKey) {
             if (A.enablePan === !1) return;
-            eA(D), f = v.PAN;
+            eA(P), f = v.PAN;
           } else {
             if (A.enableRotate === !1) return;
-            kA(D), f = v.ROTATE;
+            kA(P), f = v.ROTATE;
           }
           break;
         case gA.PAN:
-          if (D.ctrlKey || D.metaKey || D.shiftKey) {
+          if (P.ctrlKey || P.metaKey || P.shiftKey) {
             if (A.enableRotate === !1) return;
-            kA(D), f = v.ROTATE;
+            kA(P), f = v.ROTATE;
           } else {
             if (A.enablePan === !1) return;
-            eA(D), f = v.PAN;
+            eA(P), f = v.PAN;
           }
           break;
         default:
@@ -2034,28 +2034,28 @@ class eP extends g8 {
       }
       f !== v.NONE && A.dispatchEvent(Hw);
     }
-    function H8(D) {
+    function H8(P) {
       if (A.enabled !== !1)
         switch (f) {
           case v.ROTATE:
             if (A.enableRotate === !1) return;
-            Q8(D);
+            Q8(P);
             break;
           case v.DOLLY:
             if (A.enableZoom === !1) return;
-            B8(D);
+            B8(P);
             break;
           case v.PAN:
             if (A.enablePan === !1) return;
-            M8(D);
+            M8(P);
             break;
         }
     }
-    function Fw(D) {
-      A.enabled === !1 || A.enableZoom === !1 || f !== v.NONE || (A.dispatchEvent(Hw), z8(D), A.dispatchEvent(A8));
+    function Fw(P) {
+      A.enabled === !1 || A.enableZoom === !1 || f !== v.NONE || (A.dispatchEvent(Hw), z8(P), A.dispatchEvent(A8));
     }
-    function i8(D) {
-      switch (kw(D), P.length) {
+    function i8(P) {
+      switch (kw(P), D.length) {
         case 1:
           switch (A.touches.ONE) {
             case mA.ROTATE:
@@ -2089,48 +2089,48 @@ class eP extends g8 {
       }
       f !== v.NONE && A.dispatchEvent(Hw);
     }
-    function a8(D) {
-      switch (kw(D), f) {
+    function a8(P) {
+      switch (kw(P), f) {
         case v.TOUCH_ROTATE:
           if (A.enableRotate === !1) return;
-          sw(D), A.update();
+          sw(P), A.update();
           break;
         case v.TOUCH_PAN:
           if (A.enablePan === !1) return;
-          Uw(D), A.update();
+          Uw(P), A.update();
           break;
         case v.TOUCH_DOLLY_PAN:
           if (A.enableZoom === !1 && A.enablePan === !1) return;
-          c8(D), A.update();
+          c8(P), A.update();
           break;
         case v.TOUCH_DOLLY_ROTATE:
           if (A.enableZoom === !1 && A.enableRotate === !1) return;
-          t8(D), A.update();
+          t8(P), A.update();
           break;
         default:
           f = v.NONE;
       }
     }
-    function jw(D) {
-      A.enabled !== !1 && (D.preventDefault(), A.domElement.removeEventListener("contextmenu", jw));
+    function jw(P) {
+      A.enabled !== !1 && (P.preventDefault(), A.domElement.removeEventListener("contextmenu", jw));
     }
-    function E8(D) {
-      P.push(D);
+    function E8(P) {
+      D.push(P);
     }
-    function lw(D) {
-      delete r[D.pointerId];
-      for (let F = 0; F < P.length; F++)
-        if (P[F].pointerId === D.pointerId) {
-          P.splice(F, 1);
+    function lw(P) {
+      delete r[P.pointerId];
+      for (let F = 0; F < D.length; F++)
+        if (D[F].pointerId === P.pointerId) {
+          D.splice(F, 1);
           return;
         }
     }
-    function kw(D) {
-      let F = r[D.pointerId];
-      F === void 0 && (F = new AA(), r[D.pointerId] = F), F.set(D.pageX, D.pageY);
+    function kw(P) {
+      let F = r[P.pointerId];
+      F === void 0 && (F = new AA(), r[P.pointerId] = F), F.set(P.pageX, P.pageY);
     }
-    function zw(D) {
-      const F = D.pointerId === P[0].pointerId ? P[1] : P[0];
+    function zw(P) {
+      const F = P.pointerId === D[0].pointerId ? D[1] : D[0];
       return r[F.pointerId];
     }
     A.domElement.addEventListener("contextmenu", jw), A.domElement.addEventListener("pointerdown", f8), A.domElement.addEventListener("pointercancel", bw), A.domElement.addEventListener("wheel", Fw, { passive: !1 }), this.update(), A.domElement.removeEventListener("pointercancel", bw), A.domElement.removeEventListener("wheel", Fw, { passive: !1 });
@@ -2361,25 +2361,25 @@ const IP = () => {
   async function U() {
     if (T) {
       if (T.shadowMap.enabled = !0, T.shadowMap.type = z.PCFShadowMap, C.sharedUniforms) {
-        const Q = C.sharedUniforms.u_bgColor1.value, P = C.sharedUniforms.u_bgColor2.value;
-        Q.set(C.bgColor1).convertSRGBToLinear(), P.set(C.bgColor2).convertSRGBToLinear();
+        const Q = C.sharedUniforms.u_bgColor1.value, D = C.sharedUniforms.u_bgColor2.value;
+        Q.set(C.bgColor1).convertSRGBToLinear(), D.set(C.bgColor2).convertSRGBToLinear();
       }
       T.setClearColor(C.bgColor1, 1);
     }
   }
-  function a(Q, P) {
-    C.viewportWidth = Q, C.viewportHeight = P, C.viewportResolution.set(Q, window.innerHeight), C.sharedUniforms.u_viewportResolution.value = C.viewportResolution;
-    let r = Q * iA.DPR, n = P * iA.DPR;
+  function a(Q, D) {
+    C.viewportWidth = Q, C.viewportHeight = D, C.viewportResolution.set(Q, window.innerHeight), C.sharedUniforms.u_viewportResolution.value = C.viewportResolution;
+    let r = Q * iA.DPR, n = D * iA.DPR;
     const m = r / n;
-    n * r > iA.MAX_PIXEL_COUNT && (n = Math.sqrt(iA.MAX_PIXEL_COUNT / m), r = Math.ceil(n * m), n = Math.ceil(n)), C.width = r, C.height = n, C.resolution.set(r, n), c.updateProjectionMatrix(), T == null || T.setSize(r, n), v && (v.style.width = Q + "px", v.style.height = P + "px");
+    n * r > iA.MAX_PIXEL_COUNT && (n = Math.sqrt(iA.MAX_PIXEL_COUNT / m), r = Math.ceil(n * m), n = Math.ceil(n)), C.width = r, C.height = n, C.resolution.set(r, n), c.updateProjectionMatrix(), T == null || T.setSize(r, n), v && (v.style.width = Q + "px", v.style.height = D + "px");
   }
   function g() {
     a(window.innerWidth, window.innerHeight);
   }
-  async function x({ canvasEl: Q, initCallback: P }) {
+  async function x({ canvasEl: Q, initCallback: D }) {
     v = Q, T = new z.WebGLRenderer({ ...N8, canvas: v }), P8.addOnce(() => {
       H();
-    }), await U(), await rA.preload(), await w.preInit(), await o.preload(), MA.start(P);
+    }), await U(), await rA.preload(), await w.preInit(), await o.preload(), MA.start(D);
   }
   async function t() {
     C.scene.add(c), c.position.fromArray(iA.DEFAULT_POSITION), c.updateProjectionMatrix(), I = c.clone(), v && (A = new eP(I, v), A.target0.fromArray(iA.DEFAULT_LOOKAT_POSITION), A.reset());
@@ -2403,7 +2403,7 @@ const IP = () => {
       return;
     }
     Q = Math.min(Q, 1 / 15), C.time += Q, C.deltaTime = Q, C.sharedUniforms && (C.sharedUniforms.u_time.value = C.time, C.sharedUniforms.u_deltaTime.value = Q);
-    const P = (window.innerWidth - C.cameraOffsetX) / window.innerHeight, r = 10, n = r * P;
+    const D = (window.innerWidth - C.cameraOffsetX) / window.innerHeight, r = 10, n = r * D;
     let m = 0;
     if (C.offsetX) {
       const X = C.offsetX / window.innerWidth * 100;
@@ -2413,9 +2413,10 @@ const IP = () => {
     c.left = O, c.right = K, c.top = r / 2, c.bottom = r / -2, c.updateProjectionMatrix(), A == null || A.update(), I == null || I.updateMatrix(), I == null || I.matrix.decompose(c.position, c.quaternion, c.scale), c.matrix.compose(c.position, c.quaternion, c.scale), w.update(Q), tw.update(Q), rA.update(Q), o.update(Q), B.update(Q), T == null || T.render(C.scene, c);
   }
   function H() {
+    if (!v || !(v != null && v.id)) return;
     C.showVisual = !1, tw.resetPostDestroy();
-    const Q = (v == null ? void 0 : v.id) || "canvas_id", P = document.createElement("canvas");
-    P.setAttribute("id", Q), v == null || v.replaceWith(P), T.dispose(), T.forceContextLoss(), T.state.reset();
+    const Q = document.createElement("canvas");
+    Q.setAttribute("id", v.id), v.replaceWith(Q), T.dispose(), T.forceContextLoss(), T.state.reset();
   }
   return {
     preload: x,
