@@ -97,9 +97,15 @@ export default class Block {
 		this.isMoving = false;
 		this.lifeCycle++;
 
-		if (this.isErrorBlock && !this.skipFallAnimation) {
-			this.errorLifeCycle++;
-			this.isErrorBlockFalling = this.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 1;
+		if (this.isErrorBlock) {
+			if (!this.skipFallAnimation) {
+				this.errorLifeCycle++;
+				this.isErrorBlockFalling = this.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 1;
+			}
+
+			if (this.errorLifeCycle >= properties.errorBlockMaxLifeCycle + 3) {
+				this.reset(true);
+			}
 		}
 
 		if (

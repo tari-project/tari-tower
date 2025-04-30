@@ -1,6 +1,6 @@
 // Add tower prefix to logs
-
-const getTowerLogPrefix = (level) => `tari-tower ${level} | `;
+const version = import.meta.env.VITE_TARI_TOWER_VERSION;
+const getTowerLogPrefix = (level) => `tower v${version} ${level} | `;
 
 function logError(...args) {
 	return console.error(getTowerLogPrefix('error'), ...args);
@@ -14,12 +14,8 @@ function logWarn(...args) {
 	return console.warn(getTowerLogPrefix('warn'), ...args);
 }
 
-function logDebug(...args) {
-	return console.debug(getTowerLogPrefix('debug'), ...args);
-}
-
 function log(...args) {
 	return console.log(getTowerLogPrefix('log'), ...args);
 }
 
-export { logError, logInfo, logWarn, logDebug, log, getTowerLogPrefix };
+export { logError, logInfo, logWarn, log, getTowerLogPrefix };
