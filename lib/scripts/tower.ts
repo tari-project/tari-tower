@@ -189,7 +189,6 @@ const TariTower = () => {
 		canvas.replaceWith(freshCanvas);
 		// Clean up Three.js resources
 		renderer.dispose();
-		renderer.forceContextLoss();
 		renderer.state.reset();
 	}
 	return {

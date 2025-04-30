@@ -169,10 +169,9 @@ const StateManager = () => {
 			statusUpdateQueue = [];
 		}
 
-		if (!!result && properties.errorBlock && properties.errorBlock.errorLifeCycle > properties.errorBlockMaxLifeCycle) {
+		if (!!result && properties.errorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 1) {
 			logWarn(`Long block lifecycle (${properties.errorBlock.errorLifeCycle}) exceeded max, resetting in queue update`);
 			properties.errorBlock?.reset(true);
-			blocksVisual.resetBlockFromLogicBlock(properties.errorBlock);
 		}
 
 		const queueItem: QueueItem = result
