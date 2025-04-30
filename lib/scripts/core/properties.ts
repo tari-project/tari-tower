@@ -39,7 +39,6 @@ export const propertiesInitialState: PropertiesType = {
 	showVisual: settings.SHOW_BLOCK,
 	loadList: [],
 	animationSpeed: 1,
-	// animationSpeed: 4,
 	activeBlocksCount: 0,
 	maxFreeBlocksCount,
 	lightPositionX: -2,

@@ -4,7 +4,7 @@ var n = (Q, w, v) => r8(Q, typeof w != "symbol" ? w + "" : w, v);
 import * as z from "three";
 import { EventDispatcher as I8, Vector3 as zA, MOUSE as IA, TOUCH as gA, Quaternion as pw, Spherical as Xw, Vector2 as AA } from "three";
 import Y from "min-signal";
-const g8 = Math.min(2, window.devicePixelRatio || 1), m8 = 2560 * 1440, T8 = !0, n8 = [-20, 18, 20], s8 = [0, 0, 0], U8 = { antialias: !0, alpha: !1, powerPreference: "low-power" }, fA = {
+const g8 = Math.min(2, window.devicePixelRatio || 1), m8 = 2560 * 1440, T8 = !1, n8 = [-20, 18, 20], s8 = [0, 0, 0], U8 = { antialias: !0, alpha: !1, powerPreference: "low-power" }, fA = {
   DPR: g8,
   MAX_PIXEL_COUNT: m8,
   DEFAULT_POSITION: n8,
@@ -131,7 +131,7 @@ const x8 = () => {
   isPaused: !1,
   showVisual: fA.SHOW_BLOCK,
   loadList: [],
-  animationSpeed: 2,
+  animationSpeed: 1,
   activeBlocksCount: 0,
   maxFreeBlocksCount: Zw,
   lightPositionX: -2,
@@ -323,7 +323,7 @@ const u8 = 7, p8 = () => {
       g({ status: j.RESTART });
   }
   function I() {
-    c(), b();
+    c();
   }
   return {
     init: I,
@@ -647,7 +647,7 @@ class Lw {
   }
   reset(w = !1) {
     var v, A;
-    w && (console.debug("this.isErrorBlock=", this.isErrorBlock), console.debug("wen keepId=", w)), this.isErrorBlock && (this.errorLifeCycle = 0, this.isErrorBlock = !1, (v = this.currentTile) == null || v.reset(), (A = this.targetTile) == null || A.reset(), this.errorFallAnimationTime = 0, this.isErrorBlockFalling = !1, this.errorPreFallAnimationTime = 0, this.errorPreFallAnimationTimeScale = 0, this.errorFallAnimationTime = 0, this.skipFallAnimation = !1), this.id = w ? this.id : -1, this.isMoving = !1, this.hasBeenSpawned = !1, this.hasAnimationEnded = !1, this.hasBeenEvaluated = !1, this.currentTile = null, this.targetTile = null, this.moveAnimationRatio = 0, this.spawnAnimationRatio = 0, this.spawnAnimationRatioUnclamped = -Math.random(), this.easedAnimationRatio = 0, this.lifeCycle = 0;
+    this.isErrorBlock && (this.errorLifeCycle = 0, this.isErrorBlock = !1, (v = this.currentTile) == null || v.reset(), (A = this.targetTile) == null || A.reset(), this.errorFallAnimationTime = 0, this.isErrorBlockFalling = !1, this.errorPreFallAnimationTime = 0, this.errorPreFallAnimationTimeScale = 0, this.errorFallAnimationTime = 0, this.skipFallAnimation = !1), this.id = w ? this.id : -1, this.isMoving = !1, this.hasBeenSpawned = !1, this.hasAnimationEnded = !1, this.hasBeenEvaluated = !1, this.currentTile = null, this.targetTile = null, this.moveAnimationRatio = 0, this.spawnAnimationRatio = 0, this.spawnAnimationRatioUnclamped = -Math.random(), this.easedAnimationRatio = 0, this.lifeCycle = 0;
   }
   preventErrorBlockFallAnimation() {
     this.skipFallAnimation = !0;
@@ -690,12 +690,9 @@ const QP = () => {
     }
   }
   function A() {
-    var F;
+    var m;
     let t = null;
-    const m = !!(C.errorBlock && C.errorBlock.errorLifeCycle >= C.errorBlockMaxLifeCycle);
-    console.debug("needsErrorBlockReplacement=", m, C.errorBlock);
-    const O = h.length < C.maxFreeBlocksCount && q === j.FREE;
-    m ? ((F = C.errorBlock) == null || F.reset(!0), FA.resetBlockFromLogicBlock(C.errorBlock), t = C.errorBlock, C.errorBlock = null) : O && (t = new Lw(h.length), p = t), t && (t.currentTile = hA, t.init(), t.updateTile());
+    C.errorBlock ? C.errorBlock && C.errorBlock.errorLifeCycle >= C.errorBlockMaxLifeCycle && ((m = C.errorBlock) == null || m.reset(!0), FA.resetBlockFromLogicBlock(C.errorBlock), t = C.errorBlock, C.errorBlock = null) : h.length < C.maxFreeBlocksCount && q === j.FREE && (t = new Lw(h.length), p = t), t && (t.currentTile = hA, t.init(), t.updateTile());
   }
   function c() {
     L.updateAfterCycle(), !K8.includes(q) && (p && (h = [p, ...h], p = null), C.activeBlocksCount = h.length, !(K.isFailResult || K.isStopped) && (h.forEach((t) => t.resetAfterCycle()), j8.dispatch(), Aw++, Q(), H()));
@@ -1250,7 +1247,7 @@ class MP {
     this.pos.set(this.boardPos.x, 0, -this.boardPos.y), this.spinPivot.set(this.boardDir.x * 0.5, -0.5, -this.boardDir.y * 0.5), mA.set(-this.boardDir.y, 0, -this.boardDir.x), this.spinOrient.setFromAxisAngle(mA, this.animation * BP);
   }
   addsFallAnimation(w) {
-    mA.set(this.boardDir.x, -w, -this.boardDir.y), this.pos.addScaledVector(mA, w), mA.set(this.boardDir.x * 0.5, 0, -this.boardDir.y * 0.5), this.spinPivot.lerp(mA, U.saturate(w)), console.debug("wen");
+    mA.set(this.boardDir.x, -w, -this.boardDir.y), this.pos.addScaledVector(mA, w), mA.set(this.boardDir.x * 0.5, 0, -this.boardDir.y * 0.5), this.spinPivot.lerp(mA, U.saturate(w));
   }
 }
 const KA = 2 * J, V = new z.Vector2(), Pw = new z.Vector2(), TA = new z.Vector3(), Yw = new z.Vector3(), Hw = new z.Quaternion(), Sw = new z.Quaternion(), Jw = new z.Color(), Dw = new z.Color(), ew = new z.Color(), nA = new z.Color(), oA = new z.Color(), Cw = new z.Color(), UA = new z.Object3D(), W = {

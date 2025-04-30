@@ -61,22 +61,25 @@ const SystemManager = () => {
 
 	function _spawnSingleBlock() {
 		let block: Block | null | undefined = null;
-		const needsErrorBlockReplacement = Boolean(properties.errorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle);
-		const canAddNewBlock = Boolean(blocks.length < properties.maxFreeBlocksCount && stateStatus === AnimationStatus.FREE);
-		if (!needsErrorBlockReplacement) {
+
+		if (!properties.errorBlock) {
+			const canAddNewBlock = Boolean(blocks.length < properties.maxFreeBlocksCount && stateStatus === AnimationStatus.FREE);
 			if (canAddNewBlock) {
 				block = new Block(blocks.length);
 				lastSpawnedBlock = block;
 			}
 		} else {
-			properties.errorBlock?.reset(true);
-			blocksVisual.resetBlockFromLogicBlock(properties.errorBlock);
-			block = properties.errorBlock;
-			properties.errorBlock = null;
+			const needsErrorBlockReplacement = properties.errorBlock ? Boolean(properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle) : false;
+			if (needsErrorBlockReplacement) {
+				properties.errorBlock?.reset(true);
+				blocksVisual.resetBlockFromLogicBlock(properties.errorBlock);
+				block = properties.errorBlock;
+				properties.errorBlock = null;
+			}
 		}
+
 		if (block) {
 			block.currentTile = mainTile;
-
 			block.init();
 			block.updateTile();
 		}

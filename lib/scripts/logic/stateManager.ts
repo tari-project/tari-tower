@@ -29,7 +29,7 @@ interface QueueArgs {
 let status: AnimationStatus = AnimationStatus.NOT_STARTED;
 let result: AnimationResult = AnimationResult.NONE;
 let statusUpdateQueue: StatusManagerState['statusUpdateQueue'] = [];
-const MAX_QUEUE_LENGTH = 7; // amount of statuses
+const MAX_QUEUE_LENGTH = 7; // number of statuses
 
 const StateManager = () => {
 	const statusOrder = Object.values(AnimationStatus);
