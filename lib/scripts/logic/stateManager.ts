@@ -41,7 +41,7 @@ const StateManager = () => {
 			if (properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 2) {
 				logInfo('long block in updateAfterCycle | ', `lifecycle: ${properties.errorBlock?.errorLifeCycle}/${properties.errorBlockMaxLifeCycle}`);
 			}
-			if (properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 1) {
+			if (properties.errorBlock.isErrorBlockFalling) {
 				return;
 			}
 		}

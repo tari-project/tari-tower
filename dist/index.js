@@ -88,7 +88,7 @@ const x8 = () => {
   function c() {
     BA.flat().forEach((a) => a.reset());
   }
-  function e(a) {
+  function H(a) {
     BA.flat().forEach((E) => E.preUpdate(a));
   }
   function N(a) {
@@ -99,7 +99,7 @@ const x8 = () => {
     getTile: w,
     getRandomFreeTile: v,
     reset: c,
-    preUpdate: e,
+    preUpdate: H,
     update: N
   };
 }, vA = x8(), Gw = new z.Vector2(), Vw = new z.Vector2(), Zw = J - 5, b8 = {
@@ -157,7 +157,7 @@ const x8 = () => {
 }, C = { ...b8 }, Qw = new Y(), F8 = new Y(), j8 = new Y(), mw = new Y(), aw = new Y(), w8 = new Y(), Ew = new Y(), rw = new Y();
 new Y();
 const P8 = new Y(), l8 = new Y(), k8 = new Y();
-var j = /* @__PURE__ */ ((Q) => (Q.NOT_STARTED = "not-started", Q.STARTED = "started", Q.FREE = "free", Q.RESULT = "result", Q.RESULT_ANIMATION = "result_animation", Q.RESTART_ANIMATION = "restart_animation", Q.RESTART = "restart", Q))(j || {}), l = /* @__PURE__ */ ((Q) => (Q.NONE = "none", Q.PAUSE = "pause", Q.STOP = "stop", Q.COMPLETED = "completed", Q.FAILED = "failed", Q.REPLAY = "replay", Q))(l || {}), HA = /* @__PURE__ */ ((Q) => (Q[Q.ONE = 1] = "ONE", Q[Q.TWO = 2] = "TWO", Q[Q.THREE = 3] = "THREE", Q))(HA || {});
+var j = /* @__PURE__ */ ((Q) => (Q.NOT_STARTED = "not-started", Q.STARTED = "started", Q.FREE = "free", Q.RESULT = "result", Q.RESULT_ANIMATION = "result_animation", Q.RESTART_ANIMATION = "restart_animation", Q.RESTART = "restart", Q))(j || {}), l = /* @__PURE__ */ ((Q) => (Q.NONE = "none", Q.PAUSE = "pause", Q.STOP = "stop", Q.COMPLETED = "completed", Q.FAILED = "failed", Q.REPLAY = "replay", Q))(l || {}), eA = /* @__PURE__ */ ((Q) => (Q[Q.ONE = 1] = "ONE", Q[Q.TWO = 2] = "TWO", Q[Q.THREE = 3] = "THREE", Q))(eA || {});
 const K8 = "0.0.33", zw = (Q) => `tower v${K8} ${Q} | `;
 function iA(...Q) {
   return console.error(zw("error"), ...Q);
@@ -189,7 +189,7 @@ const p8 = 7, X8 = () => {
   let w = 0, v = !1;
   function A() {
     var f, s;
-    if (!(C.errorBlock && (C.errorBlock.errorLifeCycle >= C.errorBlockMaxLifeCycle - 2 && vw("long block in updateAfterCycle | ", `lifecycle: ${(f = C.errorBlock) == null ? void 0 : f.errorLifeCycle}/${C.errorBlockMaxLifeCycle}`), C.errorBlock.errorLifeCycle >= C.errorBlockMaxLifeCycle - 1)) && (K.isStart ? t() : K.isResult && H(), DA.length !== 0)) {
+    if (!(C.errorBlock && (C.errorBlock.errorLifeCycle >= C.errorBlockMaxLifeCycle - 2 && vw("long block in updateAfterCycle | ", `lifecycle: ${(f = C.errorBlock) == null ? void 0 : f.errorLifeCycle}/${C.errorBlockMaxLifeCycle}`), C.errorBlock.isErrorBlockFalling)) && (K.isStart ? t() : K.isResult && e(), DA.length !== 0)) {
       vw(`statusUpdateQueue (${DA.length}):`, DA.map((X) => X.status).join(" | "));
       const k = (s = DA.shift()) == null ? void 0 : s.callback;
       k == null || k();
@@ -210,7 +210,7 @@ const p8 = 7, X8 = () => {
       isStopped: f && R === l.STOP
     };
   }
-  function e(f, s) {
+  function H(f, s) {
     if (!C.showVisual) return !1;
     const k = !!s;
     s === l.REPLAY && w === 0 && (w = 2), f === j.NOT_STARTED && s === l.NONE && w === 5 && (w = 6);
@@ -218,7 +218,7 @@ const p8 = 7, X8 = () => {
     return (w + 1) % Q.length === $ ? (w = $, q = Q[w], k || (c(), Qw.dispatch(q, s)), !0) : !1;
   }
   function N({ status: f, result: s, animationStyle: k }) {
-    if (e(f, s)) {
+    if (H(f, s)) {
       if (C.errorBlock && !C.errorBlock.isErrorBlockFalling && (C.errorBlock.preventErrorBlockFallAnimation(), C.errorBlock = null), s && (R = s), c(), k) {
         w8.dispatch(k);
         return;
@@ -233,7 +233,7 @@ const p8 = 7, X8 = () => {
       start: () => b(),
       stop: () => m(),
       fail: () => i(),
-      resultAnimation: () => H(),
+      resultAnimation: () => e(),
       restartAnimation: () => o(),
       restart: () => M(),
       showVisual: () => E(),
@@ -251,7 +251,7 @@ const p8 = 7, X8 = () => {
     const X = s ? {
       status: f,
       callback: () => N({ status: f, result: s, animationStyle: k })
-    } : { status: f, callback: () => e(f) };
+    } : { status: f, callback: () => H(f) };
     DA.push(X);
   }
   function T() {
@@ -281,7 +281,7 @@ const p8 = 7, X8 = () => {
     g({
       status: j.RESULT,
       result: s,
-      animationStyle: HA.ONE
+      animationStyle: eA.ONE
     });
   }
   function F(f = !1) {
@@ -289,7 +289,7 @@ const p8 = 7, X8 = () => {
     g({
       status: j.RESULT,
       result: s,
-      animationStyle: HA.TWO
+      animationStyle: eA.TWO
     });
   }
   function r(f = !1) {
@@ -297,7 +297,7 @@ const p8 = 7, X8 = () => {
     g({
       status: j.RESULT,
       result: s,
-      animationStyle: HA.THREE
+      animationStyle: eA.THREE
     });
   }
   function i() {
@@ -306,7 +306,7 @@ const p8 = 7, X8 = () => {
       result: l.FAILED
     });
   }
-  function H() {
+  function e() {
     g({ status: j.RESULT_ANIMATION });
   }
   function o() {
@@ -356,13 +356,13 @@ const p8 = 7, X8 = () => {
       const m = 3;
       for (; t < m; )
         try {
-          const F = await (await fetch(b)).arrayBuffer(), r = new Uint32Array(F, 0, 1)[0], i = JSON.parse(new TextDecoder().decode(new Uint8Array(F, 4, r))), { vertexCount: H, indexCount: o, attributes: D } = i;
+          const F = await (await fetch(b)).arrayBuffer(), r = new Uint32Array(F, 0, 1)[0], i = JSON.parse(new TextDecoder().decode(new Uint8Array(F, 4, r))), { vertexCount: e, indexCount: o, attributes: D } = i;
           let M = 4 + r;
           const I = new z.BufferGeometry(), f = {};
           D.forEach((s) => {
-            const { id: k, componentSize: X, storageType: $, needsPack: cA, packedComponents: jA } = s, aA = k === "indices" ? o : H, lA = window[$], YA = new lA(F, M, aA * X), SA = lA.BYTES_PER_ELEMENT;
+            const { id: k, componentSize: X, storageType: $, needsPack: cA, packedComponents: jA } = s, aA = k === "indices" ? o : e, lA = window[$], YA = new lA(F, M, aA * X), SA = lA.BYTES_PER_ELEMENT;
             let EA;
-            cA ? EA = e(YA, aA, X, jA, $) : (f[k] = M, EA = YA), k === "indices" ? I.setIndex(new z.BufferAttribute(EA, 1)) : I.setAttribute(k, new z.BufferAttribute(EA, X)), M += aA * X * SA;
+            cA ? EA = H(YA, aA, X, jA, $) : (f[k] = M, EA = YA), k === "indices" ? I.setIndex(new z.BufferAttribute(EA, 1)) : I.setAttribute(k, new z.BufferAttribute(EA, X)), M += aA * X * SA;
           }), T && T(I), E(), Iw(`Loaded ${g}`);
           break;
         } catch (O) {
@@ -370,12 +370,12 @@ const p8 = 7, X8 = () => {
         }
     });
   }
-  function e(g, T, b, t, m) {
-    const O = t.length, F = m.indexOf("Int") === 0, r = 1 << g.BYTES_PER_ELEMENT * 8, i = F ? r * 0.5 : 0, H = 1 / r, o = new Float32Array(T * b);
+  function H(g, T, b, t, m) {
+    const O = t.length, F = m.indexOf("Int") === 0, r = 1 << g.BYTES_PER_ELEMENT * 8, i = F ? r * 0.5 : 0, e = 1 / r, o = new Float32Array(T * b);
     for (let D = 0, M = 0; D < T; D++)
       for (let I = 0; I < O; I++) {
         const { delta: f, from: s } = t[I];
-        o[M] = (g[M] + i) * H * f + s, M++;
+        o[M] = (g[M] + i) * e * f + s, M++;
       }
     return o;
   }
@@ -422,26 +422,26 @@ class Y8 {
   saturate(w) {
     return this.clamp(w, 0, 1);
   }
-  fit(w, v, A, c, e, N) {
-    return w = this.cUnMix(v, A, w), N && (w = N(w)), c + w * (e - c);
+  fit(w, v, A, c, H, N) {
+    return w = this.cUnMix(v, A, w), N && (w = N(w)), c + w * (H - c);
   }
 }
 const U = new Y8(), S8 = () => {
-  function Q(e) {
-    return (e *= 2) < 1 ? 0.5 * e * e * e * e : -0.5 * ((e -= 2) * e * e * e - 2);
+  function Q(H) {
+    return (H *= 2) < 1 ? 0.5 * H * H * H * H : -0.5 * ((H -= 2) * H * H * H - 2);
   }
-  function w(e) {
-    return Math.sin(e * Math.PI / 2);
+  function w(H) {
+    return Math.sin(H * Math.PI / 2);
   }
-  function v(e) {
-    return e * e * ((1.70158 + 1) * e - 1.70158);
+  function v(H) {
+    return H * H * ((1.70158 + 1) * H - 1.70158);
   }
-  function A(e, N = 1.70158) {
-    return --e * e * ((N + 1) * e + N) + 1;
+  function A(H, N = 1.70158) {
+    return --H * H * ((N + 1) * H + N) + 1;
   }
-  function c(e) {
+  function c(H) {
     const N = 2.5949095;
-    return (e *= 2) < 1 ? 0.5 * e * e * ((N + 1) * e - N) : 0.5 * ((e -= 2) * e * ((N + 1) * e + N) + 2);
+    return (H *= 2) < 1 ? 0.5 * H * H * ((N + 1) * H - N) : 0.5 * ((H -= 2) * H * ((N + 1) * H + N) + 2);
   }
   return {
     quartInOut: Q,
@@ -454,14 +454,14 @@ const U = new Y8(), S8 = () => {
 function J8(Q, w, v, A, c) {
   if (Q === 0) return 0;
   if (Q === 1) return 1;
-  function e(E, g, T, b, t) {
+  function H(E, g, T, b, t) {
     const m = 3 * (T - g), O = 3 * (b - T) - m;
     return (((t - g - m - O) * E + O) * E + m) * E + g;
   }
   function N(E, g, T, b = 1e-6) {
     let t = 0, m = 1, O = E;
     for (; t < m; ) {
-      const F = e(O, 0, g, T, 1);
+      const F = H(O, 0, g, T, 1);
       if (Math.abs(F - E) < b)
         return O;
       F < E ? t = O : m = O, O = (t + m) / 2;
@@ -469,7 +469,7 @@ function J8(Q, w, v, A, c) {
     return O;
   }
   const a = N(Q, w, A);
-  return e(a, 0, v, c, 1);
+  return H(a, 0, v, c, 1);
 }
 function sA(Q) {
   return J8(Q, 0.3, 0, 0, 1);
@@ -503,7 +503,7 @@ vec3 getBlueNoise (vec2 coord) {
 };
 let cw = !1, CA = 0;
 const AP = 3.5;
-let NA = 0, eA = 0, Bw = 0, WA = 0;
+let NA = 0, HA = 0, Bw = 0, WA = 0;
 const wP = () => {
   function Q() {
     Qw.add((A, c) => {
@@ -511,10 +511,10 @@ const wP = () => {
     });
   }
   function w() {
-    CA = 0, NA = 0, eA = 0, WA = 0, Bw = 0, cw = !1;
+    CA = 0, NA = 0, HA = 0, WA = 0, Bw = 0, cw = !1;
   }
   function v(A) {
-    CA += (cw ? 1 : 0) * A / AP, CA = U.clamp(CA, 0, 1), NA = U.fit(CA, 0, 0.3, 0, 1), eA = U.fit(CA, 0.35, 0.65, 0, 1), Bw = U.fit(CA, 0.3, 0.55, 0, 2.5), WA = U.fit(CA, 0.6, 0.8, 0, 1), CA >= 1 && (aw.dispatch(), w());
+    CA += (cw ? 1 : 0) * A / AP, CA = U.clamp(CA, 0, 1), NA = U.fit(CA, 0, 0.3, 0, 1), HA = U.fit(CA, 0.35, 0.65, 0, 1), Bw = U.fit(CA, 0.3, 0.55, 0, 2.5), WA = U.fit(CA, 0.6, 0.8, 0, 1), CA >= 1 && (aw.dispatch(), w());
   }
   return {
     init: Q,
@@ -543,19 +543,19 @@ const DP = () => {
   function c() {
     VA = 1.5, XA = 0, pA = U.fit(u, 0.1, 0.45, 0, 1), OA = U.fit(u, 0.15, 0.49, 0, 1.2), bA = U.fit(u, 0.45, 0.55, 0, 1), GA = U.fit(u, 0.45, 0.7, 0, 1), xA = U.fit(u, 0.55, 1, 0, 1);
   }
-  function e() {
+  function H() {
     VA = 2, pA = U.fit(u, 0.1, 0.5, 0, 1), XA = U.fit(u, 0.2, 0.51, 0, 1), OA = U.fit(u, 0.2, 0.49, 0, 1.2), bA = U.fit(u, 0.45, 0.55, 0, 1), GA = U.fit(u, 0.45, 0.7, 0, 1), xA = U.fit(u, 0.6, 1, 0, 1);
   }
   function N(a) {
     switch (u += ($A ? 1 : 0) * a / PP, u = U.clamp(u, 0, 1), $A) {
-      case HA.ONE:
+      case eA.ONE:
         A();
         break;
-      case HA.TWO:
+      case eA.TWO:
         c();
         break;
-      case HA.THREE:
-        e();
+      case eA.THREE:
+        H();
         break;
     }
     u >= 1 && (Ew.dispatch(), v());
@@ -643,7 +643,7 @@ class Lw {
   }
   resetAfterCycle() {
     var w;
-    this.hasBeenEvaluated = !1, this.hasAnimationEnded = !1, this.moveAnimationRatio = 0, this.easedAnimationRatio = 0, this.isMoving = !1, this.lifeCycle++, this.isErrorBlock && (this.skipFallAnimation || (this.errorLifeCycle++, this.isErrorBlockFalling = this.errorLifeCycle >= C.errorBlockMaxLifeCycle - 1), this.errorLifeCycle >= C.errorBlockMaxLifeCycle + 3 && (this.errorLifeCycle = 0)), (w = this.currentTile) != null && w.isBorder && !C.errorBlock && Math.random() < 0.5 && C.activeBlocksCount >= C.minSpawnedBlocksForTheErrorBlock && K.isFree && (C.errorBlock = this, this.isErrorBlock = !0), this._setNewEasingFunction(), this.updateTile();
+    this.hasBeenEvaluated = !1, this.hasAnimationEnded = !1, this.moveAnimationRatio = 0, this.easedAnimationRatio = 0, this.isMoving = !1, this.lifeCycle++, this.isErrorBlock && !this.skipFallAnimation && (this.errorLifeCycle++, this.isErrorBlockFalling = this.errorLifeCycle >= C.errorBlockMaxLifeCycle - 1), (w = this.currentTile) != null && w.isBorder && !C.errorBlock && Math.random() < 0.5 && C.activeBlocksCount >= C.minSpawnedBlocksForTheErrorBlock && K.isFree && (C.errorBlock = this, this.isErrorBlock = !0), this._setNewEasingFunction(), this.updateTile();
   }
   reset(w = !1) {
     var v, A;
@@ -690,14 +690,15 @@ const BP = () => {
     }
   }
   function A() {
-    var m;
+    var F;
     let t = null;
-    C.errorBlock ? C.errorBlock && C.errorBlock.errorLifeCycle >= C.errorBlockMaxLifeCycle && ((m = C.errorBlock) == null || m.reset(!0), FA.resetBlockFromLogicBlock(C.errorBlock), t = C.errorBlock, C.errorBlock = null) : h.length < C.maxFreeBlocksCount && q === j.FREE && (t = new Lw(h.length), p = t), t && (t.currentTile = hA, t.init(), t.updateTile());
+    const m = !!(C.errorBlock && C.errorBlock.errorLifeCycle >= C.errorBlockMaxLifeCycle), O = h.length < C.maxFreeBlocksCount && q === j.FREE;
+    m ? ((F = C.errorBlock) == null || F.reset(!0), FA.resetBlockFromLogicBlock(C.errorBlock), t = C.errorBlock, C.errorBlock = null) : O && (t = new Lw(h.length), p = t), t && (t.currentTile = hA, t.init(), t.updateTile());
   }
   function c() {
-    L.updateAfterCycle(), !h8.includes(q) && (p && (h = [p, ...h], p = null), C.activeBlocksCount = h.length, !(K.isFailResult || K.isStopped) && (h.forEach((t) => t.resetAfterCycle()), j8.dispatch(), Aw++, Q(), e()));
+    L.updateAfterCycle(), !h8.includes(q) && (p && (h = [p, ...h], p = null), C.activeBlocksCount = h.length, !(K.isFailResult || K.isStopped) && (h.forEach((t) => t.resetAfterCycle()), j8.dispatch(), Aw++, Q(), H()));
   }
-  function e() {
+  function H() {
     p != null && p.hasBeenSpawned && p.moveToNextTile(K.isFree, 0);
     const t = Aw % 2 === 0 ? !0 : C.activeBlocksCount < C.maxFreeBlocksCount - 1;
     h.forEach((m, O) => {
@@ -1250,7 +1251,7 @@ class zP {
     mA.set(this.boardDir.x, -w, -this.boardDir.y), this.pos.addScaledVector(mA, w), mA.set(this.boardDir.x * 0.5, 0, -this.boardDir.y * 0.5), this.spinPivot.lerp(mA, U.saturate(w));
   }
 }
-const KA = 2 * J, V = new z.Vector2(), Pw = new z.Vector2(), TA = new z.Vector3(), Yw = new z.Vector3(), ew = new z.Quaternion(), Sw = new z.Quaternion(), Jw = new z.Color(), Dw = new z.Color(), Hw = new z.Color(), nA = new z.Color(), oA = new z.Color(), Cw = new z.Color(), UA = new z.Object3D(), W = {
+const KA = 2 * J, V = new z.Vector2(), Pw = new z.Vector2(), TA = new z.Vector3(), Yw = new z.Vector3(), Hw = new z.Quaternion(), Sw = new z.Quaternion(), Jw = new z.Color(), Dw = new z.Color(), ew = new z.Color(), nA = new z.Color(), oA = new z.Color(), Cw = new z.Color(), UA = new z.Object3D(), W = {
   u_lightPosition: { value: new z.Vector3(-2, 6, -4) },
   u_goboTexture: { value: null },
   u_goboIntensity: { value: 0.45 },
@@ -1285,7 +1286,7 @@ const KA = 2 * J, V = new z.Vector2(), Pw = new z.Vector2(), TA = new z.Vector3(
     B._blockList = r.map((M) => new zP()), B._blockRenderList = [...B._blockList];
     const i = await MA.loadBuf("BASE.buf", (M) => {
       w(M);
-    }), H = await MA.loadBuf("BOX.buf", (M) => {
+    }), e = await MA.loadBuf("BOX.buf", (M) => {
       v(M);
     }), o = await MA.loadBuf("LOSE_ANIMATION.buf", (M) => {
       const { position: I, orient: f } = M.attributes;
@@ -1294,7 +1295,7 @@ const KA = 2 * J, V = new z.Vector2(), Pw = new z.Vector2(), TA = new z.Vector3(
       M.flipY = !1, M.needsUpdate = !0, W && (W.u_goboTexture.value = M);
     });
     try {
-      await Promise.all([i, H, o, D]);
+      await Promise.all([i, e, o, D]);
     } catch (M) {
       console.error("hero preload error:", M);
     }
@@ -1311,7 +1312,7 @@ const KA = 2 * J, V = new z.Vector2(), Pw = new z.Vector2(), TA = new z.Vector3(
       u_prevSuccessColor: { value: new z.Color(C.neutralColor).convertSRGBToLinear() },
       u_successColor: { value: new z.Color(C.successColor).convertSRGBToLinear() },
       u_successAnimationRatio: { value: 0 }
-    }, H = new z.ShaderMaterial({
+    }, e = new z.ShaderMaterial({
       uniforms: i,
       vertexShader: ww,
       fragmentShader: dw,
@@ -1319,7 +1320,7 @@ const KA = 2 * J, V = new z.Vector2(), Pw = new z.Vector2(), TA = new z.Vector3(
       transparent: !0,
       defines: { IS_BASE: !0 }
     });
-    B._baseMesh = new z.Mesh(r, H), B._baseMesh.receiveShadow = B._baseMesh.castShadow = !0, B._baseMesh.frustumCulled = !1, B._baseMesh.customDepthMaterial = new z.ShaderMaterial({
+    B._baseMesh = new z.Mesh(r, e), B._baseMesh.receiveShadow = B._baseMesh.castShadow = !0, B._baseMesh.frustumCulled = !1, B._baseMesh.customDepthMaterial = new z.ShaderMaterial({
       vertexShader: ww,
       fragmentShader: yw,
       defines: { IS_DEPTH: !0, IS_BASE: !0 }
@@ -1330,11 +1331,11 @@ const KA = 2 * J, V = new z.Vector2(), Pw = new z.Vector2(), TA = new z.Vector3(
     i.index = r.index, Object.keys(r.attributes).forEach((D) => {
       i.setAttribute(D, r.attributes[D]);
     }), i.instanceCount = KA;
-    const H = (D, M) => {
+    const e = (D, M) => {
       const I = new Float32Array(KA * M);
       return i.setAttribute(D, new z.InstancedBufferAttribute(I, M, M !== 4, 1).setUsage(z.DynamicDrawUsage)), I;
     };
-    B._instancePosArray = H("instancePos", 3), B._instanceOrientArray = H("instanceOrient", 4), B._instanceShowRatioArray = H("instanceShowRatio", 1), B._instanceSpinPivotArray = H("instanceSpinPivot", 3), B._instanceSpinOrientArray = H("instanceSpinOrient", 4), B._instanceColorArray = H("instanceColor", 3), B._instanceIsActiveArray = H("instanceIsActive", 1), B._instanceNextDirectionArray = H("instanceNextDirection", 2);
+    B._instancePosArray = e("instancePos", 3), B._instanceOrientArray = e("instanceOrient", 4), B._instanceShowRatioArray = e("instanceShowRatio", 1), B._instanceSpinPivotArray = e("instanceSpinPivot", 3), B._instanceSpinOrientArray = e("instanceSpinOrient", 4), B._instanceColorArray = e("instanceColor", 3), B._instanceIsActiveArray = e("instanceIsActive", 1), B._instanceNextDirectionArray = e("instanceNextDirection", 2);
     const o = new z.ShaderMaterial({
       uniforms: {
         ...z.UniformsUtils.merge([z.UniformsLib.lights]),
@@ -1354,8 +1355,8 @@ const KA = 2 * J, V = new z.Vector2(), Pw = new z.Vector2(), TA = new z.Vector3(
     }), UA.add(B._blocksMesh);
   }
   function A() {
-    var i, H;
-    B.directLight = new z.DirectionalLight(16777215, 1), B.directLight.castShadow = !0, B.directLight.shadow.camera.near = C.lightCameraNear, B.directLight.shadow.camera.far = C.lightCameraFar, B.directLight.shadow.camera.right = C.lightCameraSize, B.directLight.shadow.camera.left = -C.lightCameraSize, B.directLight.shadow.camera.top = C.lightCameraSize, B.directLight.shadow.camera.bottom = -C.lightCameraSize, B.directLight.shadow.bias = C.lightCameraBias, B.directLight.shadow.mapSize.width = 768, B.directLight.shadow.mapSize.height = 768, (i = C.scene) == null || i.add(B.directLight), (H = C.scene) == null || H.add(B.directLight.target), B.isShadowCameraHelperVisible = !0, B.shadowCameraHelper = new z.CameraHelper(B.directLight.shadow.camera), k8.add(() => {
+    var i, e;
+    B.directLight = new z.DirectionalLight(16777215, 1), B.directLight.castShadow = !0, B.directLight.shadow.camera.near = C.lightCameraNear, B.directLight.shadow.camera.far = C.lightCameraFar, B.directLight.shadow.camera.right = C.lightCameraSize, B.directLight.shadow.camera.left = -C.lightCameraSize, B.directLight.shadow.camera.top = C.lightCameraSize, B.directLight.shadow.camera.bottom = -C.lightCameraSize, B.directLight.shadow.bias = C.lightCameraBias, B.directLight.shadow.mapSize.width = 768, B.directLight.shadow.mapSize.height = 768, (i = C.scene) == null || i.add(B.directLight), (e = C.scene) == null || e.add(B.directLight.target), B.isShadowCameraHelperVisible = !0, B.shadowCameraHelper = new z.CameraHelper(B.directLight.shadow.camera), k8.add(() => {
       var o, D;
       (o = B.directLight) == null || o.shadow.camera.updateProjectionMatrix(), (D = B.shadowCameraHelper) == null || D.update();
     }), l8.add(() => {
@@ -1382,33 +1383,33 @@ const KA = 2 * J, V = new z.Vector2(), Pw = new z.Vector2(), TA = new z.Vector3(
   }
   function c() {
     BA.forEach((r, i) => {
-      r.forEach((H, o) => {
+      r.forEach((e, o) => {
         var M, I;
         const D = i * d + o;
-        H.loseAnimationPositionArray = new Float32Array(B.animationTotalFrames * 3), H.loseAnimationOrientArray = new Float32Array(B.animationTotalFrames * 4);
+        e.loseAnimationPositionArray = new Float32Array(B.animationTotalFrames * 3), e.loseAnimationOrientArray = new Float32Array(B.animationTotalFrames * 4);
         for (let f = 0; f < B.animationTotalFrames; f++) {
           const s = (f * J + D) * 3, k = (f * J + D) * 4;
-          H.loseAnimationPositionArray.set(((M = B.heroLoseAnimationPositionArray) == null ? void 0 : M.subarray(s, s + 3)) || [], f * 3), H.loseAnimationOrientArray.set(((I = B.heroLoseAnimationOrientArray) == null ? void 0 : I.subarray(k, k + 4)) || [], f * 4);
+          e.loseAnimationPositionArray.set(((M = B.heroLoseAnimationPositionArray) == null ? void 0 : M.subarray(s, s + 3)) || [], f * 3), e.loseAnimationOrientArray.set(((I = B.heroLoseAnimationOrientArray) == null ? void 0 : I.subarray(k, k + 4)) || [], f * 4);
         }
       });
     });
   }
-  function e() {
+  function H() {
     B.successColorRatio = 0, B._blockList.forEach((r) => r.reset());
   }
   function N(r) {
     B._blockList[r.id].reset();
   }
   function a(r) {
-    var i, H;
-    Jw.set(C.mainColor), Dw.set(C.successColor), Hw.set(C.failColor), nA.set(C.neutralColor).convertSRGBToLinear(), oA.copy(Jw), R === l.FAILED && eA > 0 && oA.copy(Hw), (R === l.COMPLETED || R === l.REPLAY) && (B.successColorRatio = Math.min(1, B.successColorRatio + 0.5 * r), oA.lerp(Dw, B.successColorRatio)), R !== l.REPLAY && R !== l.COMPLETED && oA.lerp(nA, U.saturate(LA + WA)), oA.convertSRGBToLinear(), nA.convertSRGBToLinear(), Dw.convertSRGBToLinear();
+    var i, e;
+    Jw.set(C.mainColor), Dw.set(C.successColor), ew.set(C.failColor), nA.set(C.neutralColor).convertSRGBToLinear(), oA.copy(Jw), R === l.FAILED && HA > 0 && oA.copy(ew), (R === l.COMPLETED || R === l.REPLAY) && (B.successColorRatio = Math.min(1, B.successColorRatio + 0.5 * r), oA.lerp(Dw, B.successColorRatio)), R !== l.REPLAY && R !== l.COMPLETED && oA.lerp(nA, U.saturate(LA + WA)), oA.convertSRGBToLinear(), nA.convertSRGBToLinear(), Dw.convertSRGBToLinear();
     for (let o = 0; o < KA; o++) {
       const D = h.filter((f) => f.id === o)[0], M = o < h.length + (p ? 1 : 0), I = M ? oA : nA;
       if (M && (D != null && D.isErrorBlock)) {
         let f = U.saturate(0.5 * (1 - Math.cos(D.errorPreFallAnimationTime)));
-        D.errorFallAnimationTime > 0 && (f = U.saturate(0.5 * (1 - Math.cos(14 * D.errorFallAnimationTime)))), Cw.lerpColors(I, Hw, f), (i = B._instanceColorArray) == null || i.set([Cw.r, Cw.g, Cw.b], o * 3);
+        D.errorFallAnimationTime > 0 && (f = U.saturate(0.5 * (1 - Math.cos(14 * D.errorFallAnimationTime)))), Cw.lerpColors(I, ew, f), (i = B._instanceColorArray) == null || i.set([Cw.r, Cw.g, Cw.b], o * 3);
       } else
-        (H = B._instanceColorArray) == null || H.set([I.r, I.g, I.b], o * 3);
+        (e = B._instanceColorArray) == null || e.set([I.r, I.g, I.b], o * 3);
       B._instanceIsActiveArray && (B._instanceIsActiveArray[o] = M ? 1 : 0);
     }
     B._baseMesh && (B._baseMesh.material.uniforms.u_color.value.set(nA).convertSRGBToLinear(), B._baseMesh.material.uniforms.u_blocksColor.value.copy(oA), B._baseMesh.material.uniforms.u_successColor.value.copy(Dw), B._baseMesh.material.uniforms.u_prevSuccessColor.value.set(nA).convertSRGBToLinear(), B._baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(oA.set(C.successColor), RA), B._baseMesh.material.uniforms.u_prevSuccessColor.value.convertSRGBToLinear());
@@ -1416,29 +1417,29 @@ const KA = 2 * J, V = new z.Vector2(), Pw = new z.Vector2(), TA = new z.Vector3(
   function E() {
     BA.forEach((r) => {
       r.forEach((i) => {
-        const H = i.id % d + 1, D = ((Math.floor(i.id / d) + 1) * QA + H) * 4;
+        const e = i.id % d + 1, D = ((Math.floor(i.id / d) + 1) * QA + e) * 4;
         let M = 0.5 * OA * U.fit(bA, 0, 0.1, 1, 0);
-        M += (eA > 0 ? 1 : 0) * U.fit(WA, 0, 0.1, 1, 0), M += qA * U.fit(LA, 0, 0.1, 1, 0), M = Math.min(1, M), B.infoTexture && (B.infoTexture.image.data[D] = i.activeRatio * (1 - M), B.infoTexture.image.data[D + 1] = i.isOccupied || i.willBeOccupied ? 1 : 0, B.infoTexture.image.data[D + 2] = i.isMain ? 1 : 0, B.infoTexture.image.data[D + 3] = i.isBorder ? 1 : 0);
+        M += (HA > 0 ? 1 : 0) * U.fit(WA, 0, 0.1, 1, 0), M += qA * U.fit(LA, 0, 0.1, 1, 0), M = Math.min(1, M), B.infoTexture && (B.infoTexture.image.data[D] = i.activeRatio * (1 - M), B.infoTexture.image.data[D + 1] = i.isOccupied || i.willBeOccupied ? 1 : 0, B.infoTexture.image.data[D + 2] = i.isMain ? 1 : 0, B.infoTexture.image.data[D + 3] = i.isBorder ? 1 : 0);
       });
     }), B.infoTexture && B.infoTextureLinear && (B.infoTexture.needsUpdate = !0, B.infoTextureLinear.needsUpdate = !0);
   }
   function g() {
     var r, i;
     if (p) {
-      const H = B._blockList[p.id];
-      p.currentTile && H.boardPos.set((r = p.currentTile) == null ? void 0 : r.row, (i = p.currentTile) == null ? void 0 : i.col), H.showRatio = sA(U.saturate(p.spawnAnimationRatioUnclamped));
+      const e = B._blockList[p.id];
+      p.currentTile && e.boardPos.set((r = p.currentTile) == null ? void 0 : r.row, (i = p.currentTile) == null ? void 0 : i.col), e.showRatio = sA(U.saturate(p.spawnAnimationRatioUnclamped));
     }
-    h.forEach((H) => {
+    h.forEach((e) => {
       var D, M, I, f;
-      const o = B._blockList[H.id];
-      o && (o.showRatio = sA(U.saturate(H.spawnAnimationRatioUnclamped)), H.currentTile && o.boardPos.set((D = H.currentTile) == null ? void 0 : D.row, (M = H.currentTile) == null ? void 0 : M.col), H.targetTile && o.boardDir.set(H.targetTile.row - (((I = H.currentTile) == null ? void 0 : I.row) || 0), H.targetTile.col - (((f = H.currentTile) == null ? void 0 : f.col) || 0)), o.animation = H.hasAnimationEnded ? 0 : H.easedAnimationRatio);
+      const o = B._blockList[e.id];
+      o && (o.showRatio = sA(U.saturate(e.spawnAnimationRatioUnclamped)), e.currentTile && o.boardPos.set((D = e.currentTile) == null ? void 0 : D.row, (M = e.currentTile) == null ? void 0 : M.col), e.targetTile && o.boardDir.set(e.targetTile.row - (((I = e.currentTile) == null ? void 0 : I.row) || 0), e.targetTile.col - (((f = e.currentTile) == null ? void 0 : f.col) || 0)), o.animation = e.hasAnimationEnded ? 0 : e.easedAnimationRatio);
     });
   }
   function T(r) {
-    var H, o;
+    var e, o;
     for (let D = 0; D < r; D++) {
       const M = B._blockRenderList[D];
-      M.pos.toArray(B._instancePosArray || [], D * 3), M.orient.toArray(B._instanceOrientArray || [], D * 4), B._instanceShowRatioArray && (B._instanceShowRatioArray[D] = kA.quartInOut(M.showRatio)), M.spinPivot.toArray(B._instanceSpinPivotArray || [], D * 3), M.spinOrient.toArray(B._instanceSpinOrientArray || [], D * 4), (H = B._instanceNextDirectionArray) == null || H.set([M.boardDir.x, M.boardDir.y], D * 2);
+      M.pos.toArray(B._instancePosArray || [], D * 3), M.orient.toArray(B._instanceOrientArray || [], D * 4), B._instanceShowRatioArray && (B._instanceShowRatioArray[D] = kA.quartInOut(M.showRatio)), M.spinPivot.toArray(B._instanceSpinPivotArray || [], D * 3), M.spinOrient.toArray(B._instanceSpinOrientArray || [], D * 4), (e = B._instanceNextDirectionArray) == null || e.set([M.boardDir.x, M.boardDir.y], D * 2);
     }
     const i = (o = B._blocksMesh) == null ? void 0 : o.geometry;
     if (i) {
@@ -1451,7 +1452,7 @@ const KA = 2 * J, V = new z.Vector2(), Pw = new z.Vector2(), TA = new z.Vector3(
   }
   function b(r, i) {
     if (R === l.STOP && i >= J) {
-      const H = i - J, o = H % d - y, D = Math.floor(H / d) - y, M = vA.getTile(D, o);
+      const e = i - J, o = e % d - y, D = Math.floor(e / d) - y, M = vA.getTile(D, o);
       if (!M.isOccupied) {
         const I = U.saturate(qA - M.randomDelay);
         M.activeRatio = I, r.showRatio = sA(I), r.boardPos.set(D, o);
@@ -1460,17 +1461,17 @@ const KA = 2 * J, V = new z.Vector2(), Pw = new z.Vector2(), TA = new z.Vector3(
   }
   function t(r, i) {
     if (r && r.isErrorBlock && r.errorLifeCycle >= C.errorBlockMaxLifeCycle - 1) {
-      const H = r.currentTile, o = r.errorFallAnimationTime;
-      i.boardPos.set(H.row, H.col), V.set(H.row, H.col).normalize(), Math.abs(V.x) > Math.abs(V.y) ? V.set(Math.sign(V.x), 0) : V.set(0, Math.sign(V.y)), i.boardDir.set(V.x, V.y), i.animation = U.fit(o, 0, 1, 0, 1, kA.sineOut), i.animation += Math.max(0, o - 0.8), i.update(C.deltaTime), i.addsFallAnimation(Math.max(0, o - 0.8));
+      const e = r.currentTile, o = r.errorFallAnimationTime;
+      i.boardPos.set(e.row, e.col), V.set(e.row, e.col).normalize(), Math.abs(V.x) > Math.abs(V.y) ? V.set(Math.sign(V.x), 0) : V.set(0, Math.sign(V.y)), i.boardDir.set(V.x, V.y), i.animation = U.fit(o, 0, 1, 0, 1, kA.sineOut), i.animation += Math.max(0, o - 0.8), i.update(C.deltaTime), i.addsFallAnimation(Math.max(0, o - 0.8));
     }
   }
-  function m(r, i, H) {
+  function m(r, i, e) {
     if (R === l.FAILED) {
       if (r) {
         const o = r.currentTile;
-        if (eA > 0) {
-          const D = Math.floor(eA * B.animationTotalFrames), M = Math.min(D + 1, B.animationTotalFrames - 1), I = eA * B.animationTotalFrames - D;
-          TA.fromArray(o.loseAnimationPositionArray, D * 3), Yw.fromArray(o.loseAnimationPositionArray, M * 3), TA.lerp(Yw, I), TA.y *= 0.5, i.pos.set(TA.z, TA.y, -TA.x), ew.fromArray(o.loseAnimationOrientArray, D * 4), Sw.fromArray(o.loseAnimationOrientArray, M * 4), ew.slerp(Sw, I), i.orient.copy(ew);
+        if (HA > 0) {
+          const D = Math.floor(HA * B.animationTotalFrames), M = Math.min(D + 1, B.animationTotalFrames - 1), I = HA * B.animationTotalFrames - D;
+          TA.fromArray(o.loseAnimationPositionArray, D * 3), Yw.fromArray(o.loseAnimationPositionArray, M * 3), TA.lerp(Yw, I), TA.y *= 0.5, i.pos.set(TA.z, TA.y, -TA.x), Hw.fromArray(o.loseAnimationOrientArray, D * 4), Sw.fromArray(o.loseAnimationOrientArray, M * 4), Hw.slerp(Sw, I), i.orient.copy(Hw);
         }
         if (NA > 0) {
           const D = U.fit(NA, 0, 1, 0, 1, kA.sineOut);
@@ -1480,8 +1481,8 @@ const KA = 2 * J, V = new z.Vector2(), Pw = new z.Vector2(), TA = new z.Vector3(
           }
         }
       }
-      if (H >= J) {
-        const o = H - J, D = o % d - y, M = Math.floor(o / d) - y, I = vA.getTile(M, D), f = U.saturate(Bw - I.randomDelay);
+      if (e >= J) {
+        const o = e - J, D = o % d - y, M = Math.floor(o / d) - y, I = vA.getTile(M, D), f = U.saturate(Bw - I.randomDelay);
         I.isOccupied || (I.activeRatio = f), i.showRatio = sA(f), i.boardPos.set(M, D);
       }
     }
@@ -1503,7 +1504,7 @@ const KA = 2 * J, V = new z.Vector2(), Pw = new z.Vector2(), TA = new z.Vector3(
       I.showRatio > 0 && (B._blockRenderList[i++] = I), m(f, I, M), t(f, I), b(I, M), O(f, I);
     }
     E(), T(i);
-    const H = Math.min(1, LA + WA + bA), o = kA.backOut(H, 3), D = 1 - sA(ZA);
+    const e = Math.min(1, LA + WA + bA), o = kA.backOut(e, 3), D = 1 - sA(ZA);
     UA.position.y = -o - 2 * D, UA.rotation.y = 0.5 * Math.PI * D, UA.rotation.y += 2 * Math.PI * kA.quartInOut(pA), B._baseMesh && (B._baseMesh.material.uniforms.u_yDisplacement.value = -o - 5 * D, B._baseMesh.material.uniforms.u_successAnimationRatio.value = GA), W && (W.u_endAnimationRatio.value = Math.min(
       1,
       U.fit(qA, 0.5, 2, 0, 1) + U.fit(Bw, 0.5, 2, 0, 1) + U.fit(u, 0, 0.2, 0, 1)
@@ -1512,7 +1513,7 @@ const KA = 2 * J, V = new z.Vector2(), Pw = new z.Vector2(), TA = new z.Vector3(
   return {
     preload: Q,
     init: A,
-    reset: e,
+    reset: H,
     resetBlockFromLogicBlock: N,
     update: F
   };
@@ -1755,7 +1756,7 @@ void main() {
     gl_FragColor = packDepthToRGBA( fragCoordZ );
 }
 `, D8 = new z.Object3D(), tP = () => {
-  let Q, w = null, v = null, A = null, c = null, e = null, N = null, a = null, E = null, g = 0, T = 0, b, t;
+  let Q, w = null, v = null, A = null, c = null, H = null, N = null, a = null, E = null, g = 0, T = 0, b, t;
   const m = {
     u_time: { value: 0 },
     u_ratio: { value: 0 },
@@ -1768,7 +1769,7 @@ void main() {
       Q = f;
     }), I = await MA.loadBuf("COIN_PLACEMENT.buf", (f) => {
       const { position: s, aoN: k, aoP: X, curveu: $, orient: cA } = f.attributes;
-      c = s.array, a = k.array, E = X.array, N = $.array, e = cA.array, g = s.count;
+      c = s.array, a = k.array, E = X.array, N = $.array, H = cA.array, g = s.count;
     });
     try {
       await Promise.all([D, M, I]);
@@ -1777,7 +1778,7 @@ void main() {
     }
   }
   function F() {
-    r(), i(), H(), w && D8.add(w);
+    r(), i(), e(), w && D8.add(w);
   }
   function r() {
     if (Q) {
@@ -1785,7 +1786,7 @@ void main() {
       const D = new z.InstancedBufferGeometry();
       D.index = Q.index, Object.entries(Q.attributes).forEach(([I, f]) => D.setAttribute(I, f)), t = new Float32Array(g * 3).map(() => Math.random() * 2 - 1), [
         ["a_instancePosition", c, 3],
-        ["a_instanceQuaternion", e, 4],
+        ["a_instanceQuaternion", H, 4],
         ["a_instanceCurveUV", N, 1],
         ["a_instanceAoN", a, 3],
         ["a_instanceAoP", E, 3],
@@ -1810,7 +1811,7 @@ void main() {
       lights: !0
     });
   }
-  function H() {
+  function e() {
     v && A && (w = new z.Mesh(v, A), w.frustumCulled = !1, w.castShadow = !0, w.receiveShadow = !0, w.customDepthMaterial = new z.ShaderMaterial({
       uniforms: { ...m },
       vertexShader: _w,
@@ -1831,12 +1832,12 @@ void main() {
 class fP extends I8 {
   constructor(w, v) {
     super(), v === void 0 && uA('THREE.OrbitControls: The second parameter "domElement" is now mandatory.'), v === document && iA('THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.'), this.object = w, this.domElement = v, this.domElement.style.touchAction = "none", this.enabled = !0, this.target = new zA(), this.minDistance = 0, this.maxDistance = 1 / 0, this.minZoom = 0, this.maxZoom = 1 / 0, this.minPolarAngle = Math.PI * 0.2, this.maxPolarAngle = Math.PI * 0.45, this.minAzimuthAngle = -1 / 0, this.maxAzimuthAngle = 1 / 0, this.enableDamping = !0, this.dampingFactor = 0.15, this.enableZoom = !1, this.zoomSpeed = 1, this.enableRotate = !0, this.rotateSpeed = 0.5, this.enablePan = !1, this.panSpeed = 1, this.screenSpacePanning = !0, this.autoRotate = !1, this.autoRotateSpeed = 2, this.keys = { LEFT: "ArrowLeft", UP: "ArrowUp", RIGHT: "ArrowRight", BOTTOM: "ArrowDown" }, this.mouseButtons = { LEFT: IA.ROTATE, MIDDLE: IA.DOLLY, RIGHT: IA.PAN }, this.touches = { ONE: gA.ROTATE, TWO: gA.DOLLY_PAN }, this.target0 = this.target.clone(), this.position0 = this.object.position.clone(), this.zoom0 = this.object.zoom, this.scale = 1, this.reset = function() {
-      A.target.copy(A.target0), A.object.position.copy(A.position0), A.object.zoom = A.zoom0, A.scale = 1, A.object.updateProjectionMatrix(), A.dispatchEvent($w), A.update(), e = c.NONE;
+      A.target.copy(A.target0), A.object.position.copy(A.position0), A.object.zoom = A.zoom0, A.scale = 1, A.object.updateProjectionMatrix(), A.dispatchEvent($w), A.update(), H = c.NONE;
     }, this.update = function() {
       const P = new zA(), x = new pw().setFromUnitVectors(w.up, new zA(0, 1, 0)), G = x.clone().invert(), Z = new zA(), S = new pw(), rA = 2 * Math.PI;
       return function() {
         const hw = A.object.position;
-        P.copy(hw).sub(A.target), P.applyQuaternion(x), a.setFromVector3(P), A.autoRotate && e === c.NONE && s(I()), A.enableDamping ? (a.theta += E.theta * A.dampingFactor, a.phi += E.phi * A.dampingFactor) : (a.theta += E.theta, a.phi += E.phi);
+        P.copy(hw).sub(A.target), P.applyQuaternion(x), a.setFromVector3(P), A.autoRotate && H === c.NONE && s(I()), A.enableDamping ? (a.theta += E.theta * A.dampingFactor, a.phi += E.phi * A.dampingFactor) : (a.theta += E.theta, a.phi += E.phi);
         let wA = A.minAzimuthAngle, PA = A.maxAzimuthAngle;
         isFinite(wA) && isFinite(PA) && (wA < -Math.PI ? wA += rA : wA > Math.PI && (wA -= rA), PA < -Math.PI ? PA += rA : PA > Math.PI && (PA -= rA), wA <= PA ? a.theta = Math.max(wA, Math.min(PA, a.theta)) : a.theta = a.theta > (wA + PA) / 2 ? Math.max(wA, a.theta) : Math.min(PA, a.theta)), a.phi = Math.max(A.minPolarAngle, Math.min(A.maxPolarAngle, a.phi)), a.makeSafe();
         let uw = A.enableDamping ? (A.scale - 1) * A.dampingFactor + 1 : A.scale;
@@ -1853,10 +1854,10 @@ class fP extends I8 {
       TOUCH_DOLLY_PAN: 5,
       TOUCH_DOLLY_ROTATE: 6
     };
-    let e = c.NONE;
+    let H = c.NONE;
     const N = 1e-6, a = new Xw(), E = new Xw(), g = new zA();
     let T = !1;
-    const b = new AA(), t = new AA(), m = new AA(), O = new AA(), F = new AA(), r = new AA(), i = new AA(), H = new AA(), o = new AA(), D = [], M = {};
+    const b = new AA(), t = new AA(), m = new AA(), O = new AA(), F = new AA(), r = new AA(), i = new AA(), e = new AA(), o = new AA(), D = [], M = {};
     function I() {
       return 2 * Math.PI / 60 / 60 * A.autoRotateSpeed;
     }
@@ -1912,7 +1913,7 @@ class fP extends I8 {
       s(2 * Math.PI * m.x / x.clientHeight), k(2 * Math.PI * m.y / x.clientHeight), b.copy(t), A.update();
     }
     function Q8(P) {
-      H.set(P.clientX, P.clientY), o.subVectors(H, i), o.y > 0 ? jA(f()) : o.y < 0 && aA(f()), i.copy(H), A.update();
+      e.set(P.clientX, P.clientY), o.subVectors(e, i), o.y > 0 ? jA(f()) : o.y < 0 && aA(f()), i.copy(e), A.update();
     }
     function B8(P) {
       F.set(P.clientX, P.clientY), r.subVectors(F, O).multiplyScalar(A.panSpeed), cA(r.x, r.y), O.copy(F), A.update();
@@ -1968,7 +1969,7 @@ class fP extends I8 {
     }
     function Ow(P) {
       const x = ow(P), G = P.pageX - x.x, Z = P.pageY - x.y, S = Math.sqrt(G * G + Z * Z);
-      H.set(0, S), o.set(0, Math.pow(H.y / i.y, A.zoomSpeed)), jA(o.y), i.copy(H);
+      e.set(0, S), o.set(0, Math.pow(e.y / i.y, A.zoomSpeed)), jA(o.y), i.copy(e);
     }
     function v8(P) {
       A.enableZoom && Ow(P), A.enablePan && Nw(P);
@@ -1977,13 +1978,13 @@ class fP extends I8 {
       A.enableZoom && Ow(P), A.enableRotate && Uw(P);
     }
     function t8(P) {
-      A.enabled !== !1 && (D.length === 0 && (A.domElement.setPointerCapture(P.pointerId), A.domElement.addEventListener("pointermove", xw), A.domElement.addEventListener("pointerup", bw)), a8(P), P.pointerType === "touch" ? H8(P) : f8(P));
+      A.enabled !== !1 && (D.length === 0 && (A.domElement.setPointerCapture(P.pointerId), A.domElement.addEventListener("pointermove", xw), A.domElement.addEventListener("pointerup", bw)), a8(P), P.pointerType === "touch" ? e8(P) : f8(P));
     }
     function xw(P) {
-      A.enabled !== !1 && (P.pointerType === "touch" ? i8(P) : e8(P));
+      A.enabled !== !1 && (P.pointerType === "touch" ? i8(P) : H8(P));
     }
     function bw(P) {
-      kw(P), D.length === 0 && (A.domElement.releasePointerCapture(P.pointerId), A.domElement.removeEventListener("pointermove", xw), A.domElement.removeEventListener("pointerup", bw)), A.dispatchEvent(A8), e = c.NONE;
+      kw(P), D.length === 0 && (A.domElement.releasePointerCapture(P.pointerId), A.domElement.removeEventListener("pointermove", xw), A.domElement.removeEventListener("pointerup", bw)), A.dispatchEvent(A8), H = c.NONE;
     }
     function Fw(P) {
       kw(P);
@@ -2006,34 +2007,34 @@ class fP extends I8 {
       switch (x) {
         case IA.DOLLY:
           if (A.enableZoom === !1) return;
-          YA(P), e = c.DOLLY;
+          YA(P), H = c.DOLLY;
           break;
         case IA.ROTATE:
           if (P.ctrlKey || P.metaKey || P.shiftKey) {
             if (A.enablePan === !1) return;
-            SA(P), e = c.PAN;
+            SA(P), H = c.PAN;
           } else {
             if (A.enableRotate === !1) return;
-            lA(P), e = c.ROTATE;
+            lA(P), H = c.ROTATE;
           }
           break;
         case IA.PAN:
           if (P.ctrlKey || P.metaKey || P.shiftKey) {
             if (A.enableRotate === !1) return;
-            lA(P), e = c.ROTATE;
+            lA(P), H = c.ROTATE;
           } else {
             if (A.enablePan === !1) return;
-            SA(P), e = c.PAN;
+            SA(P), H = c.PAN;
           }
           break;
         default:
-          e = c.NONE;
+          H = c.NONE;
       }
-      e !== c.NONE && A.dispatchEvent(iw);
+      H !== c.NONE && A.dispatchEvent(iw);
     }
-    function e8(P) {
+    function H8(P) {
       if (A.enabled !== !1)
-        switch (e) {
+        switch (H) {
           case c.ROTATE:
             if (A.enableRotate === !1) return;
             EA(P);
@@ -2049,45 +2050,45 @@ class fP extends I8 {
         }
     }
     function jw(P) {
-      A.enabled === !1 || A.enableZoom === !1 || e !== c.NONE || (A.dispatchEvent(iw), M8(P), A.dispatchEvent(A8));
+      A.enabled === !1 || A.enableZoom === !1 || H !== c.NONE || (A.dispatchEvent(iw), M8(P), A.dispatchEvent(A8));
     }
-    function H8(P) {
+    function e8(P) {
       switch (Kw(P), D.length) {
         case 1:
           switch (A.touches.ONE) {
             case gA.ROTATE:
               if (A.enableRotate === !1) return;
-              Tw(), e = c.TOUCH_ROTATE;
+              Tw(), H = c.TOUCH_ROTATE;
               break;
             case gA.PAN:
               if (A.enablePan === !1) return;
-              nw(), e = c.TOUCH_PAN;
+              nw(), H = c.TOUCH_PAN;
               break;
             default:
-              e = c.NONE;
+              H = c.NONE;
           }
           break;
         case 2:
           switch (A.touches.TWO) {
             case gA.DOLLY_PAN:
               if (A.enableZoom === !1 && A.enablePan === !1) return;
-              z8(), e = c.TOUCH_DOLLY_PAN;
+              z8(), H = c.TOUCH_DOLLY_PAN;
               break;
             case gA.DOLLY_ROTATE:
               if (A.enableZoom === !1 && A.enableRotate === !1) return;
-              o8(), e = c.TOUCH_DOLLY_ROTATE;
+              o8(), H = c.TOUCH_DOLLY_ROTATE;
               break;
             default:
-              e = c.NONE;
+              H = c.NONE;
           }
           break;
         default:
-          e = c.NONE;
+          H = c.NONE;
       }
-      e !== c.NONE && A.dispatchEvent(iw);
+      H !== c.NONE && A.dispatchEvent(iw);
     }
     function i8(P) {
-      switch (Kw(P), e) {
+      switch (Kw(P), H) {
         case c.TOUCH_ROTATE:
           if (A.enableRotate === !1) return;
           Uw(P), A.update();
@@ -2105,7 +2106,7 @@ class fP extends I8 {
           c8(P), A.update();
           break;
         default:
-          e = c.NONE;
+          H = c.NONE;
       }
     }
     function lw(P) {
@@ -2133,13 +2134,13 @@ class fP extends I8 {
     A.domElement.addEventListener("contextmenu", lw), A.domElement.addEventListener("pointerdown", t8), A.domElement.addEventListener("pointercancel", Fw), A.domElement.addEventListener("wheel", jw, { passive: !1 }), this.update(), A.domElement.removeEventListener("pointercancel", Fw), A.domElement.removeEventListener("wheel", jw, { passive: !1 });
   }
 }
-const eP = `varying vec2 v_uv;
+const HP = `varying vec2 v_uv;
 
 void main() {
     gl_Position = vec4(position.xy, 1.0, 1.0);
     v_uv = uv;
 }
-`, HP = `uniform vec3 u_bgColor1;
+`, eP = `uniform vec3 u_bgColor1;
 uniform vec3 u_bgColor2;
 
 varying vec2 v_uv;
@@ -2308,16 +2309,16 @@ void main() {
   const Q = new z.Mesh(), w = new z.Mesh(new z.PlaneGeometry(2, 2));
   function v() {
     var N, a, E;
-    const e = {
+    const H = {
       u_resolution: (N = C.sharedUniforms) == null ? void 0 : N.u_resolution,
       u_bgColor1: (a = C.sharedUniforms) == null ? void 0 : a.u_bgColor1,
       u_bgColor2: (E = C.sharedUniforms) == null ? void 0 : E.u_bgColor2,
       ..._
     };
     w.material = new z.ShaderMaterial({
-      uniforms: e,
-      vertexShader: eP,
-      fragmentShader: HP
+      uniforms: H,
+      vertexShader: HP,
+      fragmentShader: eP
     }), w.renderOrder = 1, gw.add(w), A();
   }
   function A() {
@@ -2344,7 +2345,7 @@ void main() {
       transparent: !0
     }), Q.geometry = a, Q.frustumCulled = !1, gw.add(Q);
   }
-  function c(e) {
+  function c(H) {
     Q.material.uniforms && (Q.material.uniforms.u_size.value = C.particlesSize, Q.material.uniforms.u_color.value.set(C.particlesColor), Q.material.uniforms.u_opacity.value = C.particlesOpacity);
   }
   return { init: v, update: c };
@@ -2353,7 +2354,7 @@ z.ColorManagement.enabled = !1;
 const rP = () => {
   const Q = EP(), w = $8(), v = tP();
   let A, c;
-  const e = window.innerWidth / window.innerHeight, N = 15, a = N * e, E = new z.OrthographicCamera(a / -2, a / 2, N / 2, N / -2, 1, 1e3);
+  const H = window.innerWidth / window.innerHeight, N = 15, a = N * H, E = new z.OrthographicCamera(a / -2, a / 2, N / 2, N / -2, 1, 1e3);
   let g, T;
   async function b() {
     if (T) {
@@ -2375,7 +2376,7 @@ const rP = () => {
   }
   async function O({ canvasEl: o, initCallback: D }) {
     c = o, T = new z.WebGLRenderer({ ...U8, canvas: c }), P8.addOnce(() => {
-      H();
+      e();
     }), await b(), await FA.preload(), await w.preInit(), await v.preload(), MA.start(D);
   }
   async function F() {
@@ -2404,7 +2405,7 @@ const rP = () => {
     const s = -I / 2 - f / 2, k = I / 2 - f / 2;
     E.left = s, E.right = k, E.top = M / 2, E.bottom = M / -2, E.updateProjectionMatrix(), A == null || A.update(), g == null || g.updateMatrix(), g == null || g.matrix.decompose(E.position, E.quaternion, E.scale), E.matrix.compose(E.position, E.quaternion, E.scale), w.update(o), fw.update(o), FA.update(o), v.update(o), Q.update(o), T == null || T.render(C.scene, E);
   }
-  function H() {
+  function e() {
     C.showVisual = !1, fw.resetPostDestroy();
     const o = (c == null ? void 0 : c.id) || "canvas_id", D = document.createElement("canvas");
     D.setAttribute("id", o), c == null || c.replaceWith(D), T.state.reset();
