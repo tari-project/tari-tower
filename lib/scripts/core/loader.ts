@@ -117,34 +117,22 @@ const Loader = () => {
 	async function loadTexture(assetName, cb) {
 		const url = assets[assetName];
 
-		list.push(async () => {
-			let attempts = 0;
-			const maxAttempts = 3;
-			while (attempts < maxAttempts) {
-				new THREE.TextureLoader().load(
-					url,
-					(texture) => {
-						texture.minFilter = THREE.LinearMipMapLinearFilter;
-						texture.magFilter = THREE.LinearFilter;
-						texture.generateMipmaps = true;
-						texture.anisotropy = 1;
-						texture.flipY = true;
-						if (cb) cb(texture);
-						_onLoad();
-						log(`Loaded ${assetName}`);
-					},
-					undefined,
-					async (error) => {
-						attempts++;
-						if (attempts >= maxAttempts) {
-							logError(`Failed to load texture: ${assetName} after ${maxAttempts} attempts`, error);
-						} else {
-							logError(`Failed to load texture: ${assetName}, attempt ${attempts}/${maxAttempts}, retrying...`, error);
-							await new Promise((resolve) => setTimeout(resolve, 100));
-						}
-					},
-				);
-			}
+		list.push(() => {
+			new THREE.TextureLoader().load(
+				url,
+				(texture) => {
+					texture.minFilter = THREE.LinearMipMapLinearFilter;
+					texture.magFilter = THREE.LinearFilter;
+					texture.generateMipmaps = true;
+					texture.anisotropy = 1;
+					texture.flipY = true;
+					cb?.(texture);
+					_onLoad();
+					log(`Loaded ${assetName}`);
+				},
+				undefined,
+				(error) => logError(`Failed to load texture: ${assetName}`, error),
+			);
 		});
 	}
 
