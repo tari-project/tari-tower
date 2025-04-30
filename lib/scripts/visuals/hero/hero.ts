@@ -433,6 +433,11 @@ const Hero = () => {
 	}
 
 	function _updateLongBlockAnimation(logicBlock, block) {
+		// if (logicBlock) {
+		// 	console.debug('logicBlock.isErrorBlock', logicBlock?.isErrorBlock);
+		// 	console.debug(`logicBlock?.errorLifeCycle=`, logicBlock?.errorLifeCycle);
+		// }
+
 		if (logicBlock && logicBlock.isErrorBlock && logicBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 1) {
 			const tile = logicBlock.currentTile;
 			const animationRatio = logicBlock.errorFallAnimationTime;

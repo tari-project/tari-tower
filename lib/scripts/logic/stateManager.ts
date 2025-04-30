@@ -39,12 +39,9 @@ const StateManager = () => {
 	function updateAfterCycle() {
 		if (properties.errorBlock) {
 			if (properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 2) {
-			logInfo(
-				'long block in updateAfterCycle | ',
-				`falling: ${properties.errorBlock?.isErrorBlockFalling}, lifecycle: ${properties.errorBlock?.errorLifeCycle}/${properties.errorBlockMaxLifeCycle}`,
-			);
-		}
-			if (properties.errorBlock.isErrorBlockFalling || properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 1) {
+				logInfo('long block in updateAfterCycle | ', `lifecycle: ${properties.errorBlock?.errorLifeCycle}/${properties.errorBlockMaxLifeCycle}`);
+			}
+			if (properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 1) {
 				return;
 			}
 		}
@@ -123,7 +120,6 @@ const StateManager = () => {
 	}
 
 	function _updateStatusAndResult({ status: newStatus, result: newResult, animationStyle }: QueueArgs) {
-
 		if (_canUpdateStatus(newStatus, newResult)) {
 			if (properties.errorBlock && !properties.errorBlock.isErrorBlockFalling) {
 				properties.errorBlock.preventErrorBlockFallAnimation();
@@ -182,9 +178,9 @@ const StateManager = () => {
 
 		const queueItem: QueueItem = result
 			? {
-				status,
-				callback: () => _updateStatusAndResult({ status, result, animationStyle }),
-			}
+					status,
+					callback: () => _updateStatusAndResult({ status, result, animationStyle }),
+				}
 			: { status, callback: () => _canUpdateStatus(status) };
 
 		statusUpdateQueue.push(queueItem);
