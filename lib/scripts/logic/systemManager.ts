@@ -65,7 +65,6 @@ const SystemManager = () => {
 	}
 
 	function _spawnSingleBlock(replaceErrorBlock = false) {
-		console.debug(`replaceErrorBlock=`, replaceErrorBlock);
 		let block: Block | null | undefined = null;
 		const needsErrorBlockReplacement = replaceErrorBlock || Boolean(properties.errorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle);
 		const canAddNewBlock = Boolean(blocks.length < properties.maxFreeBlocksCount && stateStatus === AnimationStatus.FREE);
