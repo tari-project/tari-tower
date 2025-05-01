@@ -158,7 +158,7 @@ const b8 = () => {
 new Y();
 const P8 = new Y(), k8 = new Y(), K8 = new Y();
 var j = /* @__PURE__ */ ((B) => (B.NOT_STARTED = "not-started", B.STARTED = "started", B.FREE = "free", B.RESULT = "result", B.RESULT_ANIMATION = "result_animation", B.RESTART_ANIMATION = "restart_animation", B.RESTART = "restart", B))(j || {}), l = /* @__PURE__ */ ((B) => (B.NONE = "none", B.PAUSE = "pause", B.STOP = "stop", B.COMPLETED = "completed", B.FAILED = "failed", B.REPLAY = "replay", B))(l || {}), EA = /* @__PURE__ */ ((B) => (B[B.ONE = 1] = "ONE", B[B.TWO = 2] = "TWO", B[B.THREE = 3] = "THREE", B))(EA || {});
-const h8 = "0.0.40", Mw = (B) => `tower v${h8} ${B} | `;
+const h8 = "0.0.41", Mw = (B) => `tower v${h8} ${B} | `;
 function cA(...B) {
   return console.error(Mw("error"), ...B);
 }
