@@ -10,7 +10,7 @@ import { Background, bgContainer } from './visuals/bg/bg.ts';
 import loader from './core/loader.ts';
 import { OrthographicCamera } from 'three';
 import { canvasSignal } from './logic/signals.ts';
-import { logError } from './utils/logger.ts';
+import { logError, logInfo } from './utils/logger.ts';
 
 THREE.ColorManagement.enabled = false;
 
@@ -81,7 +81,7 @@ const TariTower = () => {
 		_handleResize(window.innerWidth, window.innerHeight);
 	}
 
-	async function preload({ canvasEl, initCallback }: { canvasEl: HTMLElement; initCallback: () => void }) {
+	async function preload({ canvasEl, initCallback }: { canvasEl: HTMLElement; initCallback: () => Promise<void> }) {
 		canvas = canvasEl as HTMLCanvasElement;
 		renderer = new THREE.WebGLRenderer({ ...WEBGL_OPTS, canvas });
 		canvasSignal.addOnce(() => {
@@ -94,6 +94,7 @@ const TariTower = () => {
 		await coins.preload();
 
 		await loader.start(initCallback);
+		await initCallback();
 	}
 
 	async function _initScene() {

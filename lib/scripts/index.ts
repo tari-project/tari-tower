@@ -2,7 +2,7 @@ import TariTower from './tower.ts';
 import { stateManager, status } from './logic/stateManager.ts';
 import { gameEndedSignal } from './logic/signals.ts';
 import { properties } from './core/properties.ts';
-import { log, logError } from './utils/logger.ts';
+import { log, logError, logInfo } from './utils/logger.ts';
 
 const tower = TariTower();
 
@@ -33,6 +33,7 @@ function animate() {
 
 async function initCallback() {
 	try {
+		logInfo('Initializing Tari Tower...');
 		await tower.init();
 
 		time = performance.now() / 1000;
@@ -41,6 +42,7 @@ async function initCallback() {
 		window.addEventListener('resize', tower.onResize);
 		tower.onResize();
 		animate();
+		logInfo('Tari Tower initialized successfully.');
 	} catch (error) {
 		logError('initCallback:', error);
 	}
