@@ -81,7 +81,7 @@ const TariTower = () => {
 		_handleResize(window.innerWidth, window.innerHeight);
 	}
 
-	async function preload({ canvasEl, initCallback }: { canvasEl: HTMLElement; initCallback: () => void }) {
+	async function preload({ canvasEl, initCallback }: { canvasEl: HTMLElement; initCallback: () => Promise<void> }) {
 		canvas = canvasEl as HTMLCanvasElement;
 		renderer = new THREE.WebGLRenderer({ ...WEBGL_OPTS, canvas });
 		canvasSignal.addOnce(() => {
@@ -93,7 +93,8 @@ const TariTower = () => {
 		await blueNoise.preInit();
 		await coins.preload();
 
-		loader.start(initCallback);
+		await loader.start(initCallback);
+		await initCallback();
 	}
 
 	async function _initScene() {

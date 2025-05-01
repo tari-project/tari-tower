@@ -127,7 +127,6 @@ const Loader = () => {
 					texture.anisotropy = 1;
 					texture.flipY = true;
 					cb?.(texture);
-					_onLoad();
 					log(`Loaded ${assetName}`);
 				},
 				undefined,
@@ -136,10 +135,12 @@ const Loader = () => {
 		});
 	}
 
-	function start(cb) {
+	async function start(cb) {
+		for (const loadFunction of list) {
+			await loadFunction();
+		}
 		loadedCount = 0;
 		onLoadCallback = cb;
-		list.forEach((loadFunction) => loadFunction());
 	}
 
 	function _onLoad() {
