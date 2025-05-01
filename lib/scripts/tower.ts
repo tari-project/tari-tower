@@ -10,7 +10,7 @@ import { Background, bgContainer } from './visuals/bg/bg.ts';
 import loader from './core/loader.ts';
 import { OrthographicCamera } from 'three';
 import { canvasSignal } from './logic/signals.ts';
-import { logError, logInfo } from './utils/logger.ts';
+import { logError } from './utils/logger.ts';
 
 THREE.ColorManagement.enabled = false;
 
