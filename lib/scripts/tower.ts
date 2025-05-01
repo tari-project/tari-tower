@@ -93,7 +93,7 @@ const TariTower = () => {
 		await blueNoise.preInit();
 		await coins.preload();
 
-		loader.start(initCallback);
+		await loader.start(initCallback);
 	}
 
 	async function _initScene() {

@@ -136,10 +136,12 @@ const Loader = () => {
 		});
 	}
 
-	function start(cb) {
+	async function start(cb) {
 		loadedCount = 0;
 		onLoadCallback = cb;
-		list.forEach((loadFunction) => loadFunction());
+		for (const loadFunction of list) {
+			await loadFunction();
+		}
 	}
 
 	function _onLoad() {

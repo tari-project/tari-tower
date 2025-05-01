@@ -395,8 +395,10 @@ const X8 = 4, G8 = () => {
       );
     });
   }
-  function b(c) {
-    w = 0, o = c, B.forEach((r) => r());
+  async function b(c) {
+    w = 0, o = c;
+    for (const r of B)
+      await r();
   }
   function i() {
     w++, w === B.length && (B = [], o == null || o());
@@ -2383,7 +2385,7 @@ const IP = () => {
   async function O({ canvasEl: Q, initCallback: D }) {
     v = Q, T = new z.WebGLRenderer({ ...N8, canvas: v }), P8.addOnce(() => {
       H();
-    }), await U(), await jA.preload(), await w.preInit(), await o.preload(), MA.start(D);
+    }), await U(), await jA.preload(), await w.preInit(), await o.preload(), await MA.start(D);
   }
   async function t() {
     C.scene.add(c), c.position.fromArray(iA.DEFAULT_POSITION), c.updateProjectionMatrix(), r = c.clone(), v && (A = new eP(r, v), A.target0.fromArray(iA.DEFAULT_LOOKAT_POSITION), A.reset());
