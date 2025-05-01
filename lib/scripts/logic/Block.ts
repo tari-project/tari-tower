@@ -109,8 +109,8 @@ export default class Block {
 			properties.activeBlocksCount >= properties.minSpawnedBlocksForTheErrorBlock &&
 			stateFlags.isFree
 		) {
-			properties.errorBlock = this;
 			this.isErrorBlock = true;
+			properties.errorBlock = this;
 		}
 
 		this._setNewEasingFunction();

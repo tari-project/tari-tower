@@ -2,15 +2,15 @@ import * as THREE from 'three';
 
 import { log, logError } from '../utils/logger';
 
-import BASE from 'public/assets/BASE.buf?url&inline';
-import BOX from 'public/assets/BOX.buf?url&inline';
-import COIN from 'public/assets/COIN.buf?url&inline';
-import COIN_PLACEMENT from 'public/assets/COIN_PLACEMENT.buf?url&inline';
-import LOSE_ANIMATION from 'public/assets/LOSE_ANIMATION.buf?url&inline';
+import buf_base from 'public/assets/buf_base.buf?url&inline';
+import buf_box from 'public/assets/buf_box.buf?url&inline';
+import buf_coin from 'public/assets/buf_coin.buf?url&inline';
+import buf_coin_p from 'public/assets/buf_coin_p.buf?url&inline';
+import buf_lose from 'public/assets/buf_lose.buf?url&inline';
 
 import gobo from 'public/assets/gobo.jpg';
-import LDR_RGB1_0 from 'public/assets/LDR_RGB1_0.png';
-import matcap_gold from 'public/assets/matcap_gold.jpg';
+import noise from 'public/assets/noise.png';
+import gold from 'public/assets/gold.jpg';
 
 interface LoaderItems {
 	list: (() => void | Promise<void>)[];
@@ -18,21 +18,20 @@ interface LoaderItems {
 	onLoadCallback: (() => void) | null;
 }
 
+const assets = {
+	buf_base: buf_base,
+	buf_box: buf_box,
+	buf_coin: buf_coin,
+	buf_coin_p: buf_coin_p,
+	buf_lose: buf_lose,
+	gobo: gobo,
+	noise: noise,
+	gold: gold,
+};
 const Loader = () => {
 	let list: LoaderItems['list'] = [];
 	let loadedCount: LoaderItems['loadedCount'] = 0;
 	let onLoadCallback: LoaderItems['onLoadCallback'] = null;
-
-	const assets = {
-		'BASE.buf': BASE,
-		'BOX.buf': BOX,
-		'COIN.buf': COIN,
-		'COIN_PLACEMENT.buf': COIN_PLACEMENT,
-		'LOSE_ANIMATION.buf': LOSE_ANIMATION,
-		'gobo.jpg': gobo,
-		'LDR_RGB1_0.png': LDR_RGB1_0,
-		'matcap_gold.jpg': matcap_gold,
-	};
 
 	async function loadBuf(assetName, cb) {
 		const url = assets[assetName];
@@ -127,7 +126,7 @@ const Loader = () => {
 					texture.generateMipmaps = true;
 					texture.anisotropy = 1;
 					texture.flipY = true;
-					if (cb) cb(texture);
+					cb?.(texture);
 					_onLoad();
 					log(`Loaded ${assetName}`);
 				},

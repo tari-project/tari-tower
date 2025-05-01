@@ -10,6 +10,7 @@ import { SystemManagerState } from '../../types/systemManager';
 import { AnimationStatus } from '../../types';
 import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
 import math from '../utils/math';
+import { logWarn } from '../utils/logger.ts';
 
 let firstStartAnimationRatio: SystemManagerState['firstStartAnimationRatio'] = 0;
 let blocks: SystemManagerState['blocks'] = [];
@@ -21,6 +22,10 @@ let previousSuccessBlocksAnimationRatio: SystemManagerState['previousSuccessBloc
 const SystemManager = () => {
 	function _spawnBlock() {
 		if (_shouldPreventSpawn()) {
+			if (properties.errorBlock && properties.errorBlock.isErrorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle) {
+				logWarn(`Long block lifecycle (${properties.errorBlock.errorLifeCycle}) exceeded max, resetting in spawn`);
+				_spawnSingleBlock(true);
+			}
 			return;
 		}
 		if (stateFlags.isSuccessResult || stateFlags.isReplayResult) {
@@ -59,9 +64,9 @@ const SystemManager = () => {
 		}
 	}
 
-	function _spawnSingleBlock() {
+	function _spawnSingleBlock(replaceErrorBlock = false) {
 		let block: Block | null | undefined = null;
-		const needsErrorBlockReplacement = Boolean(properties.errorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle);
+		const needsErrorBlockReplacement = replaceErrorBlock || Boolean(properties.errorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle);
 		const canAddNewBlock = Boolean(blocks.length < properties.maxFreeBlocksCount && stateStatus === AnimationStatus.FREE);
 		if (!needsErrorBlockReplacement) {
 			if (canAddNewBlock) {

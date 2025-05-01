@@ -35,14 +35,14 @@ const Coins = () => {
 	};
 
 	async function preload() {
-		const t = await loader.loadTexture(`matcap_gold.jpg`, (texture) => {
+		const t = await loader.loadTexture(`gold`, (texture) => {
 			matcapTexture = texture;
 			matcapTexture.needsUpdate = true;
 		});
-		const b = await loader.loadBuf(`COIN.buf`, (geometry) => {
+		const b = await loader.loadBuf(`buf_coin`, (geometry) => {
 			refGeometry = geometry;
 		});
-		const b1 = await loader.loadBuf(`COIN_PLACEMENT.buf`, (geometry) => {
+		const b1 = await loader.loadBuf(`buf_coin_p`, (geometry) => {
 			const { position, aoN, aoP, curveu, orient } = geometry.attributes;
 			positionsArray = position.array;
 			aoNArray = aoN.array;

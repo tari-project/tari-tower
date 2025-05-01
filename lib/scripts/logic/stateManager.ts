@@ -29,7 +29,7 @@ interface QueueArgs {
 let status: AnimationStatus = AnimationStatus.NOT_STARTED;
 let result: AnimationResult = AnimationResult.NONE;
 let statusUpdateQueue: StatusManagerState['statusUpdateQueue'] = [];
-const MAX_QUEUE_LENGTH = 7; // amount of statuses
+const MAX_QUEUE_LENGTH = 4;
 
 const StateManager = () => {
 	const statusOrder = Object.values(AnimationStatus);
@@ -37,16 +37,9 @@ const StateManager = () => {
 	let removeCanvas = false;
 
 	function updateAfterCycle() {
-		if (properties.errorBlock) {
-			if (properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 2) {
-			logInfo(
-				'long block in updateAfterCycle | ',
-				`falling: ${properties.errorBlock?.isErrorBlockFalling}, lifecycle: ${properties.errorBlock?.errorLifeCycle}/${properties.errorBlockMaxLifeCycle}`,
-			);
-		}
-			if (properties.errorBlock.isErrorBlockFalling || properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 1) {
-				return;
-			}
+		if (properties.errorBlock && properties.errorBlock.isErrorBlockFalling) {
+			logInfo(`long block lifecycle: ${properties.errorBlock?.errorLifeCycle}/${properties.errorBlockMaxLifeCycle}`);
+			return;
 		}
 		if (stateFlags.isStart) {
 			setFree();
@@ -55,7 +48,7 @@ const StateManager = () => {
 		}
 
 		if (statusUpdateQueue.length !== 0) {
-			logInfo(`statusUpdateQueue (${statusUpdateQueue.length}):`, statusUpdateQueue.map((q) => q.status).join(' | '));
+			logInfo(`queue (${statusUpdateQueue.length}):`, statusUpdateQueue.map((q) => q.status).join(' | '));
 			const callback = statusUpdateQueue.shift()?.callback;
 			callback?.();
 		}
@@ -123,8 +116,8 @@ const StateManager = () => {
 	}
 
 	function _updateStatusAndResult({ status: newStatus, result: newResult, animationStyle }: QueueArgs) {
-
-		if (_canUpdateStatus(newStatus, newResult)) {
+		const canUpdateStatus = _canUpdateStatus(newStatus, newResult);
+		if (canUpdateStatus) {
 			if (properties.errorBlock && !properties.errorBlock.isErrorBlockFalling) {
 				properties.errorBlock.preventErrorBlockFallAnimation();
 				properties.errorBlock = null;
@@ -144,7 +137,7 @@ const StateManager = () => {
 	}
 
 	function set(id: string, isReplay = false) {
-		logInfo(`stateManager.set - id: ${id} ${isReplay ? 'replay' : ''}`);
+		logInfo(`stateManager called with id: ${id} ${isReplay ? 'replay' : ''}`);
 		const actions = {
 			start: () => setStart(),
 			stop: () => setStop(),
@@ -171,20 +164,15 @@ const StateManager = () => {
 	function _queueStatusUpdate({ status, result = null, animationStyle = null }: QueueArgs) {
 		// Clear queue if it's getting too long
 		if (statusUpdateQueue.length >= MAX_QUEUE_LENGTH) {
-			logWarn('State update queue too long, clearing to prevent backlog');
-			statusUpdateQueue = [];
-		}
-
-		// Clear queue for result states to ensure immediate processing
-		if (result || status === AnimationStatus.STARTED) {
+			logWarn(`State update queue too long (${statusUpdateQueue.length}), clearing to prevent backlog`);
 			statusUpdateQueue = [];
 		}
 
 		const queueItem: QueueItem = result
 			? {
-				status,
-				callback: () => _updateStatusAndResult({ status, result, animationStyle }),
-			}
+					status,
+					callback: () => _updateStatusAndResult({ status, result, animationStyle }),
+				}
 			: { status, callback: () => _canUpdateStatus(status) };
 
 		statusUpdateQueue.push(queueItem);
