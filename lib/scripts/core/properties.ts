@@ -38,6 +38,7 @@ export const propertiesInitialState: PropertiesType = {
 	isPaused: false,
 	showVisual: settings.SHOW_BLOCK,
 	loadList: [],
+	// animationSpeed: 5,
 	animationSpeed: 1,
 	activeBlocksCount: 0,
 	maxFreeBlocksCount,

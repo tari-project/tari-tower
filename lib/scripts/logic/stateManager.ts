@@ -3,7 +3,6 @@ import settings from '../core/settings';
 import { gameEndedSignal, stateSignal, winAnimationSignal } from './signals';
 import { AnimationResult, AnimationStatus, QueueItem, StatusManagerState, SuccessLevel } from '../../types/stateManager';
 import { logInfo, logWarn } from '../utils/logger';
-import { heroBlocks as blocksVisual } from '../visuals/hero/hero.ts';
 
 export const PREVENT_CYCLE_STATES = [AnimationStatus.NOT_STARTED, AnimationStatus.RESTART_ANIMATION, AnimationStatus.RESTART, AnimationStatus.STARTED];
 export const resetCycleResults = [AnimationResult.FAILED, AnimationResult.COMPLETED];
@@ -38,7 +37,7 @@ const StateManager = () => {
 	let removeCanvas = false;
 
 	function updateAfterCycle() {
-		if (properties.errorBlock && properties.errorBlock.isErrorBlockFalling && status === AnimationStatus.FREE) {
+		if (properties.errorBlock && properties.errorBlock.isErrorBlockFalling) {
 			logInfo(`long block lifecycle: ${properties.errorBlock?.errorLifeCycle}/${properties.errorBlockMaxLifeCycle}`);
 			return;
 		}
@@ -167,11 +166,6 @@ const StateManager = () => {
 		if (statusUpdateQueue.length >= MAX_QUEUE_LENGTH) {
 			logWarn(`State update queue too long (${statusUpdateQueue.length}), clearing to prevent backlog`);
 			statusUpdateQueue = [];
-		}
-
-		if (!!result && properties.errorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle - 1) {
-			logWarn(`Long block lifecycle (${properties.errorBlock.errorLifeCycle}) exceeded max, resetting in queue update`);
-			properties.errorBlock?.reset(true);
 		}
 
 		const queueItem: QueueItem = result

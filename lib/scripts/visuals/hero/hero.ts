@@ -274,8 +274,8 @@ const Hero = () => {
 	}
 
 	function resetBlockFromLogicBlock(logicBlock) {
-		const block = heroState._blockList[logicBlock.id];
-		block.reset();
+		const block = heroState._blockList[logicBlock?.id];
+		block?.reset();
 	}
 
 	function _updateColors(dt: number) {
