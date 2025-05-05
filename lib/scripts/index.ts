@@ -53,6 +53,7 @@ export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: s
 	properties.offsetX = offset;
 	properties.cameraOffsetX = properties.offsetX / window.innerWidth;
 	const canvasEl = document.getElementById(canvasId);
+	resetCompleted = false;
 	towerRemovedSignal.add(() => {
 		resetCompleted = true;
 	});
@@ -80,4 +81,5 @@ export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 	while (!resetCompleted) {
 		await new Promise((resolve) => setTimeout(resolve, 100));
 	}
+	logInfo('Tower animation removed successfully.');
 }

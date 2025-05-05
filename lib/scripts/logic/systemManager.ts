@@ -19,7 +19,7 @@ import { SystemManagerState } from '../../types/systemManager';
 import { AnimationStatus } from '../../types';
 import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
 import math from '../utils/math';
-import { logWarn } from '../utils/logger.ts';
+import { logInfo, logWarn } from '../utils/logger.ts';
 
 let firstStartAnimationRatio: SystemManagerState['firstStartAnimationRatio'] = 0;
 let blocks: SystemManagerState['blocks'] = [];
@@ -179,6 +179,7 @@ const SystemManager = () => {
 			_startNewCycle();
 		});
 		towerRemovedSignal.dispatch();
+		logInfo('Tower successfully reset.');
 	}
 
 	function _updateAnimationRatios(dt: number) {
