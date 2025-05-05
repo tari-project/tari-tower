@@ -4,7 +4,16 @@ import { board, mainTile, TOTAL_TILES } from './board';
 import { errorAnimationManager } from './errorAnimationManager';
 import { successAnimationManager } from './successAnimationManager';
 import { stopAnimationManager } from './stopAnimationManager';
-import { spawnSignal, completeAnimationEndedSignal, endCycleSignal, errorAnimationEndedSignal, gameEndedSignal, stopAnimationEndedSignal, canvasSignal } from './signals';
+import {
+	spawnSignal,
+	completeAnimationEndedSignal,
+	endCycleSignal,
+	errorAnimationEndedSignal,
+	gameEndedSignal,
+	stopAnimationEndedSignal,
+	canvasSignal,
+	towerRemovedSignal,
+} from './signals';
 import Block from './Block';
 import { SystemManagerState } from '../../types/systemManager';
 import { AnimationStatus } from '../../types';
@@ -169,6 +178,7 @@ const SystemManager = () => {
 			sM.setRestart();
 			_startNewCycle();
 		});
+		towerRemovedSignal.dispatch();
 	}
 
 	function _updateAnimationRatios(dt: number) {

@@ -1,6 +1,6 @@
 import TariTower from './tower.ts';
 import { stateManager, status } from './logic/stateManager.ts';
-import { gameEndedSignal } from './logic/signals.ts';
+import { gameEndedSignal, towerRemovedSignal } from './logic/signals.ts';
 import { properties } from './core/properties.ts';
 import { log, logError, logInfo } from './utils/logger.ts';
 
@@ -11,6 +11,7 @@ let lastRender = 0;
 const targetFPS = 50;
 const frameInterval = 1 / targetFPS;
 let _frame: number;
+let resetCompleted = false;
 
 /**
  * Main animation loop that controls rendering at a fixed frame rate
@@ -52,6 +53,9 @@ export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: s
 	properties.offsetX = offset;
 	properties.cameraOffsetX = properties.offsetX / window.innerWidth;
 	const canvasEl = document.getElementById(canvasId);
+	towerRemovedSignal.add(() => {
+		resetCompleted = true;
+	});
 
 	try {
 		if (canvasEl) {
@@ -73,4 +77,7 @@ export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 	}
 	time = 0;
 	lastRender = 0;
+	while (!resetCompleted) {
+		await new Promise((resolve) => setTimeout(resolve, 100));
+	}
 }
