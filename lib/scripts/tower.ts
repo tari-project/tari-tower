@@ -67,6 +67,7 @@ const TariTower = () => {
 		properties.width = dprWidth;
 		properties.height = dprHeight;
 		properties.resolution.set(dprWidth, dprHeight);
+		camera.setViewOffset(viewportWidth, viewportHeight, 0, 87.5, viewportWidth, viewportHeight);
 		camera.updateProjectionMatrix();
 
 		renderer?.setSize(dprWidth, dprHeight);
@@ -100,6 +101,7 @@ const TariTower = () => {
 	async function _initScene() {
 		properties.scene.add(camera);
 		camera.position.fromArray(settings.DEFAULT_POSITION);
+		camera.scale.set(0.905, 0.905, 0.905);
 		camera.updateProjectionMatrix();
 		orbitCamera = camera.clone();
 		if (canvas) {

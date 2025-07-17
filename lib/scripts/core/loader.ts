@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-import { log, logError } from '../utils/logger';
+import { logError } from '../utils/logger';
 
 import buf_base from 'public/assets/buf_base.buf?url&inline';
 import buf_box from 'public/assets/buf_box.buf?url&inline';
@@ -81,7 +81,6 @@ const Loader = () => {
 					if (cb) cb(geometry);
 					_onLoad();
 
-					log(`Loaded ${assetName}`);
 					break;
 				} catch (error) {
 					attempts++;
@@ -127,7 +126,6 @@ const Loader = () => {
 					texture.anisotropy = 1;
 					texture.flipY = true;
 					cb?.(texture);
-					log(`Loaded ${assetName}`);
 				},
 				undefined,
 				(error) => logError(`Failed to load texture: ${assetName}`, error),

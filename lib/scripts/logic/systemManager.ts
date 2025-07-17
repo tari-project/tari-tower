@@ -179,7 +179,7 @@ const SystemManager = () => {
 			_startNewCycle();
 		});
 		towerRemovedSignal.dispatch();
-		logInfo('Tower successfully reset.');
+		logInfo('Reset successfully.');
 	}
 
 	function _updateAnimationRatios(dt: number) {
