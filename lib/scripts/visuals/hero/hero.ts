@@ -22,6 +22,7 @@ import { lightCameraHelperSignal, lightCameraUpdateSignal } from '../../logic/si
 import { InstancedBufferAttribute } from 'three';
 import { HeroSharedUniforms, HeroType } from '../../../types/hero';
 import { AnimationResult } from '../../../types';
+import { log } from '../../utils/logger.ts';
 
 const TOTAL_BLOCKS = 2 * TOTAL_TILES;
 const _v2_0 = new THREE.Vector2();
@@ -99,6 +100,7 @@ const Hero = () => {
 		});
 		try {
 			await Promise.all([base, box, lose, gobo]);
+			log(`Loaded assets`);
 		} catch (e) {
 			console.error('hero preload error:', e);
 		}

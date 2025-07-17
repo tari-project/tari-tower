@@ -38,7 +38,7 @@ const StateManager = () => {
 
 	function updateAfterCycle() {
 		if (properties.errorBlock && properties.errorBlock.isErrorBlockFalling) {
-			logInfo(`long block lifecycle: ${properties.errorBlock?.errorLifeCycle}/${properties.errorBlockMaxLifeCycle}`);
+			logInfo(`Long block cycle: ${properties.errorBlock?.errorLifeCycle}/${properties.errorBlockMaxLifeCycle}`);
 			return;
 		}
 		if (stateFlags.isStart) {
@@ -48,7 +48,9 @@ const StateManager = () => {
 		}
 
 		if (statusUpdateQueue.length !== 0) {
-			logInfo(`queue (${statusUpdateQueue.length}):`, statusUpdateQueue.map((q) => q.status).join(' | '));
+			if (statusUpdateQueue.length > 1) {
+				logInfo(`Queue(${statusUpdateQueue.length}):`, statusUpdateQueue.map((q) => q.status).join('|'));
+			}
 			const callback = statusUpdateQueue.shift()?.callback;
 			callback?.();
 		}
@@ -137,7 +139,7 @@ const StateManager = () => {
 	}
 
 	function set(id: string, isReplay = false) {
-		logInfo(`stateManager called with id: ${id} ${isReplay ? 'replay' : ''}`);
+		logInfo(`STATE_ID = ${id} ${isReplay ? '(replay)' : ''}`);
 		const actions = {
 			start: () => setStart(),
 			stop: () => setStop(),
@@ -164,7 +166,7 @@ const StateManager = () => {
 	function _queueStatusUpdate({ status, result = null, animationStyle = null }: QueueArgs) {
 		// Clear queue if it's getting too long
 		if (statusUpdateQueue.length >= MAX_QUEUE_LENGTH) {
-			logWarn(`State update queue too long (${statusUpdateQueue.length}), clearing to prevent backlog`);
+			logWarn(`Queue too long (${statusUpdateQueue.length}), clearing to prevent backlog`);
 			statusUpdateQueue = [];
 		}
 
