@@ -67,6 +67,7 @@ const TariTower = () => {
 		properties.width = dprWidth;
 		properties.height = dprHeight;
 		properties.resolution.set(dprWidth, dprHeight);
+		camera.setViewOffset(viewportWidth, viewportHeight, 0, 100, viewportWidth, viewportHeight);
 		camera.updateProjectionMatrix();
 
 		renderer?.setSize(dprWidth, dprHeight);

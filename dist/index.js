@@ -2348,7 +2348,7 @@ const EP = () => {
     C.viewportWidth = o, C.viewportHeight = D, C.viewportResolution.set(o, window.innerHeight), C.sharedUniforms.u_viewportResolution.value = C.viewportResolution;
     let E = o * HA.DPR, x = D * HA.DPR;
     const g = E / x;
-    x * E > HA.MAX_PIXEL_COUNT && (x = Math.sqrt(HA.MAX_PIXEL_COUNT / g), E = Math.ceil(x * g), x = Math.ceil(x)), C.width = E, C.height = x, C.resolution.set(E, x), t.updateProjectionMatrix(), n?.setSize(E, x), c && (c.style.width = o + "px", c.style.height = D + "px");
+    x * E > HA.MAX_PIXEL_COUNT && (x = Math.sqrt(HA.MAX_PIXEL_COUNT / g), E = Math.ceil(x * g), x = Math.ceil(x)), C.width = E, C.height = x, C.resolution.set(E, x), t.setViewOffset(o, D, 0, 100, o, D), t.updateProjectionMatrix(), n?.setSize(E, x), c && (c.style.width = o + "px", c.style.height = D + "px");
   }
   function T() {
     r(window.innerWidth, window.innerHeight);
