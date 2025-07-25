@@ -164,9 +164,11 @@ const StateManager = () => {
 	 * it will clear the existing queue to ensure immediate processing of important state changes.
 	 */
 	function _queueStatusUpdate({ status, result = null, animationStyle = null }: QueueArgs) {
-		// Clear queue if it's getting too long
-		if (statusUpdateQueue.length >= MAX_QUEUE_LENGTH) {
-			logWarn(`Queue too long (${statusUpdateQueue.length}), clearing to prevent backlog`);
+		const statuses = statusUpdateQueue.map((q) => q.status);
+		const shouldClearQueue = statuses?.length >= MAX_QUEUE_LENGTH;
+		// Clear the queue if it's getting too long
+		if (shouldClearQueue) {
+			logWarn(`Queue too long (${statuses.length}), clearing to prevent backlog`);
 			statusUpdateQueue = [];
 		}
 

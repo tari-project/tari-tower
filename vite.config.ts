@@ -1,7 +1,7 @@
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
-import eslint from '@nabla/vite-plugin-eslint';
+import eslint from 'vite-plugin-eslint2';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import dts from 'vite-plugin-dts';
 import glsl from 'vite-plugin-glsl';
@@ -14,7 +14,7 @@ export default defineConfig({
 	plugins: [
 		glsl(),
 		tsconfigPaths(),
-		eslint({ eslintOptions: { cache: false, fix: true } }),
+		eslint({ cache: false, fix: true }),
 		dts({ include: ['lib'], exclude: ['src'], rollupTypes: true, tsconfigPath: resolve(__dirname, 'tsconfig.app.json') }),
 	],
 	build: {

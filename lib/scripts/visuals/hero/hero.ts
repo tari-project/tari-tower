@@ -19,7 +19,7 @@ import { failFloatingCubesRatio, failPushDownRatio, failShakeRatio, failSpawnRat
 import HeroBlockCoordinates from './HeroBlockCoordinates';
 import { lightCameraHelperSignal, lightCameraUpdateSignal } from '../../logic/signals';
 
-import { InstancedBufferAttribute } from 'three';
+import { BufferGeometry, InstancedBufferAttribute, Texture } from 'three';
 import { HeroSharedUniforms, HeroType } from '../../../types/hero';
 import { AnimationResult } from '../../../types';
 import { log } from '../../utils/logger.ts';
@@ -38,6 +38,7 @@ const DEFAULT_COLOR = new THREE.Color();
 const _c = new THREE.Color();
 const _c2 = new THREE.Color();
 const heroContainer = new THREE.Object3D();
+heroContainer.name = 'hero_container';
 
 const heroSharedUniforms: HeroSharedUniforms = {
 	u_lightPosition: { value: new THREE.Vector3(-2, 6, -4) },
@@ -74,6 +75,9 @@ const heroState: HeroType = {
 };
 
 const Hero = () => {
+	const buffers: BufferGeometry[] = [];
+	const textures: Texture[] = [];
+
 	async function preload() {
 		const arr = Array.from({ length: TOTAL_BLOCKS });
 		heroState._blockList = arr.map((_) => new HeroBlockCoordinates());
@@ -81,22 +85,26 @@ const Hero = () => {
 
 		const base = await loader.loadBuf(`buf_base`, (geometry) => {
 			_onBaseBlocksLoaded(geometry);
+			buffers.push(geometry);
 		});
 		const box = await loader.loadBuf(`buf_box`, (geometry) => {
 			_onBoxLoaded(geometry);
+			buffers.push(geometry);
 		});
 		const lose = await loader.loadBuf(`buf_lose`, (geometry) => {
 			const { position, orient } = geometry.attributes;
 			heroState.animationTotalFrames = position.count / TOTAL_TILES;
 			heroState.heroLoseAnimationPositionArray = position.array;
 			heroState.heroLoseAnimationOrientArray = orient.array;
+			buffers.push(geometry);
 		});
-		const gobo = await loader.loadTexture(`gobo`, (texture) => {
-			texture.flipY = false;
-			texture.needsUpdate = true;
+		const gobo = await loader.loadTexture(`gobo`, (t) => {
+			t.flipY = false;
+			t.needsUpdate = true;
 			if (heroSharedUniforms) {
-				heroSharedUniforms.u_goboTexture.value = texture;
+				heroSharedUniforms.u_goboTexture.value = t;
 			}
+			textures.push(t);
 		});
 		try {
 			await Promise.all([base, box, lose, gobo]);
@@ -142,6 +150,7 @@ const Hero = () => {
 
 	function _onBoxLoaded(refGeometry) {
 		const geometry = new THREE.InstancedBufferGeometry();
+		geometry.name = 'hero_blocks';
 		geometry.index = refGeometry.index;
 		Object.keys(refGeometry.attributes).forEach((id) => {
 			geometry.setAttribute(id, refGeometry.attributes[id]);
@@ -232,6 +241,9 @@ const Hero = () => {
 		}
 
 		heroState.infoTexture = new THREE.DataTexture(infoData, SIZE_WITH_PADDING, SIZE_WITH_PADDING, THREE.RGBAFormat, THREE.FloatType);
+		heroState.infoTexture.name = 'hero_infoTexture';
+
+		textures.push(heroState.infoTexture);
 		heroState.infoTextureLinear = new THREE.DataTexture(
 			infoData,
 			SIZE_WITH_PADDING,
@@ -245,7 +257,10 @@ const Hero = () => {
 			THREE.LinearFilter,
 			0,
 		);
+		heroState.infoTextureLinear.name = 'hero_infoTextureLinear';
 		heroState.infoTextureLinear.needsUpdate = true;
+
+		textures.push(heroState.infoTextureLinear);
 		if (heroSharedUniforms) {
 			heroSharedUniforms.u_infoTexture.value = heroState.infoTexture;
 			heroSharedUniforms.u_infoTextureLinear.value = heroState.infoTextureLinear;
@@ -583,6 +598,8 @@ const Hero = () => {
 		reset,
 		resetBlockFromLogicBlock,
 		update,
+		buffers,
+		textures,
 	};
 };
 const heroBlocks = Hero();

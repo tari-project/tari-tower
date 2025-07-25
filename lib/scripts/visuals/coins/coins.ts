@@ -9,10 +9,13 @@ import vert from './coins.vert?raw';
 import frag from './coins.frag?raw';
 import fragDepth from './coinsDepth.frag?raw';
 import { floatingCoinsRatio, vortexCoinsRatio } from '../../logic/successAnimationManager';
-import { BufferGeometry, InstancedBufferGeometry, Mesh, ShaderMaterial } from 'three';
+import { BufferGeometry, InstancedBufferGeometry, Mesh, ShaderMaterial, Texture } from 'three';
 const coinContainer = new THREE.Object3D();
-
+coinContainer.name = 'coins_container';
 const Coins = () => {
+	const buffers: BufferGeometry[] = [];
+	const textures: Texture[] = [];
+
 	let refGeometry: BufferGeometry;
 	let coinMesh: Mesh | null = null;
 	let coinGeometry: InstancedBufferGeometry | null = null;
@@ -26,8 +29,8 @@ const Coins = () => {
 	let animationRatio = 0;
 	const isFloating = true;
 	let matcapTexture;
-
 	let randsArray;
+
 	const coinsSharedUniforms = {
 		u_time: { value: 0 },
 		u_ratio: { value: 0 },
@@ -38,9 +41,11 @@ const Coins = () => {
 		const t = await loader.loadTexture(`gold`, (texture) => {
 			matcapTexture = texture;
 			matcapTexture.needsUpdate = true;
+			textures.push(texture);
 		});
 		const b = await loader.loadBuf(`buf_coin`, (geometry) => {
 			refGeometry = geometry;
+			buffers.push(geometry);
 		});
 		const b1 = await loader.loadBuf(`buf_coin_p`, (geometry) => {
 			const { position, aoN, aoP, curveu, orient } = geometry.attributes;
@@ -49,8 +54,8 @@ const Coins = () => {
 			aoPArray = aoP.array;
 			curveuArray = curveu.array;
 			orientArray = orient.array;
-
 			coinsCount = position.count;
+			buffers.push(geometry);
 		});
 		try {
 			await Promise.all([t, b, b1]);
@@ -72,6 +77,7 @@ const Coins = () => {
 		if (refGeometry) {
 			refGeometry.computeVertexNormals();
 			const geometry = new THREE.InstancedBufferGeometry();
+			geometry.name = 'coins';
 			geometry.index = refGeometry.index;
 			Object.entries(refGeometry.attributes).forEach(([id, attr]) => geometry.setAttribute(id, attr));
 
@@ -139,12 +145,18 @@ const Coins = () => {
 			coinMesh.rotation.y = (isFloating ? 0 : 4) * animationRatio;
 			coinMesh.visible = animationRatio > 0 && animationRatio < 1;
 		}
+		if (animationRatio <= 0) {
+			buffers.forEach((b) => b?.dispose());
+			textures.forEach((t) => t?.dispose());
+		}
 	}
 
 	return {
 		preload,
 		init,
 		update,
+		buffers,
+		textures,
 	};
 };
 
