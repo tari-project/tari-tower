@@ -160,7 +160,7 @@ const u8 = () => {
 new y();
 const C8 = new y(), V8 = new y(), Z8 = new y();
 var F = /* @__PURE__ */ ((B) => (B.NOT_STARTED = "not-started", B.STARTED = "started", B.FREE = "free", B.RESULT = "result", B.RESULT_ANIMATION = "result_animation", B.RESTART_ANIMATION = "restart_animation", B.RESTART = "restart", B))(F || {}), j = /* @__PURE__ */ ((B) => (B.NONE = "none", B.PAUSE = "pause", B.STOP = "stop", B.COMPLETED = "completed", B.FAILED = "failed", B.REPLAY = "replay", B))(j || {}), IA = /* @__PURE__ */ ((B) => (B[B.ONE = 1] = "ONE", B[B.TWO = 2] = "TWO", B[B.THREE = 3] = "THREE", B))(IA || {});
-const R8 = "0.1.0", Bw = (B) => `TOWER_${R8} ${B === "warn" || B === "error" ? B : ""}`;
+const R8 = "0.1.1", Bw = (B) => `TOWER_${R8} ${B === "warn" || B === "error" ? B : ""}`;
 function fA(...B) {
   return console.error(Bw("error"), ...B);
 }
