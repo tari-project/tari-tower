@@ -182,6 +182,16 @@ const TariTower = () => {
 		renderer?.render(properties.scene, camera);
 	}
 
+	function _disposeAll() {
+		coins.buffers.forEach((b) => b?.dispose());
+		coins.textures.forEach((t) => t?.dispose());
+		heroBlocks.buffers.forEach((b) => b?.dispose());
+		heroBlocks.textures.forEach((t) => t?.dispose());
+		blueNoise.textures.forEach((t) => t?.dispose());
+		const renderTarget = renderer.getRenderTarget();
+		renderTarget?.dispose();
+		renderer.dispose();
+	}
 	function destroy() {
 		if (!canvas || !canvas?.id) return;
 		properties.showVisual = false;
@@ -190,8 +200,9 @@ const TariTower = () => {
 		const freshCanvas = document.createElement('canvas');
 		freshCanvas.setAttribute('id', canvas.id);
 		canvas.replaceWith(freshCanvas);
+
 		// Clean up Three.js resources
-		renderer.dispose();
+		_disposeAll();
 		renderer.state.reset();
 	}
 	return {

@@ -1,5 +1,4 @@
-import * as THREE from 'three';
-
+import { BufferAttribute, BufferGeometry, LinearFilter, LinearMipMapLinearFilter, TextureLoader } from 'three';
 import { logError } from '../utils/logger';
 
 import buf_base from 'public/assets/buf_base.buf?url&inline';
@@ -51,7 +50,7 @@ const Loader = () => {
 					const { vertexCount, indexCount, attributes: schematicAttributeList } = schematic;
 					let offset = 4 + schematicJsonSize;
 
-					const geometry = new THREE.BufferGeometry();
+					const geometry = new BufferGeometry();
 					const offsetMap = {};
 
 					schematicAttributeList.forEach((schematicAttribute) => {
@@ -70,13 +69,15 @@ const Loader = () => {
 						}
 
 						if (id === 'indices') {
-							geometry.setIndex(new THREE.BufferAttribute(outArr, 1));
+							geometry.setIndex(new BufferAttribute(outArr, 1));
 						} else {
-							geometry.setAttribute(id, new THREE.BufferAttribute(outArr, componentSize));
+							geometry.setAttribute(id, new BufferAttribute(outArr, componentSize));
 						}
 
 						offset += dataLength * componentSize * byteSize;
 					});
+
+					geometry.name = assetName;
 
 					if (cb) cb(geometry);
 					_onLoad();
@@ -117,11 +118,12 @@ const Loader = () => {
 		const url = assets[assetName];
 
 		list.push(() => {
-			new THREE.TextureLoader().load(
+			new TextureLoader().load(
 				url,
 				(texture) => {
-					texture.minFilter = THREE.LinearMipMapLinearFilter;
-					texture.magFilter = THREE.LinearFilter;
+					texture.name = assetName;
+					texture.minFilter = LinearMipMapLinearFilter;
+					texture.magFilter = LinearFilter;
 					texture.generateMipmaps = true;
 					texture.anisotropy = 1;
 					texture.flipY = true;

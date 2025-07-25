@@ -1,34 +1,35 @@
-import * as THREE from 'three';
 import loader from '../../core/loader';
 
 import getBlueNoiseShader from './getBlueNoise.glsl?raw';
 import { Uniform } from '../../../types/properties';
+import { NearestFilter, RepeatWrapping, ShaderChunk, Texture, Vector2 } from 'three';
 
 export interface BN_Uniforms {
 	u_blueNoiseTexture: Uniform;
-	u_blueNoiseTexelSize: Uniform<THREE.Vector2 | null>;
-	u_blueNoiseCoordOffset: Uniform<THREE.Vector2>;
+	u_blueNoiseTexelSize: Uniform<Vector2 | null>;
+	u_blueNoiseCoordOffset: Uniform<Vector2>;
 }
 const bn_sharedUniforms: BN_Uniforms = {
 	u_blueNoiseTexture: { value: null },
 	u_blueNoiseTexelSize: { value: null },
-	u_blueNoiseCoordOffset: { value: new THREE.Vector2() },
+	u_blueNoiseCoordOffset: { value: new Vector2() },
 };
 const BlueNoise = () => {
 	const TEXTURE_SIZE = 128;
-
+	const textures: Texture[] = [];
 	async function preInit() {
-		await loader.loadTexture(`noise`, (texture) => {
-			texture.generateMipmaps = false;
-			texture.minFilter = texture.magFilter = THREE.NearestFilter;
-			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-			texture.needsUpdate = true;
+		await loader.loadTexture(`noise`, (t) => {
+			t.generateMipmaps = false;
+			t.minFilter = t.magFilter = NearestFilter;
+			t.wrapS = t.wrapT = RepeatWrapping;
+			t.needsUpdate = true;
 			if (bn_sharedUniforms) {
-				bn_sharedUniforms.u_blueNoiseTexture.value = texture;
-				bn_sharedUniforms.u_blueNoiseTexelSize.value = new THREE.Vector2(1 / TEXTURE_SIZE, 1 / TEXTURE_SIZE);
+				bn_sharedUniforms.u_blueNoiseTexture.value = t;
+				bn_sharedUniforms.u_blueNoiseTexelSize.value = new Vector2(1 / TEXTURE_SIZE, 1 / TEXTURE_SIZE);
 			}
+			textures.push(t);
 		});
-		THREE.ShaderChunk['getBlueNoise'] = getBlueNoiseShader;
+		ShaderChunk['getBlueNoise'] = getBlueNoiseShader;
 	}
 
 	function update(_dt: number) {
@@ -40,6 +41,7 @@ const BlueNoise = () => {
 		preInit,
 		TEXTURE_SIZE,
 		bn_sharedUniforms,
+		textures,
 	};
 };
 

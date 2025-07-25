@@ -9,6 +9,7 @@ import particlesVert from './particles.vert?raw';
 import particlesFrag from './particles.frag?raw';
 
 const container = new THREE.Object3D();
+container.name = 'bg';
 const Background = () => {
 	const particles: Mesh & { material: ShaderMaterial } = new THREE.Mesh();
 	const mesh: Mesh & { material: ShaderMaterial } = new THREE.Mesh(new THREE.PlaneGeometry(2, 2));
@@ -32,8 +33,9 @@ const Background = () => {
 	function initParticles() {
 		const particlesCount = 50;
 		const refGeometry = new THREE.PlaneGeometry(1, 1);
-
+		refGeometry.name = 'plane';
 		const geometry = new THREE.InstancedBufferGeometry();
+		geometry.name = 'particles';
 		geometry.index = refGeometry.index;
 		Object.keys(refGeometry.attributes).forEach((id) => {
 			geometry.setAttribute(id, refGeometry.attributes[id]);
