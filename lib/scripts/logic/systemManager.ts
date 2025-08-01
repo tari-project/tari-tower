@@ -220,7 +220,6 @@ const SystemManager = () => {
 		}
 
 		if (stateFlags.isRestart) {
-			logWarn(`stateResult=`, stateResult);
 			wasSuccess = stateResult === AnimationResult.COMPLETED;
 			reset();
 			return;
