@@ -166,7 +166,7 @@ const StateManager = () => {
 	function _queueStatusUpdate({ status, result = null, animationStyle = null }: QueueArgs) {
 		const statuses = statusUpdateQueue.map((q) => q.status);
 		const queueOverloaded = statuses?.length >= MAX_QUEUE_LENGTH;
-		const shouldClearQueue = queueOverloaded || result === AnimationResult.STOP || status === AnimationStatus.RESTART;
+		const shouldClearQueue = queueOverloaded || status === AnimationStatus.RESTART;
 		// Clear the queue if it's getting too long or stop initiated
 		if (shouldClearQueue) {
 			if (queueOverloaded) {
