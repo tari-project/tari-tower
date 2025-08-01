@@ -2,6 +2,7 @@ import math from '../utils/math';
 
 import { errorAnimationEndedSignal, stateSignal } from './signals';
 import { AnimationResult, AnimationStatus } from '../../types/stateManager';
+import { logWarn } from '../utils/logger.ts';
 
 let isActive = false;
 let failRatio = 0;
@@ -14,6 +15,7 @@ let failPushDownRatio = 0;
 const ErrorAnimationManager = () => {
 	function init() {
 		stateSignal.add((status, result) => {
+			logWarn('hi from ErrorAnimationManager', status, result);
 			if (status === AnimationStatus.RESULT && result === AnimationResult.FAILED) {
 				isActive = true;
 			}

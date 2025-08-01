@@ -35,10 +35,11 @@ const StateManager = () => {
 	const statusOrder = Object.values(AnimationStatus);
 	let statusIndex = 0;
 	let removeCanvas = false;
+	let stopInitiated = false;
 
 	function updateAfterCycle() {
-		if (properties.errorBlock && properties.errorBlock.isErrorBlockFalling) {
-			logInfo(`Long block cycle: ${properties.errorBlock?.errorLifeCycle}/${properties.errorBlockMaxLifeCycle}`);
+		if (properties.errorBlock && properties.errorBlock.isErrorBlockFalling && !stateFlags.isRestart) {
+			logWarn(`we are returning`, stateFlags.isRestart);
 			return;
 		}
 		if (stateFlags.isStart) {
@@ -49,7 +50,7 @@ const StateManager = () => {
 
 		if (statusUpdateQueue.length !== 0) {
 			if (statusUpdateQueue.length > 1) {
-				logInfo(`Queue(${statusUpdateQueue.length}):`, statusUpdateQueue.map((q) => q.status).join('|'));
+				logInfo(`QUEUE.${statusUpdateQueue.length}`, statusUpdateQueue.map((q) => `${q.status}${q.result ? `[${q.result}]` : ''}`).join('|'));
 			}
 			const callback = statusUpdateQueue.shift()?.callback;
 			callback?.();
@@ -93,7 +94,7 @@ const StateManager = () => {
 			statusIndex = 2; // Jump to FREE state
 		}
 
-		// Handle special reset case - allows resetting from RESTART state
+		// Handle special reset case - allows resetting from the RESTART state
 		if (newStatus === AnimationStatus.NOT_STARTED && result === AnimationResult.NONE && statusIndex === 5) {
 			statusIndex = 6; // Move to next state to allow reset
 		}
@@ -109,7 +110,6 @@ const StateManager = () => {
 			// Results are handled separately in _updateStatusAndResult
 			if (!hasResult) {
 				updateFlags();
-				stateSignal.dispatch(status, result);
 			}
 			return true;
 		}
@@ -132,8 +132,8 @@ const StateManager = () => {
 
 			if (animationStyle) {
 				winAnimationSignal.dispatch(animationStyle);
-				return;
 			}
+
 			stateSignal.dispatch(status, result);
 		}
 	}
@@ -165,13 +165,18 @@ const StateManager = () => {
 	 */
 	function _queueStatusUpdate({ status, result = null, animationStyle = null }: QueueArgs) {
 		const statuses = statusUpdateQueue.map((q) => q.status);
-		const shouldClearQueue = statuses?.length >= MAX_QUEUE_LENGTH;
-		// Clear the queue if it's getting too long
+		const queueOverloaded = statuses?.length >= MAX_QUEUE_LENGTH;
+		const shouldClearQueue = queueOverloaded || result === AnimationResult.STOP || status === AnimationStatus.RESTART;
+		// Clear the queue if it's getting too long or stop initiated
 		if (shouldClearQueue) {
-			logWarn(`Queue too long (${statuses.length}), clearing to prevent backlog`);
+			if (queueOverloaded) {
+				logWarn(`Queue too long (${statuses.length}), clearing to prevent backlog`);
+			}
 			statusUpdateQueue = [];
 		}
-
+		if (status === AnimationStatus.RESTART_ANIMATION || status === AnimationStatus.RESULT_ANIMATION || status === AnimationStatus.RESULT) {
+			logWarn(`_queueStatusUpdate`, status, result);
+		}
 		const queueItem: QueueItem = result
 			? {
 					status,
@@ -209,6 +214,7 @@ const StateManager = () => {
 	}
 
 	function setStop() {
+		stopInitiated = true;
 		_queueStatusUpdate({
 			status: AnimationStatus.RESULT,
 			result: AnimationResult.STOP,
@@ -254,18 +260,22 @@ const StateManager = () => {
 	}
 
 	function setRestartAnimation() {
+		if (stopInitiated) {
+			logWarn(`Stop initiated, not restarting animation`, stopInitiated);
+			stopInitiated = false;
+			return;
+		}
 		_queueStatusUpdate({ status: AnimationStatus.RESTART_ANIMATION });
 	}
 	function setRemove(remove: boolean) {
 		removeCanvas = remove;
 	}
 	function setRestart() {
-		if (removeCanvas) {
+		if (removeCanvas || stopInitiated) {
 			gameEndedSignal.dispatch();
 			return;
-		} else {
-			_queueStatusUpdate({ status: AnimationStatus.RESTART });
 		}
+		_queueStatusUpdate({ status: AnimationStatus.RESTART });
 	}
 
 	function init() {

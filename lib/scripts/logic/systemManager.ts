@@ -1,25 +1,25 @@
 import { properties } from '../core/properties';
-import { stateFlags, stateManager as sM, PREVENT_CYCLE_STATES, resetCycleResults, status as stateStatus, result as stateResult } from './stateManager';
+import { PREVENT_CYCLE_STATES, resetCycleResults, result as stateResult, stateFlags, stateManager as sM, status as stateStatus } from './stateManager';
 import { board, mainTile, TOTAL_TILES } from './board';
 import { errorAnimationManager } from './errorAnimationManager';
 import { successAnimationManager } from './successAnimationManager';
 import { stopAnimationManager } from './stopAnimationManager';
 import {
-	spawnSignal,
+	canvasSignal,
 	completeAnimationEndedSignal,
 	endCycleSignal,
 	errorAnimationEndedSignal,
 	gameEndedSignal,
+	spawnSignal,
 	stopAnimationEndedSignal,
-	canvasSignal,
 	towerRemovedSignal,
 } from './signals';
 import Block from './Block';
 import { SystemManagerState } from '../../types/systemManager';
-import { AnimationStatus } from '../../types';
+import { AnimationResult, AnimationStatus } from '../../types';
 import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
 import math from '../utils/math';
-import { logInfo, logWarn } from '../utils/logger.ts';
+import { logWarn } from '../utils/logger.ts';
 
 let firstStartAnimationRatio: SystemManagerState['firstStartAnimationRatio'] = 0;
 let blocks: SystemManagerState['blocks'] = [];
@@ -27,7 +27,7 @@ let lastSpawnedBlock: SystemManagerState['lastSpawnedBlock'] = null;
 let cycleIndex: SystemManagerState['cycleIndex'] = 0;
 let animationSpeedRatio: SystemManagerState['animationSpeedRatio'] = 0;
 let previousSuccessBlocksAnimationRatio: SystemManagerState['previousSuccessBlocksAnimationRatio'] = 0;
-
+let wasSuccess = false;
 const SystemManager = () => {
 	function _spawnBlock() {
 		if (_shouldPreventSpawn()) {
@@ -99,7 +99,9 @@ const SystemManager = () => {
 	function _startNewCycle() {
 		sM.updateAfterCycle();
 
-		if (PREVENT_CYCLE_STATES.includes(stateStatus)) return;
+		if (PREVENT_CYCLE_STATES.includes(stateStatus)) {
+			return;
+		}
 		if (lastSpawnedBlock) {
 			blocks = [lastSpawnedBlock, ...blocks];
 			lastSpawnedBlock = null;
@@ -151,7 +153,7 @@ const SystemManager = () => {
 		lastSpawnedBlock = null;
 		cycleIndex = 0;
 		animationSpeedRatio = 0;
-
+		previousSuccessBlocksAnimationRatio = wasSuccess ? 1 : 0;
 		if (isDestroy) {
 			canvasSignal.dispatch();
 			firstStartAnimationRatio = 0;
@@ -168,7 +170,6 @@ const SystemManager = () => {
 		completeAnimationEndedSignal.remove(() => {
 			sM.setRestart();
 			_startNewCycle();
-			previousSuccessBlocksAnimationRatio = 1;
 		});
 		stopAnimationEndedSignal.remove(() => {
 			sM.setRestart();
@@ -179,7 +180,6 @@ const SystemManager = () => {
 			_startNewCycle();
 		});
 		towerRemovedSignal.dispatch();
-		logInfo('Reset successfully.');
 	}
 
 	function _updateAnimationRatios(dt: number) {
@@ -220,6 +220,8 @@ const SystemManager = () => {
 		}
 
 		if (stateFlags.isRestart) {
+			logWarn(`stateResult=`, stateResult);
+			wasSuccess = stateResult === AnimationResult.COMPLETED;
 			reset();
 			return;
 		}
@@ -251,7 +253,6 @@ const SystemManager = () => {
 		completeAnimationEndedSignal.add(() => {
 			sM.setRestart();
 			_startNewCycle();
-			previousSuccessBlocksAnimationRatio = 1;
 		});
 		stopAnimationEndedSignal.add(() => {
 			sM.setRestart();
