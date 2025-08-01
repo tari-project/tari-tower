@@ -7,12 +7,13 @@ import dts from 'vite-plugin-dts';
 import glsl from 'vite-plugin-glsl';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
 export default defineConfig({
 	server: {
 		port: 3001,
 	},
 	plugins: [
-		glsl(),
+		glsl({ minify: true, root: '/lib' }),
 		tsconfigPaths(),
 		eslint({ cache: false, fix: true }),
 		dts({ include: ['lib'], exclude: ['src'], rollupTypes: true, tsconfigPath: resolve(__dirname, 'tsconfig.app.json') }),
@@ -36,5 +37,6 @@ export default defineConfig({
 				},
 			},
 		},
+		sourcemap: 'hidden',
 	},
 });
