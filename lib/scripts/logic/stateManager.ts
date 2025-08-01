@@ -39,7 +39,6 @@ const StateManager = () => {
 
 	function updateAfterCycle() {
 		if (properties.errorBlock && properties.errorBlock.isErrorBlockFalling && !stateFlags.isRestart) {
-			logWarn(`we are returning`, stateFlags.isRestart);
 			return;
 		}
 		if (stateFlags.isStart) {
@@ -49,8 +48,9 @@ const StateManager = () => {
 		}
 
 		if (statusUpdateQueue.length !== 0) {
-			if (statusUpdateQueue.length > 1) {
-				logInfo(`QUEUE.${statusUpdateQueue.length}`, statusUpdateQueue.map((q) => `${q.status}${q.result ? `[${q.result}]` : ''}`).join('|'));
+			if (statusUpdateQueue.length >= 2) {
+				const mappedStatuses = statusUpdateQueue.map((q) => `${q.status}${q.result ? `[${q.result}]` : ''}`).join('|');
+				logInfo(`QUEUE.${statusUpdateQueue.length}`, mappedStatuses);
 			}
 			const callback = statusUpdateQueue.shift()?.callback;
 			callback?.();
@@ -139,7 +139,7 @@ const StateManager = () => {
 	}
 
 	function set(id: string, isReplay = false) {
-		logInfo(`STATE_ID = ${id} ${isReplay ? '(replay)' : ''}`);
+		logInfo(`STATE_ID: ${id}${isReplay ? '[replay]' : ''}`);
 		const actions = {
 			start: () => setStart(),
 			stop: () => setStop(),
@@ -171,11 +171,10 @@ const StateManager = () => {
 		if (shouldClearQueue) {
 			if (queueOverloaded) {
 				logWarn(`Queue too long (${statuses.length}), clearing to prevent backlog`);
+			} else {
+				logInfo(`Queue cleared for status: ${status}${result ? `[${result}]` : ''}`);
 			}
 			statusUpdateQueue = [];
-		}
-		if (status === AnimationStatus.RESTART_ANIMATION || status === AnimationStatus.RESULT_ANIMATION || status === AnimationStatus.RESULT) {
-			logWarn(`_queueStatusUpdate`, status, result);
 		}
 		const queueItem: QueueItem = result
 			? {
@@ -261,7 +260,7 @@ const StateManager = () => {
 
 	function setRestartAnimation() {
 		if (stopInitiated) {
-			logWarn(`Stop initiated, not restarting animation`, stopInitiated);
+			logInfo(`Stop initiated, will not restart.`);
 			stopInitiated = false;
 			return;
 		}
