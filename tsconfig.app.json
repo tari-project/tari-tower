@@ -21,7 +21,7 @@
 		"noFallthroughCasesInSwitch": true,
 		"noImplicitAny": false,
 		"baseUrl": ".",
-		"types": ["vite/client", "node"]
+		"types": ["vite/client", "node", "vite-plugin-glsl/ext"]
 	},
 	"include": ["src"],
 	"exclude": ["node_modules", "dist"],

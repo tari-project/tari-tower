@@ -12,7 +12,7 @@ export default defineConfig({
 		port: 3001,
 	},
 	plugins: [
-		glsl(),
+		glsl({ minify: true, root:'/lib' }),
 		tsconfigPaths(),
 		eslint({ cache: false, fix: true }),
 		dts({ include: ['lib'], exclude: ['src'], rollupTypes: true, tsconfigPath: resolve(__dirname, 'tsconfig.app.json') }),
