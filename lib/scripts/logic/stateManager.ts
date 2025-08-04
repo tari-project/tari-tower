@@ -270,11 +270,13 @@ const StateManager = () => {
 		removeCanvas = remove;
 	}
 	function setRestart() {
-		if (removeCanvas || stopInitiated) {
+		if (removeCanvas) {
 			gameEndedSignal.dispatch();
 			return;
 		}
-		_queueStatusUpdate({ status: AnimationStatus.RESTART });
+		if (!stopInitiated) {
+			_queueStatusUpdate({ status: AnimationStatus.RESTART });
+		}
 	}
 
 	function init() {
