@@ -38,7 +38,7 @@ export const propertiesInitialState: PropertiesType = {
 	isPaused: false,
 	showVisual: settings.SHOW_BLOCK,
 	loadList: [],
-	animationSpeed: 1,
+	animationSpeed: 1.1,
 	activeBlocksCount: 0,
 	maxFreeBlocksCount,
 	lightPositionX: -2,
@@ -58,7 +58,7 @@ export const propertiesInitialState: PropertiesType = {
 	successColor: '#00c881',
 	failColor: '#ca0101',
 	particlesColor: '#505050',
-	goboIntensity: 0.45,
+	goboIntensity: 0.4,
 	particlesOpacity: 0.75,
 	particlesSize: 0.01,
 };

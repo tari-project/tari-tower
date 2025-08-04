@@ -1,6 +1,6 @@
 // Add tower prefix to logs
 const version = import.meta.env.VITE_TARI_TOWER_VERSION;
-const getTowerLogPrefix = (level) => `TOWER_${version} ${level === 'warn' || level === 'error' ? level : ''}`;
+const getTowerLogPrefix = (level) => `TOWER_${version}${level === 'warn' || level === 'error' ? ' ' + level.toUpperCase() : ''}`;
 
 function logError(...args) {
 	return console.error(getTowerLogPrefix('error'), ...args);
