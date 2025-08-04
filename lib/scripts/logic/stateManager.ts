@@ -35,7 +35,6 @@ const StateManager = () => {
 	const statusOrder = Object.values(AnimationStatus);
 	let statusIndex = 0;
 	let removeCanvas = false;
-	let stopInitiated = false;
 
 	function updateAfterCycle() {
 		if (properties.errorBlock && properties.errorBlock.isErrorBlockFalling && !stateFlags.isRestart) {
@@ -48,7 +47,7 @@ const StateManager = () => {
 		}
 
 		if (statusUpdateQueue.length !== 0) {
-			if (statusUpdateQueue.length >= 2) {
+			if (statusUpdateQueue.length > 1) {
 				const mappedStatuses = statusUpdateQueue.map((q) => `${q.status}${q.result ? `[${q.result}]` : ''}`).join('|');
 				logInfo(`QUEUE.${statusUpdateQueue.length}`, mappedStatuses);
 			}
@@ -89,19 +88,23 @@ const StateManager = () => {
 		const hasResult = !!result;
 		const isReplay = result === AnimationResult.REPLAY;
 
+		logWarn(newStatus, result, isReplay, statusIndex);
 		// Handle special replay case - allows jumping to FREE state from NOT_STARTED
 		if (isReplay && statusIndex === 0) {
+			logWarn(`jumping to FREE`, statusIndex);
 			statusIndex = 2; // Jump to FREE state
 		}
 
 		// Handle special reset case - allows resetting from the RESTART state
 		if (newStatus === AnimationStatus.NOT_STARTED && result === AnimationResult.NONE && statusIndex === 5) {
-			statusIndex = 6; // Move to next state to allow reset
+			statusIndex = 6; // Move to the end to allow reset
 		}
 
 		// Calculate if the transition is valid
 		const newStateIndex = statusOrder.indexOf(newStatus);
 		const isNextState = (statusIndex + 1) % statusOrder.length === newStateIndex;
+
+		logWarn(newStateIndex, isNextState);
 		if (isNextState) {
 			statusIndex = newStateIndex;
 			status = statusOrder[statusIndex];
@@ -166,16 +169,12 @@ const StateManager = () => {
 	function _queueStatusUpdate({ status, result = null, animationStyle = null }: QueueArgs) {
 		const statuses = statusUpdateQueue.map((q) => q.status);
 		const queueOverloaded = statuses?.length >= MAX_QUEUE_LENGTH;
-		const shouldClearQueue = queueOverloaded || status === AnimationStatus.RESTART;
 		// Clear the queue if it's getting too long or stop initiated
-		if (shouldClearQueue) {
-			if (queueOverloaded) {
-				logWarn(`Queue too long (${statuses.length}), clearing to prevent backlog`);
-			} else {
-				logInfo(`Queue cleared for status: ${status}${result ? `[${result}]` : ''}`);
-			}
+		if (queueOverloaded) {
+			logWarn(`Queue too long (${statuses.length}), clearing to prevent backlog`);
 			statusUpdateQueue = [];
 		}
+
 		const queueItem: QueueItem = result
 			? {
 					status,
@@ -183,7 +182,9 @@ const StateManager = () => {
 				}
 			: { status, callback: () => _canUpdateStatus(status) };
 
-		statusUpdateQueue.push(queueItem);
+		if (!statuses.includes(status)) {
+			statusUpdateQueue.push(queueItem);
+		}
 	}
 
 	function reset() {
@@ -213,7 +214,6 @@ const StateManager = () => {
 	}
 
 	function setStop() {
-		stopInitiated = true;
 		_queueStatusUpdate({
 			status: AnimationStatus.RESULT,
 			result: AnimationResult.STOP,
@@ -240,6 +240,7 @@ const StateManager = () => {
 
 	function setComplete3(isReplay = false) {
 		const result = isReplay && stateFlags.hasNotStarted ? AnimationResult.REPLAY : AnimationResult.COMPLETED;
+		logWarn(`hasNotStarted`, stateFlags.hasNotStarted);
 		_queueStatusUpdate({
 			status: AnimationStatus.RESULT,
 			result,
@@ -259,11 +260,6 @@ const StateManager = () => {
 	}
 
 	function setRestartAnimation() {
-		if (stopInitiated) {
-			logInfo(`Stop initiated, will not restart.`);
-			stopInitiated = false;
-			return;
-		}
 		_queueStatusUpdate({ status: AnimationStatus.RESTART_ANIMATION });
 	}
 	function setRemove(remove: boolean) {
@@ -274,9 +270,8 @@ const StateManager = () => {
 			gameEndedSignal.dispatch();
 			return;
 		}
-		if (!stopInitiated) {
-			_queueStatusUpdate({ status: AnimationStatus.RESTART });
-		}
+
+		_queueStatusUpdate({ status: AnimationStatus.RESTART });
 	}
 
 	function init() {
