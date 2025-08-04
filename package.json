@@ -3,7 +3,7 @@
 	"type": "module",
 	"version": "0.1.2",
 	"private": false,
-	"description": "the tower block animation used in Tari Universe",
+	"description": "The Block Tower animation used in Tari Universe",
 	"homepage": "https://github.com/tari-project/tari-tower#readme",
 	"bugs": {
 		"url": "https://github.com/tari-project/tari-tower/issues"
@@ -22,7 +22,7 @@
 	],
 	"peerDependencies": {
 		"min-signal": "^1.0.2",
-		"three": "^0.179.0"
+		"three": "^0.179.1"
 	},
 	"exports": {
 		".": {
@@ -33,7 +33,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.19.0",
-		"@types/node": "^24.1.0",
+		"@types/node": "^24.2.0",
 		"@types/three": "^0.178.1",
 		"@typescript-eslint/parser": "^8.24.1",
 		"eslint": "^9.32.0",
