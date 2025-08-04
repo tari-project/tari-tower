@@ -154,6 +154,7 @@ const SystemManager = () => {
 		cycleIndex = 0;
 		animationSpeedRatio = 0;
 		previousSuccessBlocksAnimationRatio = wasSuccess ? 1 : 0;
+		wasSuccess = false;
 		if (isDestroy) {
 			canvasSignal.dispatch();
 			firstStartAnimationRatio = 0;

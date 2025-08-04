@@ -88,10 +88,8 @@ const StateManager = () => {
 		const hasResult = !!result;
 		const isReplay = result === AnimationResult.REPLAY;
 
-		logWarn(newStatus, result, isReplay, statusIndex);
 		// Handle special replay case - allows jumping to FREE state from NOT_STARTED
 		if (isReplay && statusIndex === 0) {
-			logWarn(`jumping to FREE`, statusIndex);
 			statusIndex = 2; // Jump to FREE state
 		}
 
@@ -104,7 +102,6 @@ const StateManager = () => {
 		const newStateIndex = statusOrder.indexOf(newStatus);
 		const isNextState = (statusIndex + 1) % statusOrder.length === newStateIndex;
 
-		logWarn(newStateIndex, isNextState);
 		if (isNextState) {
 			statusIndex = newStateIndex;
 			status = statusOrder[statusIndex];
@@ -240,7 +237,7 @@ const StateManager = () => {
 
 	function setComplete3(isReplay = false) {
 		const result = isReplay && stateFlags.hasNotStarted ? AnimationResult.REPLAY : AnimationResult.COMPLETED;
-		logWarn(`hasNotStarted`, stateFlags.hasNotStarted);
+
 		_queueStatusUpdate({
 			status: AnimationStatus.RESULT,
 			result,
