@@ -19,7 +19,7 @@ import { SystemManagerState } from '../../types/systemManager';
 import { AnimationResult, AnimationStatus } from '../../types';
 import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
 import math from '../utils/math';
-import { logWarn } from '../utils/logger.ts';
+import { logInfo } from '../utils/logger.ts';
 
 let firstStartAnimationRatio: SystemManagerState['firstStartAnimationRatio'] = 0;
 let blocks: SystemManagerState['blocks'] = [];
@@ -32,7 +32,7 @@ const SystemManager = () => {
 	function _spawnBlock() {
 		if (_shouldPreventSpawn()) {
 			if (properties.errorBlock && properties.errorBlock.isErrorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle) {
-				logWarn(`Long block lifecycle (${properties.errorBlock.errorLifeCycle}) exceeded max, resetting in spawn`);
+				logInfo(`[spawnBlock] "Long block" lifecycle(${properties.errorBlock.errorLifeCycle}) exceeded max. Spawning standard block.`);
 				_spawnSingleBlock(true);
 			}
 			return;

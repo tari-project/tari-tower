@@ -6,7 +6,6 @@ import { PropertiesType } from '../../types/properties';
 
 const _resolution = new THREE.Vector2();
 const _viewportResolution = new THREE.Vector2();
-
 const maxFreeBlocksCount = TOTAL_TILES - 5;
 
 export const propertiesInitialState: PropertiesType = {
@@ -38,7 +37,7 @@ export const propertiesInitialState: PropertiesType = {
 	isPaused: false,
 	showVisual: settings.SHOW_BLOCK,
 	loadList: [],
-	animationSpeed: 1.1,
+	animationSpeed: 1,
 	activeBlocksCount: 0,
 	maxFreeBlocksCount,
 	lightPositionX: -2,
