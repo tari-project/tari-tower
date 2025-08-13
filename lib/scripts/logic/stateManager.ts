@@ -131,7 +131,7 @@ const StateManager = () => {
 		}
 		return canUpdateStatus;
 	}
-	//logInfo(`Adding status: "${newStatus}" to the queue${result ? ` with result: "${result}"` : ''}.`);
+
 	function _updateStatusAndResult({ status: newStatus, result: newResult, animationStyle }: QueueArgs) {
 		const canUpdateStatus = _canUpdateStatus(newStatus, newResult);
 		if (canUpdateStatus) {
