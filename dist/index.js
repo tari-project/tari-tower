@@ -158,7 +158,7 @@ const u8 = () => {
   particlesSize: 0.01
 }, C = { ...p8 }, Iw = new Y(), X8 = new Y(), G8 = new Y(), gw = new Y(), D8 = new Y(), aw = new Y(), C8 = new Y(), rw = new Y(), Ew = new Y(), Q8 = new Y(), V8 = new Y(), Z8 = new Y();
 var F = /* @__PURE__ */ ((B) => (B.NOT_STARTED = "not-started", B.STARTED = "started", B.FREE = "free", B.RESULT = "result", B.RESULT_ANIMATION = "result_animation", B.RESTART_ANIMATION = "restart_animation", B.RESTART = "restart", B))(F || {}), j = /* @__PURE__ */ ((B) => (B.NONE = "none", B.STOP = "stop", B.COMPLETED = "completed", B.FAILED = "failed", B.REPLAY = "replay", B))(j || {}), mA = /* @__PURE__ */ ((B) => (B[B.ONE = 1] = "ONE", B[B.TWO = 2] = "TWO", B[B.THREE = 3] = "THREE", B))(mA || {});
-const R8 = "0.1.3", Mw = (B) => `🟪 TOWER_${R8}${B === "warn" || B === "error" ? ` ${B.toUpperCase()}` : ""}`;
+const R8 = "0.1.4", Mw = (B) => `🟪 TOWER_${R8}${B === "warn" || B === "error" ? ` ${B.toUpperCase()}` : ""}`;
 function eA(...B) {
   return console.error(Mw("error"), ...B);
 }
@@ -219,7 +219,7 @@ const y8 = 4, S8 = () => {
     I === j.REPLAY && w === 0 && (w = 2), o === F.NOT_STARTED && I === j.NONE && w === 5 && (w = 6);
     const J = B.indexOf(o);
     if ((w + 1) % B.length === J && (w = J, R = B[w], h || z(), b = !0), L8.includes(R)) {
-      const wA = I ? `[${I}]` : "", iA = `"${R}${wA}"`, TA = `"${o}${wA}"`;
+      const wA = I ? `[${I}]` : "", iA = `${R}${wA}`, TA = `${o}${wA}`;
       HA(b ? `[canUpdateStatus] ✓ | ${TA} added to queue` : `[canUpdateStatus] ✗ | attempted: ${TA} | current: ${iA}`);
     }
     return b;
@@ -668,7 +668,7 @@ let ZA = 0, k = [], u = null, JA = 0, Pw = 0, tw = !1;
 const iP = () => {
   function B() {
     if (w()) {
-      C.errorBlock && C.errorBlock.isErrorBlock && C.errorBlock.errorLifeCycle >= C.errorBlockMaxLifeCycle && (HA(`[spawnBlock] "Long block" lifecycle(${C.errorBlock.errorLifeCycle}) exceeded max. Spawning standard block.`), A(!0));
+      C.errorBlock && C.errorBlock.isErrorBlock && C.errorBlock.errorLifeCycle >= C.errorBlockMaxLifeCycle && (HA(`[spawnBlock] Long block lifecycle(${C.errorBlock.errorLifeCycle}) exceeded max. Spawning standard block.`), A(!0));
       return;
     }
     l.isSuccessResult || l.isReplayResult ? i() : A(), !(k.length === C.maxFreeBlocksCount && l.isFree) && X8.dispatch();
@@ -2455,7 +2455,7 @@ async function KP({ canvasId: B, offset: w = 0 }) {
 }
 async function hP({ canvasId: B }) {
   if (document.getElementById(B)) {
-    for (HA(`[removeTowerAnimation] initiated | current status:"${R}"`), R === "not-started" ? gw.dispatch() : (q.setRemove(!0), q.set("stop")), LA = 0, Qw = 0; !Bw; )
+    for (HA(`[removeTowerAnimation] initiated | current status: ${R}`), R === "not-started" ? gw.dispatch() : (q.setRemove(!0), q.set("stop")), LA = 0, Qw = 0; !Bw; )
       await new Promise((w) => setTimeout(w, 100));
     Bw && HA("[removeTowerAnimation] Tower animation removed successfully.");
   }

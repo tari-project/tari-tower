@@ -69,7 +69,7 @@ export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: s
 
 export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 	if (!document.getElementById(canvasId)) return;
-	logInfo(`[removeTowerAnimation] initiated | current status:"${status}"`);
+	logInfo(`[removeTowerAnimation] initiated | current status: ${status}`);
 	if (status === 'not-started') {
 		gameEndedSignal.dispatch();
 	} else {

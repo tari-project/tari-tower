@@ -121,8 +121,8 @@ const StateManager = () => {
 
 		if (LOG_STATES.includes(status)) {
 			const resultText = result ? `[${result}]` : '';
-			const currentStatus = `"${status}${resultText}"`;
-			const baseLogText = `"${newStatus}${resultText}"`;
+			const currentStatus = `${status}${resultText}`;
+			const baseLogText = `${newStatus}${resultText}`;
 			if (canUpdateStatus) {
 				logInfo(`[canUpdateStatus] ✓ | ${baseLogText} added to queue`);
 			} else {

@@ -1,7 +1,7 @@
 {
 	"name": "@tari-project/tari-tower",
 	"type": "module",
-	"version": "0.1.3",
+	"version": "0.1.4",
 	"private": false,
 	"description": "The Block Tower animation used in Tari Universe",
 	"homepage": "https://github.com/tari-project/tari-tower#readme",
