@@ -7,6 +7,8 @@ import { logInfo, logWarn } from '../utils/logger';
 export const PREVENT_CYCLE_STATES = [AnimationStatus.NOT_STARTED, AnimationStatus.RESTART_ANIMATION, AnimationStatus.RESTART, AnimationStatus.STARTED];
 export const resetCycleResults = [AnimationResult.FAILED, AnimationResult.COMPLETED];
 
+// only log these state changes
+const LOG_STATES = [AnimationStatus.STARTED, AnimationStatus.RESULT, AnimationStatus.RESTART_ANIMATION];
 let stateFlags = {
 	hasNotStarted: true,
 	isStart: false,
@@ -48,8 +50,8 @@ const StateManager = () => {
 
 		if (statusUpdateQueue.length !== 0) {
 			if (statusUpdateQueue.length > 1) {
-				const mappedStatuses = statusUpdateQueue.map((q) => `${q.status}${q.result ? `[${q.result}]` : ''}`).join('|');
-				logInfo(`QUEUE.${statusUpdateQueue.length}`, mappedStatuses);
+				const mappedStatuses = statusUpdateQueue.map((q) => `${q.status}${q.result ? `[${q.result}]` : ''}`).join(', ');
+				logInfo(`[updateAfterCycle] Queue(${statusUpdateQueue.length})`, mappedStatuses);
 			}
 			const callback = statusUpdateQueue.shift()?.callback;
 			callback?.();
@@ -85,6 +87,8 @@ const StateManager = () => {
 		// Prevent state changes if visualization is disabled
 		if (!properties.showVisual) return false;
 
+		let canUpdateStatus = false;
+
 		const hasResult = !!result;
 		const isReplay = result === AnimationResult.REPLAY;
 
@@ -111,10 +115,21 @@ const StateManager = () => {
 			if (!hasResult) {
 				updateFlags();
 			}
-			return true;
+
+			canUpdateStatus = true;
 		}
 
-		return false;
+		if (LOG_STATES.includes(status)) {
+			const resultText = result ? `[${result}]` : '';
+			const currentStatus = `"${status}${resultText}"`;
+			const baseLogText = `"${newStatus}${resultText}"`;
+			if (canUpdateStatus) {
+				logInfo(`[canUpdateStatus] ✓ | ${baseLogText} added to queue`);
+			} else {
+				logInfo(`[canUpdateStatus] ✗ | attempted: ${baseLogText} | current: ${currentStatus}`);
+			}
+		}
+		return canUpdateStatus;
 	}
 
 	function _updateStatusAndResult({ status: newStatus, result: newResult, animationStyle }: QueueArgs) {
@@ -139,7 +154,6 @@ const StateManager = () => {
 	}
 
 	function set(id: string, isReplay = false) {
-		logInfo(`STATE_ID: ${id}${isReplay ? '[replay]' : ''}`);
 		const actions = {
 			start: () => setStart(),
 			stop: () => setStop(),

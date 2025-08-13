@@ -2,7 +2,7 @@ import TariTower from './tower.ts';
 import { stateManager, status } from './logic/stateManager.ts';
 import { gameEndedSignal, towerRemovedSignal } from './logic/signals.ts';
 import { properties } from './core/properties.ts';
-import { log, logError, logInfo } from './utils/logger.ts';
+import { logError, logInfo } from './utils/logger.ts';
 
 const tower = TariTower();
 
@@ -69,7 +69,7 @@ export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: s
 
 export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 	if (!document.getElementById(canvasId)) return;
-	log(`removeTowerAnimation initiated, current status: ${status}`);
+	logInfo(`[removeTowerAnimation] initiated | current status:"${status}"`);
 	if (status === 'not-started') {
 		gameEndedSignal.dispatch();
 	} else {
@@ -81,5 +81,7 @@ export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 	while (!resetCompleted) {
 		await new Promise((resolve) => setTimeout(resolve, 100));
 	}
-	logInfo('Tower animation removed successfully.');
+	if (resetCompleted) {
+		logInfo('[removeTowerAnimation] Tower animation removed successfully.');
+	}
 }

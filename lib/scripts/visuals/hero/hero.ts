@@ -108,7 +108,7 @@ const Hero = () => {
 		});
 		try {
 			await Promise.all([base, box, lose, gobo]);
-			log(`Loaded assets`);
+			log(`Loaded Hero assets`);
 		} catch (e) {
 			console.error('hero preload error:', e);
 		}

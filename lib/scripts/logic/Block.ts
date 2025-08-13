@@ -208,10 +208,10 @@ export default class Block {
 		}
 
 		if (this.isErrorBlockFalling) {
-			this.errorFallAnimationTime = this.errorFallAnimationTime + 3 * properties.animationSpeed * dt;
+			this.errorFallAnimationTime = this.errorFallAnimationTime + 3.25 * properties.animationSpeed * dt;
 		}
 		if (this.isErrorBlock) {
-			this.errorPreFallAnimationTimeScale = this.errorPreFallAnimationTimeScale + 3 * dt;
+			this.errorPreFallAnimationTimeScale = this.errorPreFallAnimationTimeScale + 3.25 * dt;
 			this.errorPreFallAnimationTimeScale = Math.min(20, this.errorPreFallAnimationTimeScale);
 			this.errorPreFallAnimationTime = this.errorPreFallAnimationTime + this.errorPreFallAnimationTimeScale * dt;
 			if (this.skipFallAnimation) {
