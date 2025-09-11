@@ -2,9 +2,9 @@ import math from '../utils/math';
 import { stateSignal, stopAnimationEndedSignal } from './signals';
 import { AnimationResult, AnimationStatus } from '../../types/stateManager';
 
+const stopAnimationDuration = 2.25; // seconds
 let isActive = false;
 let stopRatio = 0;
-const stopAnimationDuration = 2.5; // seconds
 let stopSpawnRatio = 0;
 let stopPushDownRatio = 0;
 
@@ -44,4 +44,4 @@ const StopAnimationManager = () => {
 	};
 };
 const stopAnimationManager = StopAnimationManager();
-export { stopAnimationManager, stopSpawnRatio, stopPushDownRatio, stopAnimationDuration };
+export { stopAnimationManager, stopSpawnRatio, stopPushDownRatio };

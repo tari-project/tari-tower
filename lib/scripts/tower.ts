@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import settings, { WEBGL_OPTS } from './core/settings.ts';
-import { properties, resetProperties } from './core/properties.ts';
+import { properties } from './core/properties.ts';
 import { heroBlocks, heroContainer } from './visuals/hero/hero.ts';
 import { coinContainer, Coins } from './visuals/coins/coins.ts';
 import BlueNoise from './utils/blueNoise/blueNoise.ts';
@@ -73,12 +73,10 @@ const TariTower = () => {
 
 	async function preload({ canvasEl, initCallback }: { canvasEl: HTMLCanvasElement; initCallback: () => Promise<void> }) {
 		renderer = new THREE.WebGLRenderer({ ...WEBGL_OPTS, canvas: canvasEl });
-
 		canvasSignal.addOnce(() => {
 			destroy();
 		});
 		await _handleRenderer();
-
 		await heroBlocks.preload();
 		await blueNoise.preInit();
 		await coins.preload();
@@ -93,7 +91,7 @@ const TariTower = () => {
 		camera.scale.set(0.905, 0.905, 0.905);
 		camera.updateProjectionMatrix();
 		orbitCamera = camera.clone();
-		const canvas = renderer.domElement;
+		const canvas = renderer?.domElement;
 		if (canvas) {
 			orbitControls = new OrbitControls(orbitCamera, canvas);
 			orbitControls.target0.fromArray(settings.DEFAULT_LOOKAT_POSITION);
@@ -125,8 +123,10 @@ const TariTower = () => {
 	}
 
 	function render(dt: number) {
-		const canvas = renderer.domElement;
+		const canvas = document.getElementById(renderer?.domElement?.id) as HTMLCanvasElement | null;
+
 		if (!canvas) {
+			dt *= 0;
 			return;
 		}
 
@@ -157,8 +157,8 @@ const TariTower = () => {
 		camera.right = right;
 		camera.top = viewHeight / 2;
 		camera.bottom = viewHeight / -2;
-
 		camera.updateProjectionMatrix();
+
 		orbitControls?.update();
 		orbitCamera?.updateMatrix();
 		orbitCamera?.matrix.decompose(camera.position, camera.quaternion, camera.scale);
@@ -179,12 +179,10 @@ const TariTower = () => {
 		heroBlocks.buffers.forEach((b) => b?.dispose());
 		heroBlocks.textures.forEach((t) => t?.dispose());
 		blueNoise.textures.forEach((t) => t?.dispose());
-		const renderTarget = renderer.getRenderTarget();
-		renderTarget?.dispose();
-		renderer.dispose();
+		renderer?.dispose();
 	}
 	function destroy() {
-		const canvas = renderer.domElement;
+		const canvas = renderer?.domElement;
 		if (!canvas || !canvas?.id) return;
 		properties.showVisual = false;
 
@@ -193,8 +191,7 @@ const TariTower = () => {
 		canvasEl?.remove();
 		// Clean up Three.js resources
 		_disposeAll();
-		renderer.state.reset();
-		resetProperties();
+		renderer?.state.reset();
 	}
 	return {
 		preload,

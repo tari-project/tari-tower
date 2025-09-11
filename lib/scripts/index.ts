@@ -12,6 +12,8 @@ const targetFPS = 50;
 const frameInterval = 1 / targetFPS;
 let resetCompleted = false;
 
+let _frame: number;
+
 /**
  * Main animation loop that controls rendering at a fixed frame rate
  * Uses requestAnimationFrame but limits actual renders to targetFPS
@@ -25,23 +27,19 @@ function animate() {
 		time = newTime;
 	}
 
-	// Schedule next frame
-	// Note: cancelAnimationFrame is not needed here since requestAnimationFrame
-	// automatically cancels the previous frame
-	requestAnimationFrame(animate);
+	_frame = requestAnimationFrame(animate);
 }
 
 async function initCallback() {
 	logInfo('[loadTowerAnimation] Initializing...');
 	try {
 		await tower.init();
+		logInfo('[loadTowerAnimation] Tari Tower initialized successfully.');
 		time = performance.now() / 1000;
 		lastRender = time;
-
 		window.addEventListener('resize', tower.onResize);
 		tower.onResize();
 		animate();
-		logInfo('[loadTowerAnimation] Tari Tower initialized successfully.');
 	} catch (error) {
 		logError('[loadTowerAnimation] initCallback:', error);
 	}

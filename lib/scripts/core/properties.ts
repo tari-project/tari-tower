@@ -61,10 +61,6 @@ export const propertiesInitialState: PropertiesType = {
 	particlesOpacity: 0.75,
 	particlesSize: 0.01,
 };
+const properties = { ...propertiesInitialState };
 
-let properties = { ...propertiesInitialState };
-
-function resetProperties() {
-	properties = propertiesInitialState;
-}
-export { properties, resetProperties };
+export { properties };
