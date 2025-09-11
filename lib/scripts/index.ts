@@ -63,6 +63,7 @@ export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: s
 		const canvasEl = document.createElement('canvas');
 		canvasEl.setAttribute('id', canvasId);
 		root.appendChild(canvasEl);
+		canvasEl.setAttribute('style', 'display: block; width: 100%; height: 100%;');
 		try {
 			await tower.preload({ canvasEl, initCallback });
 		} catch (e) {
@@ -82,8 +83,9 @@ export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 	}
 	time = 0;
 	lastRender = 0;
+
 	while (!resetCompleted) {
-		await new Promise((resolve) => setTimeout(resolve, 100));
+		await new Promise((resolve) => setTimeout(resolve, 150));
 	}
 	if (resetCompleted) {
 		logInfo('[removeTowerAnimation] Tower animation removed successfully.');
