@@ -1,15 +1,15 @@
 import { BufferAttribute, BufferGeometry, LinearFilter, LinearMipMapLinearFilter, TextureLoader } from 'three';
 import { logError } from '../utils/logger';
 
-import buf_base from '/assets/buf_base.buf?url&inline';
-import buf_box from '/assets/buf_box.buf?url&inline';
-import buf_coin from '/assets/buf_coin.buf?url&inline';
-import buf_coin_p from '/assets/buf_coin_p.buf?url&inline';
-import buf_lose from '/assets/buf_lose.buf?url&inline';
+import buf_base from 'public/assets/buf_base.buf?url&inline';
+import buf_box from 'public/assets/buf_box.buf?url&inline';
+import buf_coin from 'public/assets/buf_coin.buf?url&inline';
+import buf_coin_p from 'public/assets/buf_coin_p.buf?url&inline';
+import buf_lose from 'public/assets/buf_lose.buf?url&inline';
 
-import gobo from '/assets/gobo.jpg';
-import noise from '/assets/noise.png';
-import gold from '/assets/gold.jpg';
+import gobo from 'public/assets/gobo.jpg';
+import noise from 'public/assets/noise.png';
+import gold from 'public/assets/gold.jpg';
 
 interface LoaderItems {
 	list: (() => void | Promise<void>)[];
