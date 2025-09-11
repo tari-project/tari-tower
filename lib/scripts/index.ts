@@ -12,8 +12,6 @@ const targetFPS = 50;
 const frameInterval = 1 / targetFPS;
 let resetCompleted = false;
 
-let _frame: number;
-
 /**
  * Main animation loop that controls rendering at a fixed frame rate
  * Uses requestAnimationFrame but limits actual renders to targetFPS
@@ -27,7 +25,7 @@ function animate() {
 		time = newTime;
 	}
 
-	_frame = requestAnimationFrame(animate);
+	requestAnimationFrame(animate);
 }
 
 async function initCallback() {
