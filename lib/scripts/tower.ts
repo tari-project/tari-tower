@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import settings, { WEBGL_OPTS } from './core/settings.ts';
-import { properties, propertiesInitialState, resetProperties } from './core/properties.ts';
+import { properties, resetProperties } from './core/properties.ts';
 import { heroBlocks, heroContainer } from './visuals/hero/hero.ts';
 import { coinContainer, Coins } from './visuals/coins/coins.ts';
 import BlueNoise from './utils/blueNoise/blueNoise.ts';
@@ -36,6 +36,7 @@ const TariTower = () => {
 				bgColor1.set(properties.bgColor1).convertSRGBToLinear();
 				bgColor2.set(properties.bgColor2).convertSRGBToLinear();
 			}
+
 			renderer.setClearColor(properties.bgColor1, 1);
 		}
 	}
@@ -72,6 +73,7 @@ const TariTower = () => {
 
 	async function preload({ canvasEl, initCallback }: { canvasEl: HTMLCanvasElement; initCallback: () => Promise<void> }) {
 		renderer = new THREE.WebGLRenderer({ ...WEBGL_OPTS, canvas: canvasEl });
+
 		canvasSignal.addOnce(() => {
 			destroy();
 		});
@@ -167,6 +169,7 @@ const TariTower = () => {
 		heroBlocks.update(dt);
 		coins.update(dt);
 		background.update(dt);
+
 		renderer?.render(properties.scene, camera);
 	}
 

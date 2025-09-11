@@ -10,7 +10,6 @@ let time = 0;
 let lastRender = 0;
 const targetFPS = 50;
 const frameInterval = 1 / targetFPS;
-let _frame: number;
 let resetCompleted = false;
 
 /**
@@ -29,33 +28,31 @@ function animate() {
 	// Schedule next frame
 	// Note: cancelAnimationFrame is not needed here since requestAnimationFrame
 	// automatically cancels the previous frame
-	_frame = requestAnimationFrame(animate);
+	requestAnimationFrame(animate);
 }
 
 async function initCallback() {
+	logInfo('[loadTowerAnimation] Initializing...');
 	try {
-		logInfo('Initializing Tari Tower...');
 		await tower.init();
-
 		time = performance.now() / 1000;
 		lastRender = time;
 
 		window.addEventListener('resize', tower.onResize);
 		tower.onResize();
 		animate();
-		logInfo('Tari Tower initialized successfully.');
+		logInfo('[loadTowerAnimation] Tari Tower initialized successfully.');
 	} catch (error) {
-		logError('initCallback:', error);
+		logError('[loadTowerAnimation] initCallback:', error);
 	}
 }
 
 export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: string; offset?: number }) {
-	if (document.getElementById(canvasId)) return;
-
 	resetCompleted = false;
 	towerRemovedSignal.add(() => {
 		resetCompleted = true;
 	});
+	if (document.getElementById(canvasId)) return;
 
 	properties.offsetX = offset;
 	properties.cameraOffsetX = properties.offsetX / window.innerWidth;
@@ -69,7 +66,7 @@ export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: s
 		try {
 			await tower.preload({ canvasEl, initCallback });
 		} catch (e) {
-			logError('loadTowerAnimation', e);
+			logError('[loadTowerAnimation]', e);
 		}
 	}
 }

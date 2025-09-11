@@ -7,8 +7,6 @@ import { logInfo, logWarn } from '../utils/logger';
 export const PREVENT_CYCLE_STATES = [AnimationStatus.NOT_STARTED, AnimationStatus.RESTART_ANIMATION, AnimationStatus.RESTART, AnimationStatus.STARTED];
 export const resetCycleResults = [AnimationResult.FAILED, AnimationResult.COMPLETED];
 
-// only log these state changes
-const LOG_STATES = [AnimationStatus.STARTED, AnimationStatus.RESULT, AnimationStatus.RESTART_ANIMATION];
 let stateFlags = {
 	hasNotStarted: true,
 	isStart: false,
@@ -50,7 +48,7 @@ const StateManager = () => {
 
 		if (statusUpdateQueue.length !== 0) {
 			if (statusUpdateQueue.length > 1) {
-				const mappedStatuses = statusUpdateQueue.map((q) => `${q.status}${q.result ? `[${q.result}]` : ''}`).join(', ');
+				const mappedStatuses = statusUpdateQueue.map((q) => `${q.status}${q.result ? `[${q.result}]` : ''}`).join('->');
 				logInfo(`[updateAfterCycle] Queue(${statusUpdateQueue.length})`, mappedStatuses);
 			}
 			const callback = statusUpdateQueue.shift()?.callback;
@@ -102,6 +100,13 @@ const StateManager = () => {
 			statusIndex = 6; // Move to the end to allow reset
 		}
 
+		// Handle special quick restart (due to quick mining changes in TU)
+		if (newStatus === AnimationStatus.STARTED && statusIndex === 5) {
+			statusIndex = 0; // Move to the start
+		}
+
+		const shouldLog = (hasResult && result !== AnimationResult.NONE) || (newStatus === AnimationStatus.STARTED && status !== AnimationStatus.FREE);
+
 		// Calculate if the transition is valid
 		const newStateIndex = statusOrder.indexOf(newStatus);
 		const isNextState = (statusIndex + 1) % statusOrder.length === newStateIndex;
@@ -109,17 +114,10 @@ const StateManager = () => {
 		if (isNextState) {
 			statusIndex = newStateIndex;
 			status = statusOrder[statusIndex];
-
-			// Only update flags and dispatch if there's no result
-			// Results are handled separately in _updateStatusAndResult
-			if (!hasResult) {
-				updateFlags();
-			}
-
 			canUpdateStatus = true;
 		}
 
-		if (LOG_STATES.includes(status)) {
+		if (shouldLog) {
 			const resultText = result ? `[${result}]` : '';
 			const currentStatus = `${status}${resultText}`;
 			const baseLogText = `${newStatus}${resultText}`;
@@ -128,6 +126,12 @@ const StateManager = () => {
 			} else {
 				logInfo(`[canUpdateStatus] ✗ | attempted: ${baseLogText} | current: ${currentStatus}`);
 			}
+		}
+
+		// Only update flags and dispatch if there's no result
+		// Results are handled separately in _updateStatusAndResult
+		if (canUpdateStatus && !hasResult) {
+			updateFlags();
 		}
 		return canUpdateStatus;
 	}
@@ -142,13 +146,10 @@ const StateManager = () => {
 			if (newResult) {
 				result = newResult;
 			}
-
 			updateFlags();
-
 			if (animationStyle) {
 				winAnimationSignal.dispatch(animationStyle);
 			}
-
 			stateSignal.dispatch(status, result);
 		}
 	}
