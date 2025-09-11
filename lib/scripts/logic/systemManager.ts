@@ -32,7 +32,10 @@ const SystemManager = () => {
 	function _spawnBlock() {
 		if (_shouldPreventSpawn()) {
 			if (properties.errorBlock && properties.errorBlock.isErrorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle) {
-				logInfo(`[spawnBlock] Long block lifecycle(${properties.errorBlock.errorLifeCycle}) exceeded max. Spawning standard block.`);
+				if (properties.errorBlock.errorLifeCycle > properties.errorBlockMaxLifeCycle) {
+					// only log if it actually exceeded the max
+					logInfo(`[spawnBlock] Long block lifecycle(${properties.errorBlock.errorLifeCycle}) exceeded max. Spawning standard block.`);
+				}
 				_spawnSingleBlock(true);
 			}
 			return;

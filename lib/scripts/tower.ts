@@ -21,15 +21,8 @@ const TariTower = () => {
 
 	let orbitControls: OrbitControls;
 
-	let canvas: HTMLCanvasElement | null;
-	const aspect = window.innerWidth / window.innerHeight;
-	const viewHeight = 15;
-	const viewWidth = viewHeight * aspect;
-
-	const camera = new THREE.OrthographicCamera(viewWidth / -2, viewWidth / 2, viewHeight / 2, viewHeight / -2, 1, 1000);
-
+	const camera = new THREE.OrthographicCamera();
 	let orbitCamera: OrthographicCamera;
-
 	let renderer: THREE.WebGLRenderer;
 
 	async function _handleRenderer() {
@@ -43,6 +36,7 @@ const TariTower = () => {
 				bgColor1.set(properties.bgColor1).convertSRGBToLinear();
 				bgColor2.set(properties.bgColor2).convertSRGBToLinear();
 			}
+
 			renderer.setClearColor(properties.bgColor1, 1);
 		}
 	}
@@ -50,13 +44,12 @@ const TariTower = () => {
 	function _handleResize(viewportWidth: number, viewportHeight: number) {
 		properties.viewportWidth = viewportWidth;
 		properties.viewportHeight = viewportHeight;
-		properties.viewportResolution.set(viewportWidth, window.innerHeight);
+		properties.viewportResolution.set(viewportWidth, viewportHeight);
 		properties.sharedUniforms.u_viewportResolution.value = properties.viewportResolution;
 
 		let dprWidth = viewportWidth * settings.DPR;
 		let dprHeight = viewportHeight * settings.DPR;
-
-		const aspect = dprWidth / dprHeight;
+		const aspect = viewportWidth / viewportHeight;
 
 		if (dprHeight * dprWidth > settings.MAX_PIXEL_COUNT) {
 			dprHeight = Math.sqrt(settings.MAX_PIXEL_COUNT / aspect);
@@ -66,30 +59,24 @@ const TariTower = () => {
 
 		properties.width = dprWidth;
 		properties.height = dprHeight;
+
 		properties.resolution.set(dprWidth, dprHeight);
+		renderer?.setSize(dprWidth, dprHeight, false);
+
 		camera.setViewOffset(viewportWidth, viewportHeight, 0, 87.5, viewportWidth, viewportHeight);
 		camera.updateProjectionMatrix();
-
-		renderer?.setSize(dprWidth, dprHeight);
-
-		if (canvas) {
-			canvas.style.width = viewportWidth + 'px';
-			canvas.style.height = viewportHeight + 'px';
-		}
 	}
 
 	function onResize() {
 		_handleResize(window.innerWidth, window.innerHeight);
 	}
 
-	async function preload({ canvasEl, initCallback }: { canvasEl: HTMLElement; initCallback: () => Promise<void> }) {
-		canvas = canvasEl as HTMLCanvasElement;
-		renderer = new THREE.WebGLRenderer({ ...WEBGL_OPTS, canvas });
+	async function preload({ canvasEl, initCallback }: { canvasEl: HTMLCanvasElement; initCallback: () => Promise<void> }) {
+		renderer = new THREE.WebGLRenderer({ ...WEBGL_OPTS, canvas: canvasEl });
 		canvasSignal.addOnce(() => {
 			destroy();
 		});
 		await _handleRenderer();
-
 		await heroBlocks.preload();
 		await blueNoise.preInit();
 		await coins.preload();
@@ -104,6 +91,7 @@ const TariTower = () => {
 		camera.scale.set(0.905, 0.905, 0.905);
 		camera.updateProjectionMatrix();
 		orbitCamera = camera.clone();
+		const canvas = renderer?.domElement;
 		if (canvas) {
 			orbitControls = new OrbitControls(orbitCamera, canvas);
 			orbitControls.target0.fromArray(settings.DEFAULT_LOOKAT_POSITION);
@@ -135,6 +123,8 @@ const TariTower = () => {
 	}
 
 	function render(dt: number) {
+		const canvas = document.getElementById(renderer?.domElement?.id) as HTMLCanvasElement | null;
+
 		if (!canvas) {
 			dt *= 0;
 			return;
@@ -167,8 +157,8 @@ const TariTower = () => {
 		camera.right = right;
 		camera.top = viewHeight / 2;
 		camera.bottom = viewHeight / -2;
-
 		camera.updateProjectionMatrix();
+
 		orbitControls?.update();
 		orbitCamera?.updateMatrix();
 		orbitCamera?.matrix.decompose(camera.position, camera.quaternion, camera.scale);
@@ -179,6 +169,7 @@ const TariTower = () => {
 		heroBlocks.update(dt);
 		coins.update(dt);
 		background.update(dt);
+
 		renderer?.render(properties.scene, camera);
 	}
 
@@ -188,22 +179,19 @@ const TariTower = () => {
 		heroBlocks.buffers.forEach((b) => b?.dispose());
 		heroBlocks.textures.forEach((t) => t?.dispose());
 		blueNoise.textures.forEach((t) => t?.dispose());
-		const renderTarget = renderer.getRenderTarget();
-		renderTarget?.dispose();
-		renderer.dispose();
+		renderer?.dispose();
 	}
 	function destroy() {
+		const canvas = renderer?.domElement;
 		if (!canvas || !canvas?.id) return;
 		properties.showVisual = false;
+
 		game.resetPostDestroy();
-
-		const freshCanvas = document.createElement('canvas');
-		freshCanvas.setAttribute('id', canvas.id);
-		canvas.replaceWith(freshCanvas);
-
+		const canvasEl = document.getElementById(canvas.id);
+		canvasEl?.remove();
 		// Clean up Three.js resources
 		_disposeAll();
-		renderer.state.reset();
+		renderer?.state.reset();
 	}
 	return {
 		preload,

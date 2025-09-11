@@ -10,7 +10,6 @@ let time = 0;
 let lastRender = 0;
 const targetFPS = 50;
 const frameInterval = 1 / targetFPS;
-let _frame: number;
 let resetCompleted = false;
 
 /**
@@ -26,44 +25,46 @@ function animate() {
 		time = newTime;
 	}
 
-	// Schedule next frame
-	// Note: cancelAnimationFrame is not needed here since requestAnimationFrame
-	// automatically cancels the previous frame
-	_frame = requestAnimationFrame(animate);
+	requestAnimationFrame(animate);
 }
 
 async function initCallback() {
+	logInfo('[loadTowerAnimation] Initializing...');
 	try {
-		logInfo('Initializing Tari Tower...');
 		await tower.init();
-
+		logInfo('[loadTowerAnimation] Tari Tower initialized successfully.');
 		time = performance.now() / 1000;
 		lastRender = time;
-
 		window.addEventListener('resize', tower.onResize);
 		tower.onResize();
 		animate();
-		logInfo('Tari Tower initialized successfully.');
 	} catch (error) {
-		logError('initCallback:', error);
+		logError('[loadTowerAnimation] initCallback:', error);
 	}
 }
 
 export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: string; offset?: number }) {
-	properties.offsetX = offset;
-	properties.cameraOffsetX = properties.offsetX / window.innerWidth;
-	const canvasEl = document.getElementById(canvasId);
 	resetCompleted = false;
 	towerRemovedSignal.add(() => {
 		resetCompleted = true;
 	});
+	if (document.getElementById(canvasId)) return;
 
-	try {
-		if (canvasEl) {
+	properties.offsetX = offset;
+	properties.cameraOffsetX = properties.offsetX / window.innerWidth;
+
+	const root = document.getElementById('root');
+
+	if (root) {
+		const canvasEl = document.createElement('canvas');
+		canvasEl.setAttribute('id', canvasId);
+		root.appendChild(canvasEl);
+		canvasEl.setAttribute('style', 'display: block; width: 100%; height: 100%;');
+		try {
 			await tower.preload({ canvasEl, initCallback });
+		} catch (e) {
+			logError('[loadTowerAnimation]', e);
 		}
-	} catch (e) {
-		logError('loadTowerAnimation', e);
 	}
 }
 
@@ -78,8 +79,9 @@ export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 	}
 	time = 0;
 	lastRender = 0;
+
 	while (!resetCompleted) {
-		await new Promise((resolve) => setTimeout(resolve, 100));
+		await new Promise((resolve) => setTimeout(resolve, 150));
 	}
 	if (resetCompleted) {
 		logInfo('[removeTowerAnimation] Tower animation removed successfully.');

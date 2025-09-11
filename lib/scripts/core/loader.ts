@@ -17,17 +17,8 @@ interface LoaderItems {
 	onLoadCallback: (() => void) | null;
 }
 
-const assets = {
-	buf_base: buf_base,
-	buf_box: buf_box,
-	buf_coin: buf_coin,
-	buf_coin_p: buf_coin_p,
-	buf_lose: buf_lose,
-	gobo: gobo,
-	noise: noise,
-	gold: gold,
-};
 const Loader = () => {
+	const assets = { buf_base, buf_box, buf_coin, buf_coin_p, buf_lose, gobo, noise, gold };
 	let list: LoaderItems['list'] = [];
 	let loadedCount: LoaderItems['loadedCount'] = 0;
 	let onLoadCallback: LoaderItems['onLoadCallback'] = null;

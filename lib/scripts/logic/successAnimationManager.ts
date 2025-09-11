@@ -110,5 +110,4 @@ export {
 	successPushDownRatio,
 	successColorTowerRatio,
 	floatingCubesDisplacement,
-	successAnimationDuration,
 };

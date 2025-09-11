@@ -8,8 +8,8 @@ if (import.meta.env.MODE === 'development') {
 	gui.add(document, 'title');
 
 	const actions = {
-		removeCanvas: () => removeTowerAnimation({ canvasId: 'canvas_id' }),
-		initCanvas: () => loadTowerAnimation({ canvasId: 'canvas_id', offset: 0 }),
+		removeTowerAnimation: () => removeTowerAnimation({ canvasId: 'canvas_id' }),
+		loadTowerAnimation: () => loadTowerAnimation({ canvasId: 'canvas_id', offset: 0 }),
 		showVisual: () => setAnimationState('showVisual'),
 		start: () => setAnimationState('start'),
 		stopVis: () => setAnimationState('stop'),
@@ -27,17 +27,17 @@ if (import.meta.env.MODE === 'development') {
 		},
 	};
 
+	gui.add(actions, 'removeTowerAnimation');
+	gui.add(actions, 'loadTowerAnimation');
 	gui.add(actions, 'showVisual');
 	gui.add(actions, 'start');
 	gui.add(actions, 'stopVis');
+	gui.add(actions, 'fail');
 	gui.add(actions, 'success');
 	gui.add(actions, 'success2');
 	gui.add(actions, 'success3');
-	gui.add(actions, 'fail');
-	gui.add(actions, 'removeCanvas');
 	gui.add(actions, 'darkMode');
 	gui.add(actions, 'lightMode');
-	gui.add(actions, 'initCanvas');
 
 	function handleLoad() {
 		loadTowerAnimation({ canvasId: 'canvas_id', offset: 0 });

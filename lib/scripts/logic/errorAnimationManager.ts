@@ -3,9 +3,9 @@ import math from '../utils/math';
 import { errorAnimationEndedSignal, stateSignal } from './signals';
 import { AnimationResult, AnimationStatus } from '../../types/stateManager';
 
+const errorAnimationDuration = 3.25; // seconds
 let isActive = false;
 let failRatio = 0;
-const errorAnimationDuration = 3.5; // seconds
 let failShakeRatio = 0;
 let failFloatingCubesRatio = 0;
 let failSpawnRatio = 0;
@@ -50,4 +50,4 @@ const ErrorAnimationManager = () => {
 	};
 };
 const errorAnimationManager = ErrorAnimationManager();
-export { errorAnimationManager, failShakeRatio, failFloatingCubesRatio, failSpawnRatio, failPushDownRatio, errorAnimationDuration };
+export { errorAnimationManager, failShakeRatio, failFloatingCubesRatio, failSpawnRatio, failPushDownRatio };
