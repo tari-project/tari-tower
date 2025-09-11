@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import settings, { WEBGL_OPTS } from './core/settings.ts';
-import { properties } from './core/properties.ts';
+import { properties, propertiesInitialState, resetProperties } from './core/properties.ts';
 import { heroBlocks, heroContainer } from './visuals/hero/hero.ts';
 import { coinContainer, Coins } from './visuals/coins/coins.ts';
 import BlueNoise from './utils/blueNoise/blueNoise.ts';
@@ -21,15 +21,8 @@ const TariTower = () => {
 
 	let orbitControls: OrbitControls;
 
-	let canvas: HTMLCanvasElement | null;
-	const aspect = window.innerWidth / window.innerHeight;
-	const viewHeight = 15;
-	const viewWidth = viewHeight * aspect;
-
-	const camera = new THREE.OrthographicCamera(viewWidth / -2, viewWidth / 2, viewHeight / 2, viewHeight / -2, 1, 1000);
-
+	const camera = new THREE.OrthographicCamera();
 	let orbitCamera: OrthographicCamera;
-
 	let renderer: THREE.WebGLRenderer;
 
 	async function _handleRenderer() {
@@ -50,13 +43,12 @@ const TariTower = () => {
 	function _handleResize(viewportWidth: number, viewportHeight: number) {
 		properties.viewportWidth = viewportWidth;
 		properties.viewportHeight = viewportHeight;
-		properties.viewportResolution.set(viewportWidth, window.innerHeight);
+		properties.viewportResolution.set(viewportWidth, viewportHeight);
 		properties.sharedUniforms.u_viewportResolution.value = properties.viewportResolution;
 
 		let dprWidth = viewportWidth * settings.DPR;
 		let dprHeight = viewportHeight * settings.DPR;
-
-		const aspect = dprWidth / dprHeight;
+		const aspect = viewportWidth / viewportHeight;
 
 		if (dprHeight * dprWidth > settings.MAX_PIXEL_COUNT) {
 			dprHeight = Math.sqrt(settings.MAX_PIXEL_COUNT / aspect);
@@ -66,25 +58,20 @@ const TariTower = () => {
 
 		properties.width = dprWidth;
 		properties.height = dprHeight;
+
 		properties.resolution.set(dprWidth, dprHeight);
+		renderer?.setSize(dprWidth, dprHeight, false);
+
 		camera.setViewOffset(viewportWidth, viewportHeight, 0, 87.5, viewportWidth, viewportHeight);
 		camera.updateProjectionMatrix();
-
-		renderer?.setSize(dprWidth, dprHeight);
-
-		if (canvas) {
-			canvas.style.width = viewportWidth + 'px';
-			canvas.style.height = viewportHeight + 'px';
-		}
 	}
 
 	function onResize() {
 		_handleResize(window.innerWidth, window.innerHeight);
 	}
 
-	async function preload({ canvasEl, initCallback }: { canvasEl: HTMLElement; initCallback: () => Promise<void> }) {
-		canvas = canvasEl as HTMLCanvasElement;
-		renderer = new THREE.WebGLRenderer({ ...WEBGL_OPTS, canvas });
+	async function preload({ canvasEl, initCallback }: { canvasEl: HTMLCanvasElement; initCallback: () => Promise<void> }) {
+		renderer = new THREE.WebGLRenderer({ ...WEBGL_OPTS, canvas: canvasEl });
 		canvasSignal.addOnce(() => {
 			destroy();
 		});
@@ -104,6 +91,7 @@ const TariTower = () => {
 		camera.scale.set(0.905, 0.905, 0.905);
 		camera.updateProjectionMatrix();
 		orbitCamera = camera.clone();
+		const canvas = renderer.domElement;
 		if (canvas) {
 			orbitControls = new OrbitControls(orbitCamera, canvas);
 			orbitControls.target0.fromArray(settings.DEFAULT_LOOKAT_POSITION);
@@ -135,8 +123,8 @@ const TariTower = () => {
 	}
 
 	function render(dt: number) {
+		const canvas = renderer.domElement;
 		if (!canvas) {
-			dt *= 0;
 			return;
 		}
 
@@ -193,17 +181,17 @@ const TariTower = () => {
 		renderer.dispose();
 	}
 	function destroy() {
+		const canvas = renderer.domElement;
 		if (!canvas || !canvas?.id) return;
 		properties.showVisual = false;
+
 		game.resetPostDestroy();
-
-		const freshCanvas = document.createElement('canvas');
-		freshCanvas.setAttribute('id', canvas.id);
-		canvas.replaceWith(freshCanvas);
-
+		const canvasEl = document.getElementById(canvas.id);
+		canvasEl?.remove();
 		// Clean up Three.js resources
 		_disposeAll();
 		renderer.state.reset();
+		resetProperties();
 	}
 	return {
 		preload,

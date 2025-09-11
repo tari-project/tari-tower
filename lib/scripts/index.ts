@@ -50,20 +50,27 @@ async function initCallback() {
 }
 
 export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: string; offset?: number }) {
-	properties.offsetX = offset;
-	properties.cameraOffsetX = properties.offsetX / window.innerWidth;
-	const canvasEl = document.getElementById(canvasId);
+	if (document.getElementById(canvasId)) return;
+
 	resetCompleted = false;
 	towerRemovedSignal.add(() => {
 		resetCompleted = true;
 	});
 
-	try {
-		if (canvasEl) {
+	properties.offsetX = offset;
+	properties.cameraOffsetX = properties.offsetX / window.innerWidth;
+
+	const root = document.getElementById('root');
+
+	if (root) {
+		const canvasEl = document.createElement('canvas');
+		canvasEl.setAttribute('id', canvasId);
+		root.appendChild(canvasEl);
+		try {
 			await tower.preload({ canvasEl, initCallback });
+		} catch (e) {
+			logError('loadTowerAnimation', e);
 		}
-	} catch (e) {
-		logError('loadTowerAnimation', e);
 	}
 }
 
