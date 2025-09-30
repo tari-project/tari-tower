@@ -127,6 +127,7 @@ const Loader = () => {
 	}
 
 	async function start(cb) {
+		if (list.length === 0) return;
 		for (const loadFunction of list) {
 			await loadFunction();
 		}

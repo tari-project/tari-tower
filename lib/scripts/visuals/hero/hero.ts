@@ -48,7 +48,6 @@ const heroSharedUniforms: HeroSharedUniforms = {
 	u_infoTextureLinear: { value: null },
 	u_endAnimationRatio: { value: 0 },
 };
-
 const heroState: HeroType = {
 	_baseMesh: undefined,
 	_blocksMesh: undefined,
@@ -74,11 +73,15 @@ const heroState: HeroType = {
 	heroSharedUniforms,
 };
 
+let preloadComplete = false;
 const Hero = () => {
 	const buffers: BufferGeometry[] = [];
 	const textures: Texture[] = [];
 
 	async function preload() {
+		if (preloadComplete) {
+			return;
+		}
 		const arr = Array.from({ length: TOTAL_BLOCKS });
 		heroState._blockList = arr.map((_) => new HeroBlockCoordinates());
 		heroState._blockRenderList = [...heroState._blockList];
@@ -107,7 +110,9 @@ const Hero = () => {
 			textures.push(t);
 		});
 		try {
-			await Promise.all([base, box, lose, gobo]);
+			await Promise.all([base, box, lose, gobo]).then(() => {
+				preloadComplete = true;
+			});
 			log(`Loaded Hero assets`);
 		} catch (e) {
 			console.error('hero preload error:', e);

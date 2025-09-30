@@ -80,8 +80,15 @@ export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 	time = 0;
 	lastRender = 0;
 
+	let timeout: NodeJS.Timeout | undefined;
 	while (!resetCompleted) {
-		await new Promise((resolve) => setTimeout(resolve, 150));
+		await new Promise((resolve) => {
+			timeout = setTimeout(resolve, 200);
+		});
+
+		if (timeout) {
+			clearTimeout(timeout);
+		}
 	}
 	if (resetCompleted) {
 		logInfo('[removeTowerAnimation] Tower animation removed successfully.');
