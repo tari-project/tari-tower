@@ -1,5 +1,5 @@
 import { WebGLRendererParameters } from 'three';
-export const WEBGL_OPTS: WebGLRendererParameters = { antialias: true, powerPreference: 'low-power', precision: 'lowp' };
+export const WEBGL_OPTS: WebGLRendererParameters = { antialias: true, powerPreference: 'low-power', precision: 'lowp', failIfMajorPerformanceCaveat: true };
 
 const AUTO_RESTART = true;
 const AUTO_START = false;

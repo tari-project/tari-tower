@@ -12,6 +12,8 @@ import { floatingCoinsRatio, vortexCoinsRatio } from '../../logic/successAnimati
 import { BufferGeometry, InstancedBufferGeometry, Mesh, ShaderMaterial, Texture } from 'three';
 const coinContainer = new THREE.Object3D();
 coinContainer.name = 'coins_container';
+
+let loadComplete = false;
 const Coins = () => {
 	const buffers: BufferGeometry[] = [];
 	const textures: Texture[] = [];
@@ -38,11 +40,15 @@ const Coins = () => {
 	};
 
 	async function preload() {
+		if (loadComplete) {
+			return;
+		}
 		const t = await loader.loadTexture(`gold`, (texture) => {
 			matcapTexture = texture;
 			matcapTexture.needsUpdate = true;
 			textures.push(texture);
 		});
+
 		const b = await loader.loadBuf(`buf_coin`, (geometry) => {
 			refGeometry = geometry;
 			buffers.push(geometry);
@@ -58,7 +64,9 @@ const Coins = () => {
 			buffers.push(geometry);
 		});
 		try {
-			await Promise.all([t, b, b1]);
+			await Promise.all([t, b, b1]).then(() => {
+				loadComplete = true;
+			});
 		} catch (err) {
 			console.error('coin preload error:', err);
 		}

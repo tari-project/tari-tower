@@ -8,7 +8,7 @@ const tower = TariTower();
 
 let time = 0;
 let lastRender = 0;
-const targetFPS = 50;
+const targetFPS = 40;
 const frameInterval = 1 / targetFPS;
 let resetCompleted = false;
 
@@ -44,6 +44,7 @@ async function initCallback() {
 }
 
 export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: string; offset?: number }) {
+	let loaded = false;
 	resetCompleted = false;
 	towerRemovedSignal.add(() => {
 		resetCompleted = true;
@@ -62,13 +63,17 @@ export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: s
 		canvasEl.setAttribute('style', 'display: block; width: 100%; height: 100%;');
 		try {
 			await tower.preload({ canvasEl, initCallback });
+			loaded = true;
 		} catch (e) {
 			logError('[loadTowerAnimation]', e);
+			loaded = false;
 		}
 	}
+	return loaded;
 }
 
 export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
+	let removed = false;
 	if (!document.getElementById(canvasId)) return;
 	logInfo(`[removeTowerAnimation] initiated | current status: ${status}`);
 	if (status === 'not-started') {
@@ -80,10 +85,20 @@ export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 	time = 0;
 	lastRender = 0;
 
+	let timeout: NodeJS.Timeout | undefined;
 	while (!resetCompleted) {
-		await new Promise((resolve) => setTimeout(resolve, 150));
+		await new Promise((resolve) => {
+			timeout = setTimeout(resolve, 200);
+		});
+
+		if (timeout) {
+			clearTimeout(timeout);
+		}
 	}
 	if (resetCompleted) {
 		logInfo('[removeTowerAnimation] Tower animation removed successfully.');
+		removed = true;
 	}
+
+	return removed;
 }

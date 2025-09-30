@@ -122,13 +122,13 @@ const TariTower = () => {
 		}
 	}
 
-	function render(dt: number) {
+	function render(delta: number) {
 		const canvas = document.getElementById(renderer?.domElement?.id) as HTMLCanvasElement | null;
-
 		if (!canvas) {
-			dt *= 0;
 			return;
 		}
+
+		let dt = delta;
 
 		dt = Math.min(dt, 1 / 15);
 

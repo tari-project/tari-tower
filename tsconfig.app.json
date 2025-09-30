@@ -1,8 +1,7 @@
 {
 	"compilerOptions": {
-		"target": "ES2020",
-		"useDefineForClassFields": true,
-		"lib": ["ES2020", "DOM", "DOM.Iterable"],
+		"target": "ESNext",
+		"lib": ["ESNext", "DOM", "DOM.Iterable"],
 		"module": "ESNext",
 		"skipLibCheck": true,
 		"esModuleInterop": true,
@@ -23,7 +22,7 @@
 		"baseUrl": ".",
 		"types": ["vite/client", "node", "vite-plugin-glsl/ext"]
 	},
-	"include": ["src"],
+	"include": ["./src/*"],
 	"exclude": ["node_modules", "dist"],
 	"references": [{ "path": "./tsconfig.node.json" }]
 }

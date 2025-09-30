@@ -1,7 +1,7 @@
 {
 	"name": "@tari-project/tari-tower",
 	"type": "module",
-	"version": "0.1.5",
+	"version": "0.1.7",
 	"private": false,
 	"description": "The Block Tower animation used in Tari Universe",
 	"homepage": "https://github.com/tari-project/tari-tower#readme",
@@ -26,28 +26,30 @@
 	},
 	"exports": {
 		".": {
-			"assets": "./public/assets/",
+			"assets": "./dist/assets/**/*",
 			"types": "./dist/index.d.ts",
 			"default": "./dist/index.js"
 		}
 	},
+	"types": "dist/index.d.ts",
 	"devDependencies": {
 		"@eslint/js": "^9.19.0",
-		"@types/node": "^24.3.1",
+		"@tweakpane/core": "^2.0.5",
+		"@types/node": "^24.6.0",
 		"@types/three": "^0.180.0",
 		"@typescript-eslint/parser": "^8.24.1",
-		"eslint": "^9.35.0",
+		"eslint": "^9.36.0",
 		"eslint-config-prettier": "^10.1.8",
 		"globals": "^16.4.0",
-		"lil-gui": "^0.20.0",
 		"min-signal": "^1.0.2",
 		"prettier": "^3.6.2",
+		"tweakpane": "^4.0.5",
 		"typescript": "^5.9.2",
-		"typescript-eslint": "^8.43.0",
-		"vite": "^7.1.5",
+		"typescript-eslint": "^8.45.0",
+		"vite": "^7.1.7",
 		"vite-plugin-dts": "^4.5.4",
 		"vite-plugin-eslint2": "^5.0.4",
-		"vite-plugin-glsl": "^1.5.1",
+		"vite-plugin-glsl": "^1.5.2",
 		"vite-tsconfig-paths": "^5.1.4"
 	},
 	"publishConfig": {
