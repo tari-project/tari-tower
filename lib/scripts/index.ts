@@ -44,6 +44,7 @@ async function initCallback() {
 }
 
 export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: string; offset?: number }) {
+	let loaded = false;
 	resetCompleted = false;
 	towerRemovedSignal.add(() => {
 		resetCompleted = true;
@@ -62,13 +63,17 @@ export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: s
 		canvasEl.setAttribute('style', 'display: block; width: 100%; height: 100%;');
 		try {
 			await tower.preload({ canvasEl, initCallback });
+			loaded = true;
 		} catch (e) {
 			logError('[loadTowerAnimation]', e);
+			loaded = false;
 		}
 	}
+	return loaded;
 }
 
 export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
+	let removed = false;
 	if (!document.getElementById(canvasId)) return;
 	logInfo(`[removeTowerAnimation] initiated | current status: ${status}`);
 	if (status === 'not-started') {
@@ -92,5 +97,8 @@ export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 	}
 	if (resetCompleted) {
 		logInfo('[removeTowerAnimation] Tower animation removed successfully.');
+		removed = true;
 	}
+
+	return removed;
 }

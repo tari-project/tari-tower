@@ -8,21 +8,15 @@ declare enum AnimationStatus {
     RESTART = "restart"
 }
 
-/**
- * Current animation state
- */
-export declare const animationStatus: AnimationStatus;
+export declare const getCurrentState: () => AnimationStatus;
 
 export declare const getTowerLogPrefix: (level: any) => string;
 
 export declare function loadTowerAnimation({ canvasId, offset }: {
     canvasId: string;
     offset?: number;
-}): Promise<void>;
+}): Promise<boolean | undefined>;
 
-/**
- * Animation properties
- */
 declare interface Property {
     property: string;
     value: unknown;
@@ -30,7 +24,7 @@ declare interface Property {
 
 export declare function removeTowerAnimation({ canvasId }: {
     canvasId: string;
-}): Promise<void>;
+}): Promise<boolean | undefined>;
 
 export declare function setAnimationProperties(newProps: Property[]): void;
 

@@ -46,13 +46,8 @@ const StateManager = () => {
 			setResultAnimation();
 		}
 
-		if (statusUpdateQueue.length !== 0) {
-			if (statusUpdateQueue.length > 1) {
-				const mappedStatuses = statusUpdateQueue.map((q) => `${q.status}${q.result ? `[${q.result}]` : ''}`).join('->');
-				logInfo(`[updateAfterCycle] Queue(${statusUpdateQueue.length})`, mappedStatuses);
-			}
-			const callback = statusUpdateQueue.shift()?.callback;
-			callback?.();
+		if (statusUpdateQueue.length) {
+			statusUpdateQueue.shift()?.callback();
 		}
 	}
 
@@ -93,16 +88,6 @@ const StateManager = () => {
 		// Handle special replay case - allows jumping to FREE state from NOT_STARTED
 		if (isReplay && statusIndex === 0) {
 			statusIndex = 2; // Jump to FREE state
-		}
-
-		// Handle special reset case - allows resetting from the RESTART state
-		if (newStatus === AnimationStatus.NOT_STARTED && result === AnimationResult.NONE && statusIndex === 5) {
-			statusIndex = 6; // Move to the end to allow reset
-		}
-
-		// Handle special quick restart (due to quick mining changes in TU)
-		if (newStatus === AnimationStatus.STARTED && statusIndex === 5) {
-			statusIndex = 0; // Move to the start
 		}
 
 		const shouldLog = (hasResult && result !== AnimationResult.NONE) || (newStatus === AnimationStatus.STARTED && status !== AnimationStatus.FREE);
@@ -163,9 +148,9 @@ const StateManager = () => {
 			restartAnimation: () => setRestartAnimation(),
 			restart: () => setRestart(),
 			showVisual: () => showVisual(),
-			success: () => setComplete(isReplay),
-			success2: () => setComplete2(isReplay),
-			success3: () => setComplete3(isReplay),
+			success: () => win(isReplay),
+			success2: () => win2(isReplay),
+			success3: () => win3(isReplay),
 		};
 		actions[id]?.();
 	}
@@ -194,7 +179,7 @@ const StateManager = () => {
 				}
 			: { status, callback: () => _canUpdateStatus(status) };
 
-		if (!statuses.includes(status)) {
+		if (!statuses.includes(status) || !!result) {
 			statusUpdateQueue.push(queueItem);
 		}
 	}
@@ -217,7 +202,6 @@ const StateManager = () => {
 	}
 
 	function setStart() {
-		statusUpdateQueue = [];
 		_queueStatusUpdate({ status: AnimationStatus.STARTED });
 	}
 
@@ -232,7 +216,7 @@ const StateManager = () => {
 		});
 	}
 
-	function setComplete(isReplay = false) {
+	function win(isReplay = false) {
 		const result = isReplay && stateFlags.hasNotStarted ? AnimationResult.REPLAY : AnimationResult.COMPLETED;
 		_queueStatusUpdate({
 			status: AnimationStatus.RESULT,
@@ -241,7 +225,7 @@ const StateManager = () => {
 		});
 	}
 
-	function setComplete2(isReplay = false) {
+	function win2(isReplay = false) {
 		const result = isReplay && stateFlags.hasNotStarted ? AnimationResult.REPLAY : AnimationResult.COMPLETED;
 		_queueStatusUpdate({
 			status: AnimationStatus.RESULT,
@@ -250,7 +234,7 @@ const StateManager = () => {
 		});
 	}
 
-	function setComplete3(isReplay = false) {
+	function win3(isReplay = false) {
 		const result = isReplay && stateFlags.hasNotStarted ? AnimationResult.REPLAY : AnimationResult.COMPLETED;
 
 		_queueStatusUpdate({
@@ -294,6 +278,10 @@ const StateManager = () => {
 		}
 	}
 
+	function getStatus() {
+		return status;
+	}
+
 	return {
 		init,
 		updateAfterCycle,
@@ -305,6 +293,7 @@ const StateManager = () => {
 		setRestart,
 		setRemove,
 		statusIndex,
+		getStatus,
 	};
 };
 
