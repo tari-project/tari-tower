@@ -30,20 +30,20 @@ const DARK = [
 
 if (import.meta.env.MODE === 'development') {
 	const p = new Pane({ title: 'Tari Tower' });
-
-	const tab = p.addTab({
-		pages: [{ title: 'Parameters' }, { title: 'Actions' }],
-	});
-
 	const PARAMS = {
 		speed: 1,
+		minSpawn: 20,
 	};
-	tab.pages[0].addBinding(PARAMS, 'speed', { min: 0.5, max: 10, step: 0.5 }).on('change', (e) => {
+
+	p.addBinding(PARAMS, 'speed', { min: 0.5, max: 10, step: 0.5 }).on('change', (e) => {
 		setAnimationProperties([{ property: 'animationSpeed', value: e.value }]);
 	});
+	p.addBinding(PARAMS, 'minSpawn', { min: 1, max: 25, step: 1 }).on('change', (e) => {
+		setAnimationProperties([{ property: 'minSpawnedBlocksForTheErrorBlock', value: e.value }]);
+	});
 
-	const gen = tab.pages[1].addFolder({ title: 'General' });
-	const s = tab.pages[1].addFolder({ title: 'States' });
+	const gen = p.addFolder({ title: 'General' });
+	const s = p.addFolder({ title: 'States' });
 
 	gen.addButton({ title: 'remove' }).on('click', () => removeTowerAnimation({ canvasId }));
 	gen.addButton({ title: 'load' }).on('click', () => loadTowerAnimation({ canvasId, offset: 0 }));
@@ -64,6 +64,8 @@ if (import.meta.env.MODE === 'development') {
 	s.addButton({ title: 'success' }).on('click', () => setAnimationState('success'));
 	s.addButton({ title: 'success2' }).on('click', () => setAnimationState('success2'));
 	s.addButton({ title: 'success3' }).on('click', () => setAnimationState('success3', true));
+
+	p.refresh();
 
 	function handleLoad() {
 		loadTowerAnimation({ canvasId, offset: 0 });

@@ -1,18 +1,22 @@
 import * as THREE from 'three';
 import { properties } from './scripts/core/properties';
-import { stateManager, status as animationStatus } from './scripts/logic/stateManager';
+import { stateManager, status } from './scripts/logic/stateManager';
 import { loadTowerAnimation, removeTowerAnimation } from './scripts/index';
 import { getTowerLogPrefix } from './scripts/utils/logger';
+
+/**
+ * Animation properties
+ */
 
 interface Property {
 	property: string;
 	value: unknown;
 }
-function setAnimationState(id: string, isReplay?: boolean) {
+export function setAnimationState(id: string, isReplay?: boolean) {
 	stateManager.set(id, isReplay);
 }
 
-function setAnimationProperties(newProps: Property[]) {
+export function setAnimationProperties(newProps: Property[]) {
 	for (const item of newProps) {
 		properties[item.property] = item.value;
 
@@ -26,4 +30,8 @@ function setAnimationProperties(newProps: Property[]) {
 	}
 }
 
-export { animationStatus, loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState, getTowerLogPrefix };
+/**
+ * Current animation state
+ */
+export const animationStatus = status;
+export { loadTowerAnimation, removeTowerAnimation, getTowerLogPrefix };
