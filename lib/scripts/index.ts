@@ -8,7 +8,7 @@ const tower = TariTower();
 
 let time = 0;
 let lastRender = 0;
-const targetFPS = 50;
+const targetFPS = 40;
 const frameInterval = 1 / targetFPS;
 let resetCompleted = false;
 

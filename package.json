@@ -33,13 +33,13 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.19.0",
+		"@tweakpane/core": "^2.0.5",
 		"@types/node": "^24.6.0",
 		"@types/three": "^0.180.0",
 		"@typescript-eslint/parser": "^8.24.1",
 		"eslint": "^9.36.0",
 		"eslint-config-prettier": "^10.1.8",
 		"globals": "^16.4.0",
-		"lil-gui": "^0.20.0",
 		"min-signal": "^1.0.2",
 		"prettier": "^3.6.2",
 		"typescript": "^5.9.2",
@@ -52,5 +52,8 @@
 	},
 	"publishConfig": {
 		"access": "public"
+	},
+	"dependencies": {
+		"tweakpane": "^4.0.5"
 	}
 }

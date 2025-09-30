@@ -1,7 +1,7 @@
 import * as c from "three";
 import { TextureLoader as I8, LinearMipMapLinearFilter as g8, LinearFilter as m8, BufferGeometry as T8, BufferAttribute as Xw, Vector2 as Y, NearestFilter as n8, RepeatWrapping as s8, ShaderChunk as U8, EventDispatcher as N8, Vector3 as cA, MOUSE as UA, TOUCH as NA, Quaternion as Gw, Spherical as Vw } from "three";
 import S from "min-signal";
-const O8 = { antialias: !0, powerPreference: "low-power", precision: "lowp" }, b8 = !1, x8 = [0, 0, 0], F8 = [-20, 18, 20], j8 = Math.min(2, window.devicePixelRatio || 1), l8 = 2560 * 1440, EA = { DEFAULT_LOOKAT_POSITION: x8, DEFAULT_POSITION: F8, DPR: j8, MAX_PIXEL_COUNT: l8, SHOW_BLOCK: b8 }, SA = (Q, w) => Math.hypot(Q, w);
+const O8 = { antialias: !0, powerPreference: "low-power", precision: "lowp" }, b8 = !0, x8 = [0, 0, 0], F8 = [-20, 18, 20], j8 = Math.min(2, window.devicePixelRatio || 1), l8 = 2560 * 1440, EA = { DEFAULT_LOOKAT_POSITION: x8, DEFAULT_POSITION: F8, DPR: j8, MAX_PIXEL_COUNT: l8, SHOW_BLOCK: b8 }, SA = (Q, w) => Math.hypot(Q, w);
 class k8 {
   id = 0;
   row = 0;
@@ -309,7 +309,7 @@ const d8 = 4, L8 = () => {
     I({ status: j.RESTART });
   }
   function v() {
-    B();
+    B(), U();
   }
   return {
     init: v,
@@ -2404,7 +2404,7 @@ const NP = () => {
   };
 }, LA = NP();
 let yA = 0, Bw = 0;
-const OP = 50, bP = 1 / OP;
+const OP = 40, bP = 1 / OP;
 let Mw = !1;
 function B8() {
   const Q = performance.now() / 1e3, w = Q - yA;
