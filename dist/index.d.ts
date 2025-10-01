@@ -1,4 +1,17 @@
-export declare const getCurrentState: () => "NOT_STARTED" | "STARTED" | "FREE" | "RESULT" | "RESULT_ANIMATION" | "RESTART_ANIMATION" | "RESTART";
+export declare const getCurrentAnimationState: () => "NOT_STARTED" | "STARTED" | "FREE" | "RESULT" | "RESULT_ANIMATION" | "RESTART_ANIMATION" | "RESTART";
+
+export declare const getCurrentFlags: () => {
+    hasNotStarted: boolean;
+    isStart: boolean;
+    isFree: boolean;
+    isResult: boolean;
+    isResultAnimation: boolean;
+    isRestart: boolean;
+    isReplayResult: boolean;
+    isSuccessResult: boolean;
+    isFailResult: boolean;
+    isStopped: boolean;
+};
 
 export declare const getTowerLogPrefix: (level: any) => string;
 

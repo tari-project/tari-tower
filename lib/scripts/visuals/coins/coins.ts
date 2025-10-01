@@ -9,12 +9,13 @@ import frag from './coins.frag?raw';
 import fragDepth from './coinsDepth.frag?raw';
 import { floatingCoinsRatio, vortexCoinsRatio } from '../../logic/successAnimationManager';
 import { BufferGeometry, InstancedBufferGeometry, Mesh, ShaderMaterial, Texture } from 'three';
-import { heroBlocks } from '../../modules.ts';
-const coinContainer = new THREE.Object3D();
-coinContainer.name = 'coins_container';
+import { tower } from '../../modules.ts';
 
-let loadComplete = false;
-const Coins = () => {
+export const Coins = () => {
+	let loadComplete = false;
+	const coinContainer = new THREE.Object3D();
+	coinContainer.name = 'coins_container';
+
 	const buffers: BufferGeometry[] = [];
 	const textures: Texture[] = [];
 
@@ -111,7 +112,7 @@ const Coins = () => {
 	function _setupMaterial() {
 		coinMaterial = new THREE.ShaderMaterial({
 			uniforms: {
-				...heroBlocks.heroSharedUniforms,
+				...tower.heroBlocks.heroSharedUniforms,
 				...properties.sharedUniforms,
 				...coinsSharedUniforms,
 				...bn_sharedUniforms,
@@ -165,7 +166,6 @@ const Coins = () => {
 		update,
 		buffers,
 		textures,
+		coinContainer,
 	};
 };
-
-export { Coins, coinContainer };

@@ -1,5 +1,7 @@
-import { loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState } from '@tari-project/tari-tower';
 import { Pane } from 'tweakpane';
+
+import { loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState, getCurrentAnimationState } from '@tari-project/tari-tower';
+import { getCurrentFlags } from '../lib';
 
 const canvasId = 'canvas_id';
 
@@ -33,7 +35,25 @@ if (import.meta.env.MODE === 'development') {
 	const PARAMS = {
 		speed: 1,
 		minSpawn: 20,
+		status: '',
+		flags: '',
 	};
+
+	p.addBinding(PARAMS, 'status', {
+		readonly: true,
+		interval: 500,
+	}).on('change', (_) => {
+		PARAMS.status = getCurrentAnimationState();
+	});
+	p.addBinding(PARAMS, 'flags', {
+		readonly: true,
+		multiline: true,
+		rows: 12,
+		interval: 500,
+	}).on('change', (_) => {
+		const flags = getCurrentFlags();
+		PARAMS.flags = JSON.stringify(flags, null, 2);
+	});
 
 	p.addBinding(PARAMS, 'speed', { min: 0.5, max: 10, step: 0.5 }).on('change', (e) => {
 		setAnimationProperties([{ property: 'animationSpeed', value: e.value }]);

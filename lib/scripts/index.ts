@@ -1,10 +1,7 @@
-import TariTower from './tower.ts';
 import { gameEndedSignal, towerRemovedSignal } from './logic/signals.ts';
 import { properties } from './core/properties.ts';
 import { logError, logInfo } from './utils/logger.ts';
-import { stateManager } from './modules.ts';
-
-const tower = TariTower();
+import { stateManager, tower } from './modules.ts';
 
 let time = 0;
 let lastRender = 0;

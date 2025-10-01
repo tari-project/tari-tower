@@ -16,7 +16,7 @@ import Block from './Block';
 import { SystemManagerState } from '../../types/systemManager';
 import math from '../utils/math';
 import { logInfo } from '../utils/logger.ts';
-import { failAnimation, heroBlocks, stateManager as sM } from '../modules.ts';
+import { failAnimation, stateManager as sM, tower } from '../modules.ts';
 import { PREVENT_CYCLE_STATES, RESET_CYCLE_RESULTS } from '../core/states.ts';
 
 let firstStartAnimationRatio: SystemManagerState['firstStartAnimationRatio'] = 0;
@@ -88,7 +88,7 @@ const SystemManager = () => {
 			}
 		} else {
 			properties.errorBlock?.reset(true);
-			heroBlocks.resetBlockFromLogicBlock(properties.errorBlock);
+			tower.heroBlocks.resetBlockFromLogicBlock(properties.errorBlock);
 			block = properties.errorBlock;
 			properties.errorBlock = null;
 		}
@@ -138,7 +138,7 @@ const SystemManager = () => {
 
 	function resetPostDestroy() {
 		blocks.forEach((block) => block.reset());
-		heroBlocks.reset();
+		tower.heroBlocks.reset();
 		board.reset();
 
 		blocks = [];
@@ -150,7 +150,7 @@ const SystemManager = () => {
 
 	function reset(isDestroy = false) {
 		blocks.forEach((block) => block.reset());
-		heroBlocks.reset();
+		tower.heroBlocks.reset();
 		board.reset();
 
 		blocks = [];

@@ -1,34 +1,35 @@
-import * as THREE from 'three';
+import { ColorManagement, PCFShadowMap, WebGLRenderer } from 'three';
 import settings, { WEBGL_OPTS } from './core/settings.ts';
-import { properties } from './core/properties.ts';
-import { coinContainer, Coins } from './visuals/coins/coins.ts';
 import BlueNoise from './utils/blueNoise/blueNoise.ts';
-import { OrbitControls } from './controls/OrbitControls';
 import game from './logic/systemManager.ts';
-import { Background, bgContainer } from './visuals/bg/bg.ts';
 import loader from './core/loader.ts';
+import { Background, bgContainer } from './visuals/bg/bg.ts';
+import { OrbitControls } from './controls/OrbitControls';
 import { OrthographicCamera } from 'three';
 import { canvasSignal } from './logic/signals.ts';
+import { Coins } from './visuals/coins/coins.ts';
+import { properties } from './core/properties.ts';
 import { logError } from './utils/logger.ts';
-import { heroBlocks } from './modules.ts';
+import { Hero } from './visuals/hero/hero.ts';
 
-THREE.ColorManagement.enabled = false;
-
-const TariTower = () => {
+ColorManagement.enabled = false;
+export const TariTower = () => {
 	const background = Background();
 	const blueNoise = BlueNoise();
+	const heroBlocks = Hero();
+
 	const coins = Coins();
 
 	let orbitControls: OrbitControls;
 
-	const camera = new THREE.OrthographicCamera();
+	const camera = new OrthographicCamera();
 	let orbitCamera: OrthographicCamera;
-	let renderer: THREE.WebGLRenderer;
+	let renderer: WebGLRenderer;
 
 	async function _handleRenderer() {
 		if (renderer) {
 			renderer.shadowMap.enabled = true;
-			renderer.shadowMap.type = THREE.PCFShadowMap;
+			renderer.shadowMap.type = PCFShadowMap;
 
 			if (properties.sharedUniforms) {
 				const bgColor1 = properties.sharedUniforms.u_bgColor1.value;
@@ -72,7 +73,7 @@ const TariTower = () => {
 	}
 
 	async function preload({ canvasEl, initCallback }: { canvasEl: HTMLCanvasElement; initCallback: () => Promise<void> }) {
-		renderer = new THREE.WebGLRenderer({ ...WEBGL_OPTS, canvas: canvasEl });
+		renderer = new WebGLRenderer({ ...WEBGL_OPTS, canvas: canvasEl });
 		canvasSignal.addOnce(() => {
 			destroy();
 		});
@@ -114,7 +115,7 @@ const TariTower = () => {
 			coins.init();
 			background.init();
 
-			properties.scene.add(coinContainer);
+			properties.scene.add(coins.coinContainer);
 			properties.scene.add(bgContainer);
 			properties.scene.add(heroBlocks.heroContainer);
 		} catch (error) {
@@ -200,7 +201,6 @@ const TariTower = () => {
 		blueNoise,
 		onResize,
 		render,
+		heroBlocks,
 	};
 };
-
-export default TariTower;

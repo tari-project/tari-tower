@@ -35,7 +35,6 @@ export const StateManager = () => {
 		if (stateFlags.isResult) {
 			setResultAnimation();
 		}
-
 		if (statusUpdateQueue.length) {
 			statusUpdateQueue.shift()?.callback();
 		}
@@ -74,11 +73,6 @@ export const StateManager = () => {
 
 		const hasResult = !!result;
 		const isReplay = result === 'REPLAY';
-		const isStop = result === 'STOP';
-
-		if (isStop) {
-			console.debug(newStatus, status);
-		}
 
 		// Handle special replay case - allows jumping to FREE state from NOT_STARTED
 		if (isReplay && _statusIndex === 0) {
@@ -280,6 +274,9 @@ export const StateManager = () => {
 	function _getResult() {
 		return result;
 	}
+	function _getFlags() {
+		return stateFlags;
+	}
 
 	return {
 		init,
@@ -292,8 +289,9 @@ export const StateManager = () => {
 		setRestart,
 		setRemove,
 		getStatus,
+		_getFlags,
 		status: getStatus(),
 		result: _getResult(),
-		stateFlags,
+		stateFlags: _getFlags(),
 	};
 };

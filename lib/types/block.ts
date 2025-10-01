@@ -18,7 +18,6 @@ export interface BlockType {
 	spawnAnimationRatioUnclamped: number;
 	easedAnimationRatio: number;
 	randomVector?: Vector;
-
 	lifeCycle: number;
 	easingFunction?: ((x?: number) => number) | null;
 	errorLifeCycle: number;

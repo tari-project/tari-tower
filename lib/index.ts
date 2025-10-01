@@ -9,11 +9,12 @@ interface Property {
 	value: unknown;
 }
 
-export const getCurrentState = () => stateManager.getStatus();
-export function setAnimationState(id: string, isReplay?: boolean) {
+const getCurrentAnimationState = () => stateManager.getStatus();
+const getCurrentFlags = () => stateManager._getFlags();
+function setAnimationState(id: string, isReplay?: boolean) {
 	stateManager.set(id, isReplay);
 }
-export function setAnimationProperties(newProps: Property[]) {
+function setAnimationProperties(newProps: Property[]) {
 	for (const item of newProps) {
 		properties[item.property] = item.value;
 
@@ -27,4 +28,4 @@ export function setAnimationProperties(newProps: Property[]) {
 	}
 }
 
-export { loadTowerAnimation, removeTowerAnimation, getTowerLogPrefix };
+export { getCurrentFlags, loadTowerAnimation, removeTowerAnimation, getTowerLogPrefix, getCurrentAnimationState, setAnimationState, setAnimationProperties };
