@@ -42,7 +42,8 @@ const StateManager = () => {
 		}
 		if (stateFlags.isStart) {
 			setFree();
-		} else if (stateFlags.isResult) {
+		}
+		if (stateFlags.isResult) {
 			setResultAnimation();
 		}
 
@@ -84,6 +85,11 @@ const StateManager = () => {
 
 		const hasResult = !!result;
 		const isReplay = result === AnimationResult.REPLAY;
+		const isStop = result === AnimationResult.STOP;
+
+		if (isStop) {
+			console.debug(newStatus, status);
+		}
 
 		// Handle special replay case - allows jumping to FREE state from NOT_STARTED
 		if (isReplay && statusIndex === 0) {
@@ -91,7 +97,6 @@ const StateManager = () => {
 		}
 
 		const shouldLog = (hasResult && result !== AnimationResult.NONE) || (newStatus === AnimationStatus.STARTED && status !== AnimationStatus.FREE);
-
 		// Calculate if the transition is valid
 		const newStateIndex = statusOrder.indexOf(newStatus);
 		const isNextState = (statusIndex + 1) % statusOrder.length === newStateIndex;
@@ -165,6 +170,7 @@ const StateManager = () => {
 	 */
 	function _queueStatusUpdate({ status, result = null, animationStyle = null }: QueueArgs) {
 		const statuses = statusUpdateQueue.map((q) => q.status);
+		const results = statusUpdateQueue.map((q) => q.result);
 		const queueOverloaded = statuses?.length >= MAX_QUEUE_LENGTH;
 		// Clear the queue if it's getting too long or stop initiated
 		if (queueOverloaded) {
@@ -175,11 +181,12 @@ const StateManager = () => {
 		const queueItem: QueueItem = result
 			? {
 					status,
+					result,
 					callback: () => _updateStatusAndResult({ status, result, animationStyle }),
 				}
 			: { status, callback: () => _canUpdateStatus(status) };
-
-		if (!statuses.includes(status) || !!result) {
+		const canAddToQueue = Boolean(!statuses.includes(status) || (result && !results.includes(result)));
+		if (canAddToQueue) {
 			statusUpdateQueue.push(queueItem);
 		}
 	}
