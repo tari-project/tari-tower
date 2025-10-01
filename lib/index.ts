@@ -10,7 +10,7 @@ interface Property {
 }
 
 const getCurrentAnimationState = () => stateManager.getStatus();
-const getCurrentFlags = () => stateManager._getFlags();
+const getCurrentFlags = () => stateManager.getFlags();
 function setAnimationState(id: string, isReplay?: boolean) {
 	stateManager.set(id, isReplay);
 }

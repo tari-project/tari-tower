@@ -30,6 +30,7 @@ export const SystemManager = () => {
 	let wasSuccess = false;
 
 	function _spawnBlock() {
+		const state = sM.getFlags();
 		if (_shouldPreventSpawn()) {
 			if (properties.errorBlock && properties.errorBlock.isErrorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle) {
 				if (properties.errorBlock.errorLifeCycle > properties.errorBlockMaxLifeCycle) {
@@ -40,23 +41,19 @@ export const SystemManager = () => {
 			}
 			return;
 		}
-		if (sM.stateFlags.isSuccessResult || sM.stateFlags.isReplayResult) {
+		if (state.isSuccessResult || state.isReplayResult) {
 			_spawnMultipleBlocks();
 		} else {
 			_spawnSingleBlock();
 		}
 
-		if (blocks.length === properties.maxFreeBlocksCount && sM.stateFlags.isFree) return;
+		if (blocks.length === properties.maxFreeBlocksCount && state.isFree) return;
 		spawnSignal.dispatch();
 	}
 
 	function _shouldPreventSpawn() {
-		return (
-			sM.stateFlags.isFailResult ||
-			sM.stateFlags.isStopped ||
-			blocks.length >= TOTAL_TILES ||
-			(mainTile?.isOccupied && !sM.stateFlags.isSuccessResult && !sM.stateFlags.isReplayResult)
-		);
+		const state = sM.getFlags();
+		return state.isFailResult || state.isStopped || blocks.length >= TOTAL_TILES || (mainTile?.isOccupied && !state.isSuccessResult && !state.isReplayResult);
 	}
 
 	function _spawnMultipleBlocks() {
@@ -82,7 +79,7 @@ export const SystemManager = () => {
 	function _spawnSingleBlock(replaceErrorBlock = false) {
 		let block: Block | null | undefined = null;
 		const needsErrorBlockReplacement = replaceErrorBlock || Boolean(properties.errorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle);
-		const canAddNewBlock = Boolean(blocks.length < properties.maxFreeBlocksCount && sM.stateFlags.isFree);
+		const canAddNewBlock = Boolean(blocks.length < properties.maxFreeBlocksCount && sM.getFlags().isFree);
 		if (!needsErrorBlockReplacement) {
 			if (canAddNewBlock) {
 				block = new Block(blocks.length);
@@ -105,7 +102,7 @@ export const SystemManager = () => {
 	function _startNewCycle() {
 		sM.updateAfterCycle();
 
-		if (PREVENT_CYCLE_STATES.includes(sM.status)) {
+		if (PREVENT_CYCLE_STATES.includes(sM.getStatus())) {
 			return;
 		}
 		if (lastSpawnedBlock) {
@@ -113,7 +110,8 @@ export const SystemManager = () => {
 			lastSpawnedBlock = null;
 		}
 		properties.activeBlocksCount = blocks.length;
-		if (sM.stateFlags.isFailResult || sM.stateFlags.isStopped) return;
+		const state = sM.getFlags();
+		if (state.isFailResult || state.isStopped) return;
 
 		blocks.forEach((block) => block.resetAfterCycle());
 
@@ -126,7 +124,7 @@ export const SystemManager = () => {
 
 	function _calculatePaths() {
 		if (lastSpawnedBlock?.hasBeenSpawned) {
-			lastSpawnedBlock.moveToNextTile(sM.stateFlags.isFree, 0);
+			lastSpawnedBlock.moveToNextTile(sM.getFlags().isFree, 0);
 		}
 
 		const _isFree = cycleIndex % 2 === 0 ? true : properties.activeBlocksCount < properties.maxFreeBlocksCount - 1;
@@ -165,8 +163,8 @@ export const SystemManager = () => {
 			canvasSignal.dispatch();
 			firstStartAnimationRatio = 0;
 		}
-
-		const needsRestart = sM.result && RESET_CYCLE_RESULTS.includes(sM.result);
+		const result = sM.getResult();
+		const needsRestart = result && RESET_CYCLE_RESULTS.includes(result);
 		sM.reset();
 		_startNewCycle();
 
@@ -190,7 +188,7 @@ export const SystemManager = () => {
 	}
 
 	function _updateAnimationRatios(dt: number) {
-		const _isResult = sM.stateFlags.isResult;
+		const _isResult = sM.getFlags().isResult;
 		firstStartAnimationRatio = math.saturate(firstStartAnimationRatio + dt * (properties.showVisual ? 1 : 0));
 		animationSpeedRatio = Math.min(1, animationSpeedRatio + dt * (_isResult ? 1 : 0));
 		previousSuccessBlocksAnimationRatio = math.saturate(previousSuccessBlocksAnimationRatio - dt / 1.5);
@@ -209,8 +207,8 @@ export const SystemManager = () => {
 				isCycleComplete = isCycleComplete && block.spawnAnimationRatio === 1;
 			}
 		});
-
-		return isCycleComplete || sM.stateFlags.isResultAnimation || sM.stateFlags.isFailResult || sM.stateFlags.isStopped;
+		const state = sM.getFlags();
+		return isCycleComplete || state.isResultAnimation || state.isFailResult || state.isStopped;
 	}
 
 	function update(dt: number) {
@@ -220,17 +218,19 @@ export const SystemManager = () => {
 		stopAnimationManager.update(dt);
 		failAnimation.update(dt);
 
-		if (sM.stateFlags.hasNotStarted) {
+		const state = sM.getFlags();
+
+		if (state.hasNotStarted) {
 			_startNewCycle();
 			return;
 		}
 
-		if (sM.stateFlags.isRestart) {
-			wasSuccess = sM.stateFlags.isSuccessResult;
+		if (state.isRestart) {
+			wasSuccess = state.isSuccessResult;
 			reset();
 			return;
 		}
-		if (sM.stateFlags.isResultAnimation) {
+		if (state.isResultAnimation) {
 			sM.setRestartAnimation();
 		}
 

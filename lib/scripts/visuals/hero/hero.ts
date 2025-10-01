@@ -307,16 +307,18 @@ export const Hero = () => {
 
 		_c.copy(MAIN_COLOR);
 
-		if (sM.result === 'FAILED' && failAnimation.failFloatingCubesRatio > 0) {
+		const result = sM.getResult();
+
+		if (result === 'FAILED' && failAnimation.failFloatingCubesRatio > 0) {
 			_c.copy(ERROR_COLOR);
 		}
 
-		if (sM.result === 'COMPLETED' || sM.result === 'REPLAY') {
+		if (result === 'COMPLETED' || result === 'REPLAY') {
 			heroState.successColorRatio = Math.min(1, heroState.successColorRatio + 0.5 * dt);
 			_c.lerp(SUCCESS_COLOR, heroState.successColorRatio);
 		}
 
-		if (sM.result !== 'REPLAY' && sM.result !== 'COMPLETED') {
+		if (result !== 'REPLAY' && result !== 'COMPLETED') {
 			_c.lerp(DEFAULT_COLOR, math.saturate(stopPushDownRatio + failAnimation.failPushDownRatio));
 		}
 
@@ -438,7 +440,8 @@ export const Hero = () => {
 	}
 
 	function _updateStopAnimation(block, i) {
-		if (sM.result === 'STOP') {
+		const result = sM.getResult();
+		if (result === 'STOP') {
 			if (i >= TOTAL_TILES) {
 				const _i = i - TOTAL_TILES;
 				const col = (_i % SIZE) - HALF_SIZE;
@@ -472,7 +475,7 @@ export const Hero = () => {
 			block.update(properties.deltaTime);
 			block.addsFallAnimation(Math.max(0, animationRatio - 0.8));
 		}
-		if (sM.result === 'FAILED') {
+		if (sM.getResult() === 'FAILED') {
 			if (logicBlock) {
 				const tile = logicBlock.currentTile;
 
@@ -533,7 +536,8 @@ export const Hero = () => {
 	}
 
 	function _updateFloatAnimation(logicBlock, block) {
-		if (sM.result === 'COMPLETED' || sM.result === 'REPLAY') {
+		const result = sM.getResult();
+		if (result === 'COMPLETED' || result === 'REPLAY') {
 			if (logicBlock) {
 				const tile = logicBlock.currentTile;
 				const delay = 0.1 * tile.randomDelay;

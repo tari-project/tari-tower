@@ -269,10 +269,10 @@ export const StateManager = () => {
 	function getStatus() {
 		return status;
 	}
-	function _getResult() {
+	function getResult() {
 		return result;
 	}
-	function _getFlags() {
+	function getFlags() {
 		return stateFlags;
 	}
 
@@ -287,9 +287,7 @@ export const StateManager = () => {
 		setRestart,
 		setRemove,
 		getStatus,
-		_getFlags,
-		status: getStatus(),
-		result: _getResult(),
-		stateFlags: _getFlags(),
+		getFlags,
+		getResult,
 	};
 };
