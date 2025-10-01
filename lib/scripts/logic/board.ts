@@ -8,7 +8,7 @@ export const TOTAL_TILES_WITH_PADDING = SIZE_WITH_PADDING * SIZE_WITH_PADDING;
 
 let mainTile: Tile | null = null;
 let tiles: Tile[][] = [];
-const Board = () => {
+export const Board = () => {
 	function init() {
 		tiles = Array.from({ length: SIZE }, (_, i) =>
 			Array.from({ length: SIZE }, (_, j) => {
@@ -69,6 +69,5 @@ const Board = () => {
 		update,
 	};
 };
-const board = Board();
 
-export { board, mainTile, tiles };
+export { mainTile, tiles };

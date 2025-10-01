@@ -5,9 +5,8 @@ import { properties } from '../../core/properties';
 import math from '../../utils/math';
 import ease, { customEasing } from '../../utils/ease';
 import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
-import { blocks, firstStartAnimationRatio, lastSpawnedBlock, previousSuccessBlocksAnimationRatio } from '../../logic/systemManager';
 
-import { HALF_SIZE, SIZE, TOTAL_TILES, SIZE_WITH_PADDING, TOTAL_TILES_WITH_PADDING, tiles, board } from '../../logic/board';
+import { HALF_SIZE, SIZE, TOTAL_TILES, SIZE_WITH_PADDING, TOTAL_TILES_WITH_PADDING, tiles } from '../../logic/board';
 
 import vert from './hero.vert?raw';
 import frag from './hero.frag?raw';
@@ -22,7 +21,8 @@ import { lightCameraHelperSignal, lightCameraUpdateSignal } from '../../logic/si
 import { BufferGeometry, InstancedBufferAttribute, Texture } from 'three';
 import { HeroSharedUniforms, HeroType } from '../../../types/hero';
 import { log } from '../../utils/logger.ts';
-import { failAnimation, stateManager as sM } from '../../modules.ts';
+import { failAnimation, stateManager as sM, tower } from '../../modules.ts';
+
 export const Hero = () => {
 	const TOTAL_BLOCKS = 2 * TOTAL_TILES;
 	const _v2_0 = new THREE.Vector2();
@@ -325,9 +325,9 @@ export const Hero = () => {
 		SUCCESS_COLOR.convertSRGBToLinear();
 
 		for (let i = 0; i < TOTAL_BLOCKS; i++) {
-			const logicBlock = blocks.filter((block) => block.id === i)[0];
+			const logicBlock = tower.systemManager.blocks.filter((block) => block.id === i)[0];
 
-			const isActive = i < blocks.length + (lastSpawnedBlock ? 1 : 0);
+			const isActive = i < tower.systemManager.blocks.length + (tower.systemManager.lastSpawnedBlock ? 1 : 0);
 			const color = isActive ? _c : DEFAULT_COLOR;
 
 			if (isActive && logicBlock?.isErrorBlock) {
@@ -354,7 +354,7 @@ export const Hero = () => {
 
 			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.set(DEFAULT_COLOR).convertSRGBToLinear();
 
-			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(_c.set(properties.successColor), previousSuccessBlocksAnimationRatio);
+			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(_c.set(properties.successColor), tower.systemManager.previousSuccessBlocksAnimationRatio);
 			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.convertSRGBToLinear();
 		}
 	}
@@ -385,7 +385,8 @@ export const Hero = () => {
 	}
 
 	function _updateFreeBlocks() {
-		if (lastSpawnedBlock) {
+		if (tower.systemManager.lastSpawnedBlock) {
+			const lastSpawnedBlock = tower.systemManager.lastSpawnedBlock;
 			const block = heroState._blockList[lastSpawnedBlock.id];
 			if (lastSpawnedBlock.currentTile) {
 				block.boardPos.set(lastSpawnedBlock.currentTile?.row, lastSpawnedBlock.currentTile?.col);
@@ -393,7 +394,7 @@ export const Hero = () => {
 			block.showRatio = customEasing(math.saturate(lastSpawnedBlock.spawnAnimationRatioUnclamped));
 		}
 
-		blocks.forEach((logicBlock) => {
+		tower.systemManager.blocks.forEach((logicBlock) => {
 			const block = heroState._blockList[logicBlock.id];
 
 			if (block) {
@@ -442,7 +443,7 @@ export const Hero = () => {
 				const _i = i - TOTAL_TILES;
 				const col = (_i % SIZE) - HALF_SIZE;
 				const row = Math.floor(_i / SIZE) - HALF_SIZE;
-				const tile = board.getTile(row, col);
+				const tile = tower.systemManager.board.getTile(row, col);
 				if (!tile.isOccupied) {
 					const ratio = math.saturate(stopSpawnRatio - tile.randomDelay);
 					tile.activeRatio = ratio;
@@ -519,7 +520,7 @@ export const Hero = () => {
 				const _i = i - TOTAL_TILES;
 				const col = (_i % SIZE) - HALF_SIZE;
 				const row = Math.floor(_i / SIZE) - HALF_SIZE;
-				const tile = board.getTile(row, col);
+				const tile = tower.systemManager.board.getTile(row, col);
 				const ratio = math.saturate(failAnimation.failSpawnRatio - tile.randomDelay);
 
 				if (!tile.isOccupied) {
@@ -555,7 +556,7 @@ export const Hero = () => {
 			const block = heroState._blockList[i];
 			block.update(dt);
 
-			const logicBlock = blocks.filter((block) => block.id === i)[0];
+			const logicBlock = tower.systemManager.blocks.filter((block) => block.id === i)[0];
 
 			if (block.showRatio > 0) {
 				heroState._blockRenderList[renderCount++] = block;
@@ -571,7 +572,8 @@ export const Hero = () => {
 
 		const pushDownRatio = Math.min(1, stopPushDownRatio + failAnimation.failPushDownRatio + successPushDownRatio);
 		const easedRestartAnimationRatio = ease.backOut(pushDownRatio, 3);
-		const easedFirstStartAnimationRatio = 1 - customEasing(firstStartAnimationRatio);
+		const easedFirstStartAnimationRatio = 1 - customEasing(tower.systemManager.getFirstStart());
+
 		heroContainer.position.y = -easedRestartAnimationRatio - 2 * easedFirstStartAnimationRatio;
 		heroContainer.rotation.y = 0.5 * Math.PI * easedFirstStartAnimationRatio;
 		heroContainer.rotation.y += 2 * Math.PI * ease.quartInOut(towerRotationRatio);

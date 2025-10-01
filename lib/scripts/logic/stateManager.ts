@@ -40,7 +40,7 @@ export const StateManager = () => {
 		}
 	}
 
-	function updateFlags() {
+	function _updateFlags() {
 		const isAnyResult = status === 'RESULT' || status === 'RESULT_ANIMATION';
 
 		stateFlags = {
@@ -104,7 +104,7 @@ export const StateManager = () => {
 		// Only update flags and dispatch if there's no result
 		// Results are handled separately in _updateStatusAndResult
 		if (canUpdateStatus && !hasResult) {
-			updateFlags();
+			_updateFlags();
 		}
 		return canUpdateStatus;
 	}
@@ -119,7 +119,7 @@ export const StateManager = () => {
 			if (newResult) {
 				result = newResult;
 			}
-			updateFlags();
+			_updateFlags();
 			if (animationStyle) {
 				winAnimationSignal.dispatch(animationStyle);
 			}
@@ -261,8 +261,6 @@ export const StateManager = () => {
 	}
 
 	function init() {
-		updateFlags();
-
 		if (settings.AUTO_START) {
 			setStart();
 		}

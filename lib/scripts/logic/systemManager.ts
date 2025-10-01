@@ -1,5 +1,5 @@
 import { properties } from '../core/properties';
-import { board, mainTile, TOTAL_TILES } from './board';
+import { Board, mainTile, TOTAL_TILES } from './board';
 import { successAnimationManager } from './successAnimationManager';
 import { stopAnimationManager } from './stopAnimationManager';
 import {
@@ -19,14 +19,16 @@ import { logInfo } from '../utils/logger.ts';
 import { failAnimation, stateManager as sM, tower } from '../modules.ts';
 import { PREVENT_CYCLE_STATES, RESET_CYCLE_RESULTS } from '../core/states.ts';
 
-let firstStartAnimationRatio: SystemManagerState['firstStartAnimationRatio'] = 0;
-let blocks: SystemManagerState['blocks'] = [];
-let lastSpawnedBlock: SystemManagerState['lastSpawnedBlock'] = null;
-let cycleIndex: SystemManagerState['cycleIndex'] = 0;
-let animationSpeedRatio: SystemManagerState['animationSpeedRatio'] = 0;
-let previousSuccessBlocksAnimationRatio: SystemManagerState['previousSuccessBlocksAnimationRatio'] = 0;
-let wasSuccess = false;
-const SystemManager = () => {
+export const SystemManager = () => {
+	const board = Board();
+	let firstStartAnimationRatio = 0;
+	let blocks: SystemManagerState['blocks'] = [];
+	let lastSpawnedBlock: SystemManagerState['lastSpawnedBlock'] = null;
+	let cycleIndex: SystemManagerState['cycleIndex'] = 0;
+	let animationSpeedRatio: SystemManagerState['animationSpeedRatio'] = 0;
+	let previousSuccessBlocksAnimationRatio: SystemManagerState['previousSuccessBlocksAnimationRatio'] = 0;
+	let wasSuccess = false;
+
 	function _spawnBlock() {
 		if (_shouldPreventSpawn()) {
 			if (properties.errorBlock && properties.errorBlock.isErrorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle) {
@@ -190,7 +192,6 @@ const SystemManager = () => {
 	function _updateAnimationRatios(dt: number) {
 		const _isResult = sM.stateFlags.isResult;
 		firstStartAnimationRatio = math.saturate(firstStartAnimationRatio + dt * (properties.showVisual ? 1 : 0));
-
 		animationSpeedRatio = Math.min(1, animationSpeedRatio + dt * (_isResult ? 1 : 0));
 		previousSuccessBlocksAnimationRatio = math.saturate(previousSuccessBlocksAnimationRatio - dt / 1.5);
 	}
@@ -271,14 +272,22 @@ const SystemManager = () => {
 		});
 	}
 
+	function _getLastSpawnedBlock() {
+		return lastSpawnedBlock;
+	}
+	function getFirstStart() {
+		return firstStartAnimationRatio;
+	}
+
 	return {
 		init,
 		update,
 		reset,
 		resetPostDestroy,
+		blocks,
+		board,
+		lastSpawnedBlock: _getLastSpawnedBlock(),
+		previousSuccessBlocksAnimationRatio,
+		getFirstStart,
 	};
 };
-const game = SystemManager();
-export default game;
-
-export { firstStartAnimationRatio, blocks, lastSpawnedBlock, previousSuccessBlocksAnimationRatio };

@@ -1,7 +1,6 @@
 import { ColorManagement, PCFShadowMap, WebGLRenderer } from 'three';
 import settings, { WEBGL_OPTS } from './core/settings.ts';
 import BlueNoise from './utils/blueNoise/blueNoise.ts';
-import game from './logic/systemManager.ts';
 import loader from './core/loader.ts';
 import { Background, bgContainer } from './visuals/bg/bg.ts';
 import { OrbitControls } from './controls/OrbitControls';
@@ -11,9 +10,12 @@ import { Coins } from './visuals/coins/coins.ts';
 import { properties } from './core/properties.ts';
 import { logError } from './utils/logger.ts';
 import { Hero } from './visuals/hero/hero.ts';
+import { SystemManager } from './logic/systemManager.ts';
 
 ColorManagement.enabled = false;
 export const TariTower = () => {
+	const systemManager = SystemManager();
+
 	const background = Background();
 	const blueNoise = BlueNoise();
 	const heroBlocks = Hero();
@@ -104,7 +106,7 @@ export const TariTower = () => {
 
 		try {
 			// first the logic
-			await game.init();
+			await systemManager.init();
 		} catch (error) {
 			logError('init tower : ', error);
 		}
@@ -165,11 +167,11 @@ export const TariTower = () => {
 		orbitCamera?.matrix.decompose(camera.position, camera.quaternion, camera.scale);
 		camera.matrix.compose(camera.position, camera.quaternion, camera.scale);
 
+		systemManager.update(dt);
 		blueNoise.update(dt);
-		game.update(dt);
-		heroBlocks.update(dt);
 		coins.update(dt);
 		background.update(dt);
+		heroBlocks.update(dt);
 
 		renderer?.render(properties.scene, camera);
 	}
@@ -187,7 +189,7 @@ export const TariTower = () => {
 		if (!canvas || !canvas?.id) return;
 		properties.showVisual = false;
 
-		game.resetPostDestroy();
+		systemManager.resetPostDestroy();
 		const canvasEl = document.getElementById(canvas.id);
 		canvasEl?.remove();
 		// Clean up Three.js resources
@@ -202,5 +204,6 @@ export const TariTower = () => {
 		onResize,
 		render,
 		heroBlocks,
+		systemManager,
 	};
 };

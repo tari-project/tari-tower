@@ -16,7 +16,7 @@ export default defineConfig({
 		glsl({ minify: true, root: '/lib' }),
 		tsconfigPaths(),
 		eslint({ cache: false, fix: true }),
-		dts({ staticImport: true, include: ['./lib/**/*'], exclude: ['./src/*'], rollupTypes: true, tsconfigPath: './tsconfig.app.json' }),
+		dts({ include: ['lib'], exclude: ['src'], rollupTypes: true, tsconfigPath: resolve(__dirname, 'tsconfig.app.json') }),
 	],
 	build: {
 		emptyOutDir: true,
@@ -29,13 +29,11 @@ export default defineConfig({
 			external: ['three', 'min-signal', '@eslint/js', '@tweakpane/core', 'prettier', 'eslint', 'eslint-config-prettier', 'tweakpane', 'typescript', /node_modules/, '/src'],
 			input: resolve(__dirname, 'lib/index.ts'),
 			output: {
-				validate: true,
-				compact: true,
 				entryFileNames: '[name].js',
 				assetFileNames: 'assets/[name][extname]',
-				// generatedCode: {
-				// 	objectShorthand: true,
-				// },
+				generatedCode: {
+					objectShorthand: true,
+				},
 				globals: {
 					'three': 'THREE',
 					'min-signal': 'minSignal',

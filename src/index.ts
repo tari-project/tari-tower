@@ -1,7 +1,5 @@
+import { loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState, getCurrentAnimationState, getCurrentFlags } from '@tari-project/tari-tower';
 import { Pane } from 'tweakpane';
-
-import { loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState, getCurrentAnimationState } from '@tari-project/tari-tower';
-import { getCurrentFlags } from '../lib';
 
 const canvasId = 'canvas_id';
 
