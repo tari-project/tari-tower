@@ -1,8 +1,9 @@
 import { properties } from '../core/properties';
 import math from '../utils/math';
 import { customEasing } from '../utils/ease';
-import { stateFlags } from './stateManager';
+
 import { BlockType } from '../../types/block';
+import { stateManager } from '../modules.ts';
 
 export default class Block {
 	id: BlockType['id'] = -1;
@@ -107,7 +108,7 @@ export default class Block {
 			!properties.errorBlock &&
 			Math.random() < 0.5 &&
 			properties.activeBlocksCount >= properties.minSpawnedBlocksForTheErrorBlock &&
-			stateFlags.isFree
+			stateManager.stateFlags.isFree
 		) {
 			this.isErrorBlock = true;
 			properties.errorBlock = this;
@@ -170,11 +171,11 @@ export default class Block {
 	}
 
 	_updateMovement(dt: number) {
-		if ((this.isMoving && !this.hasAnimationEnded) || stateFlags.isResultAnimation) {
+		if ((this.isMoving && !this.hasAnimationEnded) || stateManager.stateFlags.isResultAnimation) {
 			this.moveAnimationRatio = Math.min(1, this.moveAnimationRatio + properties.animationSpeed * dt * (this.isErrorBlock ? 0.7 : 1));
 			this.easedAnimationRatio = this.easingFunction?.(Math.max(0, this.moveAnimationRatio)) || 0;
 
-			if (this.easedAnimationRatio === 1 && (stateFlags.isFree || stateFlags.isResult)) {
+			if (this.easedAnimationRatio === 1 && (stateManager.stateFlags.isFree || stateManager.stateFlags.isResult)) {
 				this._onMovementEnd();
 			}
 		}

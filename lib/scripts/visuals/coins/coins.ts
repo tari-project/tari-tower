@@ -3,13 +3,13 @@ import * as THREE from 'three';
 import loader from '../../core/loader';
 import { properties } from '../../core/properties';
 import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
-import { heroSharedUniforms } from '../hero/hero';
 
 import vert from './coins.vert?raw';
 import frag from './coins.frag?raw';
 import fragDepth from './coinsDepth.frag?raw';
 import { floatingCoinsRatio, vortexCoinsRatio } from '../../logic/successAnimationManager';
 import { BufferGeometry, InstancedBufferGeometry, Mesh, ShaderMaterial, Texture } from 'three';
+import { heroBlocks } from '../../modules.ts';
 const coinContainer = new THREE.Object3D();
 coinContainer.name = 'coins_container';
 
@@ -111,7 +111,7 @@ const Coins = () => {
 	function _setupMaterial() {
 		coinMaterial = new THREE.ShaderMaterial({
 			uniforms: {
-				...heroSharedUniforms,
+				...heroBlocks.heroSharedUniforms,
 				...properties.sharedUniforms,
 				...coinsSharedUniforms,
 				...bn_sharedUniforms,

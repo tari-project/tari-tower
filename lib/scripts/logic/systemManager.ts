@@ -1,7 +1,5 @@
 import { properties } from '../core/properties';
-import { PREVENT_CYCLE_STATES, resetCycleResults, result as stateResult, stateFlags, stateManager as sM, status as stateStatus } from './stateManager';
 import { board, mainTile, TOTAL_TILES } from './board';
-import { errorAnimationManager } from './errorAnimationManager';
 import { successAnimationManager } from './successAnimationManager';
 import { stopAnimationManager } from './stopAnimationManager';
 import {
@@ -16,10 +14,10 @@ import {
 } from './signals';
 import Block from './Block';
 import { SystemManagerState } from '../../types/systemManager';
-import { AnimationResult, AnimationStatus } from '../../types';
-import { heroBlocks as blocksVisual } from '../visuals/hero/hero';
 import math from '../utils/math';
 import { logInfo } from '../utils/logger.ts';
+import { failAnimation, heroBlocks, stateManager as sM } from '../modules.ts';
+import { PREVENT_CYCLE_STATES, RESET_CYCLE_RESULTS } from '../core/states.ts';
 
 let firstStartAnimationRatio: SystemManagerState['firstStartAnimationRatio'] = 0;
 let blocks: SystemManagerState['blocks'] = [];
@@ -40,19 +38,22 @@ const SystemManager = () => {
 			}
 			return;
 		}
-		if (stateFlags.isSuccessResult || stateFlags.isReplayResult) {
+		if (sM.stateFlags.isSuccessResult || sM.stateFlags.isReplayResult) {
 			_spawnMultipleBlocks();
 		} else {
 			_spawnSingleBlock();
 		}
 
-		if (blocks.length === properties.maxFreeBlocksCount && stateFlags.isFree) return;
+		if (blocks.length === properties.maxFreeBlocksCount && sM.stateFlags.isFree) return;
 		spawnSignal.dispatch();
 	}
 
 	function _shouldPreventSpawn() {
 		return (
-			stateFlags.isFailResult || stateFlags.isStopped || blocks.length >= TOTAL_TILES || (mainTile?.isOccupied && !stateFlags.isSuccessResult && !stateFlags.isReplayResult)
+			sM.stateFlags.isFailResult ||
+			sM.stateFlags.isStopped ||
+			blocks.length >= TOTAL_TILES ||
+			(mainTile?.isOccupied && !sM.stateFlags.isSuccessResult && !sM.stateFlags.isReplayResult)
 		);
 	}
 
@@ -79,7 +80,7 @@ const SystemManager = () => {
 	function _spawnSingleBlock(replaceErrorBlock = false) {
 		let block: Block | null | undefined = null;
 		const needsErrorBlockReplacement = replaceErrorBlock || Boolean(properties.errorBlock && properties.errorBlock.errorLifeCycle >= properties.errorBlockMaxLifeCycle);
-		const canAddNewBlock = Boolean(blocks.length < properties.maxFreeBlocksCount && stateStatus === AnimationStatus.FREE);
+		const canAddNewBlock = Boolean(blocks.length < properties.maxFreeBlocksCount && sM.stateFlags.isFree);
 		if (!needsErrorBlockReplacement) {
 			if (canAddNewBlock) {
 				block = new Block(blocks.length);
@@ -87,7 +88,7 @@ const SystemManager = () => {
 			}
 		} else {
 			properties.errorBlock?.reset(true);
-			blocksVisual.resetBlockFromLogicBlock(properties.errorBlock);
+			heroBlocks.resetBlockFromLogicBlock(properties.errorBlock);
 			block = properties.errorBlock;
 			properties.errorBlock = null;
 		}
@@ -102,7 +103,7 @@ const SystemManager = () => {
 	function _startNewCycle() {
 		sM.updateAfterCycle();
 
-		if (PREVENT_CYCLE_STATES.includes(stateStatus)) {
+		if (PREVENT_CYCLE_STATES.includes(sM.status)) {
 			return;
 		}
 		if (lastSpawnedBlock) {
@@ -110,7 +111,7 @@ const SystemManager = () => {
 			lastSpawnedBlock = null;
 		}
 		properties.activeBlocksCount = blocks.length;
-		if (stateFlags.isFailResult || stateFlags.isStopped) return;
+		if (sM.stateFlags.isFailResult || sM.stateFlags.isStopped) return;
 
 		blocks.forEach((block) => block.resetAfterCycle());
 
@@ -123,7 +124,7 @@ const SystemManager = () => {
 
 	function _calculatePaths() {
 		if (lastSpawnedBlock?.hasBeenSpawned) {
-			lastSpawnedBlock.moveToNextTile(stateFlags.isFree, 0);
+			lastSpawnedBlock.moveToNextTile(sM.stateFlags.isFree, 0);
 		}
 
 		const _isFree = cycleIndex % 2 === 0 ? true : properties.activeBlocksCount < properties.maxFreeBlocksCount - 1;
@@ -137,7 +138,7 @@ const SystemManager = () => {
 
 	function resetPostDestroy() {
 		blocks.forEach((block) => block.reset());
-		blocksVisual.reset();
+		heroBlocks.reset();
 		board.reset();
 
 		blocks = [];
@@ -149,7 +150,7 @@ const SystemManager = () => {
 
 	function reset(isDestroy = false) {
 		blocks.forEach((block) => block.reset());
-		blocksVisual.reset();
+		heroBlocks.reset();
 		board.reset();
 
 		blocks = [];
@@ -163,7 +164,7 @@ const SystemManager = () => {
 			firstStartAnimationRatio = 0;
 		}
 
-		const needsRestart = resetCycleResults.includes(stateResult);
+		const needsRestart = sM.result && RESET_CYCLE_RESULTS.includes(sM.result);
 		sM.reset();
 		_startNewCycle();
 
@@ -187,7 +188,7 @@ const SystemManager = () => {
 	}
 
 	function _updateAnimationRatios(dt: number) {
-		const _isResult = stateFlags.isResult;
+		const _isResult = sM.stateFlags.isResult;
 		firstStartAnimationRatio = math.saturate(firstStartAnimationRatio + dt * (properties.showVisual ? 1 : 0));
 
 		animationSpeedRatio = Math.min(1, animationSpeedRatio + dt * (_isResult ? 1 : 0));
@@ -208,7 +209,7 @@ const SystemManager = () => {
 			}
 		});
 
-		return isCycleComplete || stateFlags.isResultAnimation || stateFlags.isFailResult || stateFlags.isStopped;
+		return isCycleComplete || sM.stateFlags.isResultAnimation || sM.stateFlags.isFailResult || sM.stateFlags.isStopped;
 	}
 
 	function update(dt: number) {
@@ -216,19 +217,19 @@ const SystemManager = () => {
 
 		successAnimationManager.update(dt);
 		stopAnimationManager.update(dt);
-		errorAnimationManager.update(dt);
+		failAnimation.update(dt);
 
-		if (stateFlags.hasNotStarted) {
+		if (sM.stateFlags.hasNotStarted) {
 			_startNewCycle();
 			return;
 		}
 
-		if (stateFlags.isRestart) {
-			wasSuccess = stateResult === AnimationResult.COMPLETED;
+		if (sM.stateFlags.isRestart) {
+			wasSuccess = sM.stateFlags.isSuccessResult;
 			reset();
 			return;
 		}
-		if (stateFlags.isResultAnimation) {
+		if (sM.stateFlags.isResultAnimation) {
 			sM.setRestartAnimation();
 		}
 
@@ -250,7 +251,7 @@ const SystemManager = () => {
 		sM.init();
 		successAnimationManager.init();
 		stopAnimationManager.init();
-		errorAnimationManager.init();
+		failAnimation.init();
 		board.init();
 
 		completeAnimationEndedSignal.add(() => {

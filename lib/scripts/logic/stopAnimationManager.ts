@@ -1,6 +1,5 @@
 import math from '../utils/math';
 import { stateSignal, stopAnimationEndedSignal } from './signals';
-import { AnimationResult, AnimationStatus } from '../../types/stateManager';
 
 const stopAnimationDuration = 2.25; // seconds
 let isActive = false;
@@ -11,7 +10,7 @@ let stopPushDownRatio = 0;
 const StopAnimationManager = () => {
 	function init() {
 		stateSignal.add((status, result) => {
-			if (status === AnimationStatus.RESULT && result === AnimationResult.STOP) {
+			if (status === 'RESULT' && result === 'STOP') {
 				isActive = true;
 			}
 		});

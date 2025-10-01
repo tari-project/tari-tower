@@ -1,14 +1,4 @@
-declare enum AnimationStatus {
-    NOT_STARTED = "not-started",
-    STARTED = "started",
-    FREE = "free",
-    RESULT = "result",
-    RESULT_ANIMATION = "result_animation",
-    RESTART_ANIMATION = "restart_animation",
-    RESTART = "restart"
-}
-
-export declare const getCurrentState: () => AnimationStatus;
+export declare const getCurrentState: () => "NOT_STARTED" | "STARTED" | "FREE" | "RESULT" | "RESULT_ANIMATION" | "RESTART_ANIMATION" | "RESTART";
 
 export declare const getTowerLogPrefix: (level: any) => string;
 

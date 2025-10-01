@@ -10,7 +10,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
 	server: {
-		port: 3001,
+		port: 3000,
 	},
 	plugins: [
 		glsl({ minify: true, root: '/lib' }),
@@ -33,9 +33,9 @@ export default defineConfig({
 				compact: true,
 				entryFileNames: '[name].js',
 				assetFileNames: 'assets/[name][extname]',
-				generatedCode: {
-					objectShorthand: true,
-				},
+				// generatedCode: {
+				// 	objectShorthand: true,
+				// },
 				globals: {
 					'three': 'THREE',
 					'min-signal': 'minSignal',

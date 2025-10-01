@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import settings, { WEBGL_OPTS } from './core/settings.ts';
 import { properties } from './core/properties.ts';
-import { heroBlocks, heroContainer } from './visuals/hero/hero.ts';
 import { coinContainer, Coins } from './visuals/coins/coins.ts';
 import BlueNoise from './utils/blueNoise/blueNoise.ts';
 import { OrbitControls } from './controls/OrbitControls';
@@ -11,6 +10,7 @@ import loader from './core/loader.ts';
 import { OrthographicCamera } from 'three';
 import { canvasSignal } from './logic/signals.ts';
 import { logError } from './utils/logger.ts';
+import { heroBlocks } from './modules.ts';
 
 THREE.ColorManagement.enabled = false;
 
@@ -116,7 +116,7 @@ const TariTower = () => {
 
 			properties.scene.add(coinContainer);
 			properties.scene.add(bgContainer);
-			properties.scene.add(heroContainer);
+			properties.scene.add(heroBlocks.heroContainer);
 		} catch (error) {
 			logError('visuals init : ', error);
 		}
