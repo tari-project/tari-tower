@@ -1,4 +1,4 @@
-export declare const getCurrentAnimationState: () => "NOT_STARTED" | "STARTED" | "FREE" | "RESULT" | "RESULT_ANIMATION" | "RESTART_ANIMATION" | "RESTART";
+export declare const getCurrentAnimationState: () => Status;
 
 export declare const getCurrentFlags: () => {
     hasNotStarted: boolean;
@@ -30,5 +30,11 @@ export declare function setAnimationProperties(newProps: {
 }[]): void;
 
 export declare function setAnimationState(id: string, isReplay?: boolean): void;
+
+declare type Status = StatusTuple[number];
+
+declare const STATUSES: readonly ["NOT_STARTED", "STARTED", "FREE", "RESULT", "RESULT_ANIMATION", "RESTART_ANIMATION", "RESTART"];
+
+declare type StatusTuple = typeof STATUSES;
 
 export { }

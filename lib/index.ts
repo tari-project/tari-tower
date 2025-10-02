@@ -1,10 +1,11 @@
 import { Color } from 'three';
+import { Status } from './types/stateManager.ts';
 import { properties } from './scripts/core/properties';
 import { loadTowerAnimation, removeTowerAnimation } from './scripts/index';
 import { getTowerLogPrefix } from './scripts/utils/logger';
 import { stateManager } from './scripts/modules.ts';
 
-const getCurrentAnimationState = () => stateManager.getStatus();
+const getCurrentAnimationState = (): Status => stateManager.getStatus();
 const getCurrentFlags = () => stateManager.getFlags();
 function setAnimationState(id: string, isReplay?: boolean) {
 	stateManager.set(id, isReplay);

@@ -256,7 +256,7 @@ export const StateManager = () => {
 		}
 	}
 
-	function getStatus() {
+	function getStatus(): Status {
 		return status;
 	}
 	function getResult() {
