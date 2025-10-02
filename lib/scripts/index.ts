@@ -1,6 +1,6 @@
+import { logError, logInfo } from './utils/logger.ts';
 import { gameEndedSignal, towerRemovedSignal } from './logic/signals.ts';
 import { properties } from './core/properties.ts';
-import { logError, logInfo } from './utils/logger.ts';
 import { stateManager, tower } from './modules.ts';
 
 let time = 0;

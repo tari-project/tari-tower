@@ -1,4 +1,4 @@
-import { QueueArgs, QueueItem, Result, Status, STATUSES, StatusManagerState, SuccessLevel } from '../../types/stateManager';
+import { QueueArgs, QueueItem, Result, Status, STATUSES, StatusManagerState, WinLevel } from '../../types/stateManager';
 import { logInfo, logWarn } from '../utils/logger';
 import { properties } from '../core/properties';
 import settings from '../core/settings';
@@ -136,9 +136,9 @@ export const StateManager = () => {
 			restartAnimation: () => setRestartAnimation(),
 			restart: () => setRestart(),
 			showVisual: () => showVisual(),
-			success: () => win(isReplay),
-			success2: () => win2(isReplay),
-			success3: () => win3(isReplay),
+			success: () => setWin(id as WinLevel, isReplay),
+			success2: () => setWin(id as WinLevel, isReplay),
+			success3: () => setWin(id as WinLevel, isReplay),
 		};
 		actions[id]?.();
 	}
@@ -206,31 +206,12 @@ export const StateManager = () => {
 		});
 	}
 
-	function win(isReplay = false) {
+	function setWin(level: WinLevel, isReplay = false) {
 		const result = isReplay && stateFlags.hasNotStarted ? 'REPLAY' : 'COMPLETED';
 		_queueStatusUpdate({
 			status: 'RESULT',
 			result,
-			animationStyle: SuccessLevel.ONE,
-		});
-	}
-
-	function win2(isReplay = false) {
-		const result = isReplay && stateFlags.hasNotStarted ? 'REPLAY' : 'COMPLETED';
-		_queueStatusUpdate({
-			status: 'RESULT',
-			result,
-			animationStyle: SuccessLevel.TWO,
-		});
-	}
-
-	function win3(isReplay = false) {
-		const result = isReplay && stateFlags.hasNotStarted ? 'REPLAY' : 'COMPLETED';
-
-		_queueStatusUpdate({
-			status: 'RESULT',
-			result,
-			animationStyle: SuccessLevel.THREE,
+			animationStyle: level,
 		});
 	}
 

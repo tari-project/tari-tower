@@ -2,7 +2,6 @@ import * as THREE from 'three';
 
 import loader from '../../core/loader';
 import { properties } from '../../core/properties';
-import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
 
 import vert from './coins.vert?raw';
 import frag from './coins.frag?raw';
@@ -114,7 +113,7 @@ export const Coins = () => {
 				...tower.heroBlocks.heroSharedUniforms,
 				...properties.sharedUniforms,
 				...coinsSharedUniforms,
-				...bn_sharedUniforms,
+				...tower.blueNoise.getSharedUniforms(),
 				...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
 				u_matcapTexture: { value: matcapTexture },
 			},

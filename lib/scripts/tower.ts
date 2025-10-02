@@ -1,8 +1,8 @@
 import { ColorManagement, PCFShadowMap, WebGLRenderer } from 'three';
 import settings, { WEBGL_OPTS } from './core/settings.ts';
-import BlueNoise from './utils/blueNoise/blueNoise.ts';
+import { BlueNoise } from './utils/blueNoise/blueNoise.ts';
 import loader from './core/loader.ts';
-import { Background, bgContainer } from './visuals/bg/bg.ts';
+import { Background } from './visuals/bg/bg.ts';
 import { OrbitControls } from './controls/OrbitControls';
 import { OrthographicCamera } from 'three';
 import { canvasSignal } from './logic/signals.ts';
@@ -17,12 +17,10 @@ export const TariTower = () => {
 	const background = Background();
 	const blueNoise = BlueNoise();
 	const heroBlocks = Hero();
-
 	const coins = Coins();
 
-	let orbitControls: OrbitControls;
-
 	const camera = new OrthographicCamera();
+	let orbitControls: OrbitControls;
 	let orbitCamera: OrthographicCamera;
 	let renderer: WebGLRenderer;
 
@@ -41,7 +39,6 @@ export const TariTower = () => {
 			renderer.setClearColor(properties.bgColor1, 1);
 		}
 	}
-
 	function _handleResize(viewportWidth: number, viewportHeight: number) {
 		properties.viewportWidth = viewportWidth;
 		properties.viewportHeight = viewportHeight;
@@ -67,11 +64,9 @@ export const TariTower = () => {
 		camera.setViewOffset(viewportWidth, viewportHeight, 0, 87.5, viewportWidth, viewportHeight);
 		camera.updateProjectionMatrix();
 	}
-
 	function onResize() {
 		_handleResize(window.innerWidth, window.innerHeight);
 	}
-
 	async function preload({ canvasEl, initCallback }: { canvasEl: HTMLCanvasElement; initCallback: () => Promise<void> }) {
 		renderer = new WebGLRenderer({ ...WEBGL_OPTS, canvas: canvasEl });
 		canvasSignal.addOnce(() => {
@@ -85,7 +80,6 @@ export const TariTower = () => {
 		await loader.start(initCallback);
 		await initCallback();
 	}
-
 	async function _initScene() {
 		properties.scene.add(camera);
 		camera.position.fromArray(settings.DEFAULT_POSITION);
@@ -116,13 +110,12 @@ export const TariTower = () => {
 			background.init();
 
 			properties.scene.add(coins.coinContainer);
-			properties.scene.add(bgContainer);
+			properties.scene.add(background.bgContainer);
 			properties.scene.add(heroBlocks.heroContainer);
 		} catch (error) {
 			logError('visuals init : ', error);
 		}
 	}
-
 	function render(delta: number) {
 		const canvas = document.getElementById(renderer?.domElement?.id) as HTMLCanvasElement | null;
 		if (!canvas) {
@@ -173,7 +166,6 @@ export const TariTower = () => {
 
 		renderer?.render(properties.scene, camera);
 	}
-
 	function _disposeAll() {
 		coins.buffers.forEach((b) => b?.dispose());
 		coins.textures.forEach((t) => t?.dispose());

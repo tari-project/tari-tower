@@ -1,10 +1,10 @@
 import math from '../utils/math';
 
 import { completeAnimationEndedSignal, winAnimationSignal } from './signals';
-import { SuccessLevel } from '../../types/stateManager';
+import { WinLevel } from '../../types/stateManager';
 
 export const SuccessAnimationManager = () => {
-	let currentAnimationStyle: SuccessLevel | null;
+	let currentAnimationStyle: WinLevel | null;
 	let successRatio = 0;
 	const successAnimationDuration = 6.5; // seconds
 	let towerRotationRatio = 0;
@@ -75,13 +75,13 @@ export const SuccessAnimationManager = () => {
 		successRatio = math.clamp(successRatio, 0, 1);
 
 		switch (currentAnimationStyle) {
-			case SuccessLevel.ONE:
+			case 'ONE':
 				_updateRatios1();
 				break;
-			case SuccessLevel.TWO:
+			case 'TWO':
 				_updateRatios2();
 				break;
-			case SuccessLevel.THREE:
+			case 'THREE':
 				_updateRatios3();
 				break;
 		}

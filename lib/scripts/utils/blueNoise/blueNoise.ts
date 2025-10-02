@@ -9,14 +9,14 @@ export interface BN_Uniforms {
 	u_blueNoiseTexelSize: Uniform<Vector2 | null>;
 	u_blueNoiseCoordOffset: Uniform<Vector2>;
 }
-const bn_sharedUniforms: BN_Uniforms = {
-	u_blueNoiseTexture: { value: null },
-	u_blueNoiseTexelSize: { value: null },
-	u_blueNoiseCoordOffset: { value: new Vector2() },
-};
-const BlueNoise = () => {
+export const BlueNoise = () => {
 	const TEXTURE_SIZE = 128;
 	const textures: Texture[] = [];
+	const bn_sharedUniforms: BN_Uniforms = {
+		u_blueNoiseTexture: { value: null },
+		u_blueNoiseTexelSize: { value: null },
+		u_blueNoiseCoordOffset: { value: new Vector2() },
+	};
 	async function preInit() {
 		await loader.loadTexture(`noise`, (t) => {
 			t.generateMipmaps = false;
@@ -36,14 +36,15 @@ const BlueNoise = () => {
 		bn_sharedUniforms?.u_blueNoiseCoordOffset.value.set(Math.random(), Math.random());
 	}
 
+	function getSharedUniforms() {
+		return bn_sharedUniforms;
+	}
+
 	return {
 		update,
 		preInit,
 		TEXTURE_SIZE,
-		bn_sharedUniforms,
+		getSharedUniforms,
 		textures,
 	};
 };
-
-export default BlueNoise;
-export { bn_sharedUniforms };

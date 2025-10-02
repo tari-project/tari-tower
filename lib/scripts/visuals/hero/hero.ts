@@ -5,7 +5,6 @@ import { properties } from '../../core/properties';
 import loader from '../../core/loader';
 import math from '../../utils/math';
 import ease, { customEasing } from '../../utils/ease';
-import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
 
 import { HALF_SIZE, SIZE, TOTAL_TILES, SIZE_WITH_PADDING, TOTAL_TILES_WITH_PADDING } from '../../logic/board';
 
@@ -18,7 +17,7 @@ import { lightCameraHelperSignal, lightCameraUpdateSignal } from '../../logic/si
 
 import { HeroSharedUniforms, HeroType } from '../../../types/hero';
 import { log } from '../../utils/logger.ts';
-import { stateManager as sM, systemManager as system } from '../../modules.ts';
+import { stateManager as sM, systemManager as system, tower } from '../../modules.ts';
 
 export const Hero = () => {
 	const TOTAL_BLOCKS = 2 * TOTAL_TILES;
@@ -120,7 +119,7 @@ export const Hero = () => {
 			...properties.sharedUniforms,
 			...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
 			...heroSharedUniforms,
-			...bn_sharedUniforms,
+			...tower.blueNoise.getSharedUniforms(),
 			u_color: { value: new THREE.Color(properties.neutralColor) },
 			u_blocksColor: { value: new THREE.Color() },
 			u_yDisplacement: { value: 0 },
@@ -140,7 +139,6 @@ export const Hero = () => {
 		heroState._baseMesh = new THREE.Mesh(geometry, material);
 		heroState._baseMesh.receiveShadow = heroState._baseMesh.castShadow = true;
 		heroState._baseMesh.frustumCulled = false;
-
 		heroState._baseMesh.customDepthMaterial = new THREE.ShaderMaterial({
 			vertexShader: vert,
 			fragmentShader: fragDepth,
@@ -178,7 +176,7 @@ export const Hero = () => {
 				...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
 				...properties.sharedUniforms,
 				...heroSharedUniforms,
-				...bn_sharedUniforms,
+				...tower.blueNoise.getSharedUniforms(),
 			},
 			vertexShader: vert,
 			fragmentShader: frag,
