@@ -1,37 +1,25 @@
-export enum AnimationStatus {
-	NOT_STARTED = 'not-started',
-	STARTED = 'started',
-	FREE = 'free',
-	RESULT = 'result',
-	RESULT_ANIMATION = 'result_animation',
-	RESTART_ANIMATION = 'restart_animation',
-	RESTART = 'restart',
-}
-export enum AnimationResult {
-	NONE = 'none',
-	STOP = 'stop',
-	COMPLETED = 'completed',
-	FAILED = 'failed',
-	REPLAY = 'replay',
-}
+export const STATUSES = ['NOT_STARTED', 'STARTED', 'FREE', 'RESULT', 'RESULT_ANIMATION', 'RESTART_ANIMATION', 'RESTART'] as const;
+type StatusTuple = typeof STATUSES;
+export type Status = StatusTuple[number];
 
-export enum SuccessLevel {
-	ONE = 1,
-	TWO = 2,
-	THREE = 3,
-}
+const _RESULTS = ['NONE', 'STOP', 'COMPLETED', 'FAILED', 'REPLAY'] as const;
+type ResultTuple = typeof _RESULTS;
+export type Result = ResultTuple[number] | null;
+
+const _WIN_LEVEL = ['ONE', 'TWO', 'THREE'] as const;
+type WinLevelTuple = typeof _WIN_LEVEL;
+export type WinLevel = WinLevelTuple[number] | null;
 
 export interface QueueItem {
-	status: AnimationStatus;
-	result?: AnimationResult | null;
+	status: Status;
+	result?: Result;
 	callback: () => void;
 }
 export interface StatusManagerState {
-	status: AnimationStatus;
+	status: Status;
 	statusIndex: number;
-	result: AnimationResult;
-	completeAnimationLevel: SuccessLevel | null;
-
+	result: Result;
+	completeAnimationLevel: WinLevel | null;
 	isStart: boolean;
 	isFree: boolean;
 	isResult: boolean;
@@ -43,4 +31,10 @@ export interface StatusManagerState {
 	isFailResult: boolean;
 	isStopped: boolean;
 	statusUpdateQueue: QueueItem[];
+}
+
+export interface QueueArgs {
+	status: Status;
+	result?: Result;
+	animationStyle?: WinLevel | null;
 }

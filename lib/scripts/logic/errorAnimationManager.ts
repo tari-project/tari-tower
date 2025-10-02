@@ -1,24 +1,21 @@
 import math from '../utils/math';
-
 import { errorAnimationEndedSignal, stateSignal } from './signals';
-import { AnimationResult, AnimationStatus } from '../../types/stateManager';
 
-const errorAnimationDuration = 3.25; // seconds
-let isActive = false;
-let failRatio = 0;
-let failShakeRatio = 0;
-let failFloatingCubesRatio = 0;
-let failSpawnRatio = 0;
-let failPushDownRatio = 0;
+export const ErrorAnimationManager = () => {
+	const errorAnimationDuration = 3.25; // seconds
+	let isActive = false;
+	let failRatio = 0;
+	let failShakeRatio = 0;
+	let failFloatingCubesRatio = 0;
+	let failSpawnRatio = 0;
+	let failPushDownRatio = 0;
 
-const ErrorAnimationManager = () => {
-	function init() {
+	const init = () =>
 		stateSignal.add((status, result) => {
-			if (status === AnimationStatus.RESULT && result === AnimationResult.FAILED) {
+			if (status === 'RESULT' && result === 'FAILED') {
 				isActive = true;
 			}
 		});
-	}
 
 	function resetRatios() {
 		failRatio = 0;
@@ -43,11 +40,20 @@ const ErrorAnimationManager = () => {
 		}
 	}
 
+	function getRatios() {
+		return {
+			failRatio,
+			failShakeRatio,
+			failFloatingCubesRatio,
+			failSpawnRatio,
+			failPushDownRatio,
+		};
+	}
+
 	return {
 		init,
 		resetRatios,
 		update,
+		getRatios,
 	};
 };
-const errorAnimationManager = ErrorAnimationManager();
-export { errorAnimationManager, failShakeRatio, failFloatingCubesRatio, failSpawnRatio, failPushDownRatio };

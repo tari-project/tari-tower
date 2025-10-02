@@ -1,16 +1,15 @@
 import * as THREE from 'three';
 import { Mesh, ShaderMaterial } from 'three';
 import { properties } from '../../core/properties';
-import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
-
 import vert from './bg.vert?raw';
 import frag from './bg.frag?raw';
 import particlesVert from './particles.vert?raw';
 import particlesFrag from './particles.frag?raw';
+import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise.ts';
 
-const container = new THREE.Object3D();
-container.name = 'bg';
-const Background = () => {
+export const Background = () => {
+	const container = new THREE.Object3D();
+	container.name = 'bg';
 	const particles: Mesh & { material: ShaderMaterial } = new THREE.Mesh();
 	const mesh: Mesh & { material: ShaderMaterial } = new THREE.Mesh(new THREE.PlaneGeometry(2, 2));
 	function init() {
@@ -83,7 +82,5 @@ const Background = () => {
 		}
 	}
 
-	return { init, update };
+	return { init, update, bgContainer: container };
 };
-
-export { Background, container as bgContainer };

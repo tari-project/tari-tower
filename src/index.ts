@@ -1,4 +1,4 @@
-import { loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState } from '@tari-project/tari-tower';
+import { loadTowerAnimation, removeTowerAnimation, setAnimationProperties, setAnimationState, getCurrentAnimationState } from '@tari-project/tari-tower';
 import { Pane } from 'tweakpane';
 
 const canvasId = 'canvas_id';
@@ -33,7 +33,15 @@ if (import.meta.env.MODE === 'development') {
 	const PARAMS = {
 		speed: 1,
 		minSpawn: 20,
+		status: '',
 	};
+
+	p.addBinding(PARAMS, 'status', {
+		readonly: true,
+		interval: 500,
+	}).on('change', (_) => {
+		PARAMS.status = getCurrentAnimationState();
+	});
 
 	p.addBinding(PARAMS, 'speed', { min: 0.5, max: 10, step: 0.5 }).on('change', (e) => {
 		setAnimationProperties([{ property: 'animationSpeed', value: e.value }]);
@@ -42,8 +50,8 @@ if (import.meta.env.MODE === 'development') {
 		setAnimationProperties([{ property: 'minSpawnedBlocksForTheErrorBlock', value: e.value }]);
 	});
 
-	const gen = p.addFolder({ title: 'General' });
 	const s = p.addFolder({ title: 'States' });
+	const gen = p.addFolder({ title: 'General' });
 
 	gen.addButton({ title: 'remove' }).on('click', () => removeTowerAnimation({ canvasId }));
 	gen.addButton({ title: 'load' }).on('click', () => loadTowerAnimation({ canvasId, offset: 0 }));
@@ -61,9 +69,9 @@ if (import.meta.env.MODE === 'development') {
 	s.addButton({ title: 'start' }).on('click', () => setAnimationState('start'));
 	s.addButton({ title: 'stop' }).on('click', () => setAnimationState('stop'));
 	s.addButton({ title: 'fail' }).on('click', () => setAnimationState('fail'));
-	s.addButton({ title: 'success' }).on('click', () => setAnimationState('success'));
-	s.addButton({ title: 'success2' }).on('click', () => setAnimationState('success2'));
-	s.addButton({ title: 'success3' }).on('click', () => setAnimationState('success3', true));
+	s.addButton({ title: 'success' }).on('click', () => setAnimationState('ONE'));
+	s.addButton({ title: 'success2' }).on('click', () => setAnimationState('TWO'));
+	s.addButton({ title: 'success3' }).on('click', () => setAnimationState('THREE', true));
 
 	p.refresh();
 

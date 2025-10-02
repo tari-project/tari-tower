@@ -1,82 +1,78 @@
 import * as THREE from 'three';
+import { BufferGeometry, InstancedBufferAttribute, Texture } from 'three';
 
-import loader from '../../core/loader';
 import { properties } from '../../core/properties';
+import loader from '../../core/loader';
 import math from '../../utils/math';
 import ease, { customEasing } from '../../utils/ease';
-import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
-import { blocks, firstStartAnimationRatio, lastSpawnedBlock, previousSuccessBlocksAnimationRatio } from '../../logic/systemManager';
-import { result as stateResult } from '../../logic/stateManager';
-import { HALF_SIZE, SIZE, TOTAL_TILES, SIZE_WITH_PADDING, TOTAL_TILES_WITH_PADDING, tiles, board } from '../../logic/board';
+
+import { HALF_SIZE, SIZE, TOTAL_TILES, SIZE_WITH_PADDING, TOTAL_TILES_WITH_PADDING } from '../../logic/board';
 
 import vert from './hero.vert?raw';
 import frag from './hero.frag?raw';
 import fragDepth from './heroDepth.frag?raw';
 
-import { floatingCubesDisplacement, floatingCubesRatio, successPushDownRatio, successRatio, successColorTowerRatio, towerRotationRatio } from '../../logic/successAnimationManager';
-import { stopPushDownRatio, stopSpawnRatio } from '../../logic/stopAnimationManager';
-import { failFloatingCubesRatio, failPushDownRatio, failShakeRatio, failSpawnRatio } from '../../logic/errorAnimationManager';
 import HeroBlockCoordinates from './HeroBlockCoordinates';
 import { lightCameraHelperSignal, lightCameraUpdateSignal } from '../../logic/signals';
 
-import { BufferGeometry, InstancedBufferAttribute, Texture } from 'three';
 import { HeroSharedUniforms, HeroType } from '../../../types/hero';
-import { AnimationResult } from '../../../types';
 import { log } from '../../utils/logger.ts';
+import { stateManager as sM, systemManager as system } from '../../modules.ts';
+import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise.ts';
 
-const TOTAL_BLOCKS = 2 * TOTAL_TILES;
-const _v2_0 = new THREE.Vector2();
-const _v2_1 = new THREE.Vector2();
-const _v3_0 = new THREE.Vector3();
-const _v3_1 = new THREE.Vector3();
-const _q_0 = new THREE.Quaternion();
-const _q_1 = new THREE.Quaternion();
-const MAIN_COLOR = new THREE.Color();
-const SUCCESS_COLOR = new THREE.Color();
-const ERROR_COLOR = new THREE.Color();
-const DEFAULT_COLOR = new THREE.Color();
-const _c = new THREE.Color();
-const _c2 = new THREE.Color();
-const heroContainer = new THREE.Object3D();
-heroContainer.name = 'hero_container';
+export const Hero = () => {
+	const TOTAL_BLOCKS = 2 * TOTAL_TILES;
+	const _v2_0 = new THREE.Vector2();
+	const _v2_1 = new THREE.Vector2();
+	const _v3_0 = new THREE.Vector3();
+	const _v3_1 = new THREE.Vector3();
+	const _q_0 = new THREE.Quaternion();
+	const _q_1 = new THREE.Quaternion();
+	const MAIN_COLOR = new THREE.Color();
+	const SUCCESS_COLOR = new THREE.Color();
+	const ERROR_COLOR = new THREE.Color();
+	const DEFAULT_COLOR = new THREE.Color();
+	const _c = new THREE.Color();
+	const _c2 = new THREE.Color();
+	const heroContainer = new THREE.Object3D();
+	heroContainer.name = 'hero_container';
 
-const heroSharedUniforms: HeroSharedUniforms = {
-	u_lightPosition: { value: new THREE.Vector3(-2, 6, -4) },
-	u_goboTexture: { value: null },
-	u_goboIntensity: { value: 0.45 },
-	u_infoTexture: { value: null },
-	u_infoTextureLinear: { value: null },
-	u_endAnimationRatio: { value: 0 },
-};
-const heroState: HeroType = {
-	_baseMesh: undefined,
-	_blocksMesh: undefined,
-	_blockList: [],
-	animationTotalFrames: 0,
-	heroLoseAnimationPositionArray: undefined,
-	heroLoseAnimationOrientArray: undefined,
-	_blockRenderList: [],
-	successColorRatio: 0,
-	directLight: undefined,
-	infoTexture: undefined,
-	_instancePosArray: undefined,
-	_instanceOrientArray: undefined,
-	_instanceShowRatioArray: undefined,
-	_instanceSpinPivotArray: undefined,
-	_instanceSpinOrientArray: undefined,
-	_instanceColorArray: undefined,
-	_instanceIsActiveArray: undefined,
-	_instanceNextDirectionArray: undefined,
-	isShadowCameraHelperVisible: undefined,
-	shadowCameraHelper: undefined,
-	infoTextureLinear: undefined,
-	heroSharedUniforms,
-};
-
-let preloadComplete = false;
-const Hero = () => {
+	const heroSharedUniforms: HeroSharedUniforms = {
+		u_lightPosition: { value: new THREE.Vector3(-2, 6, -4) },
+		u_goboTexture: { value: null },
+		u_goboIntensity: { value: 0.45 },
+		u_infoTexture: { value: null },
+		u_infoTextureLinear: { value: null },
+		u_endAnimationRatio: { value: 0 },
+	};
+	const heroState: HeroType = {
+		_baseMesh: undefined,
+		_blocksMesh: undefined,
+		_blockList: [],
+		animationTotalFrames: 0,
+		heroLoseAnimationPositionArray: undefined,
+		heroLoseAnimationOrientArray: undefined,
+		_blockRenderList: [],
+		successColorRatio: 0,
+		directLight: undefined,
+		infoTexture: undefined,
+		_instancePosArray: undefined,
+		_instanceOrientArray: undefined,
+		_instanceShowRatioArray: undefined,
+		_instanceSpinPivotArray: undefined,
+		_instanceSpinOrientArray: undefined,
+		_instanceColorArray: undefined,
+		_instanceIsActiveArray: undefined,
+		_instanceNextDirectionArray: undefined,
+		isShadowCameraHelperVisible: undefined,
+		shadowCameraHelper: undefined,
+		infoTextureLinear: undefined,
+		heroSharedUniforms,
+	};
 	const buffers: BufferGeometry[] = [];
 	const textures: Texture[] = [];
+
+	let preloadComplete = false;
 
 	async function preload() {
 		if (preloadComplete) {
@@ -144,7 +140,6 @@ const Hero = () => {
 		heroState._baseMesh = new THREE.Mesh(geometry, material);
 		heroState._baseMesh.receiveShadow = heroState._baseMesh.castShadow = true;
 		heroState._baseMesh.frustumCulled = false;
-
 		heroState._baseMesh.customDepthMaterial = new THREE.ShaderMaterial({
 			vertexShader: vert,
 			fragmentShader: fragDepth,
@@ -273,7 +268,7 @@ const Hero = () => {
 	}
 
 	function _assignFinalAnimationToTiles() {
-		tiles.forEach((rowMap, i) => {
+		system.board.getTiles().forEach((rowMap, i) => {
 			rowMap.forEach((tile, j) => {
 				const tileIndex = i * SIZE + j;
 				tile.loseAnimationPositionArray = new Float32Array(heroState.animationTotalFrames * 3);
@@ -308,16 +303,19 @@ const Hero = () => {
 
 		_c.copy(MAIN_COLOR);
 
-		if (stateResult === AnimationResult.FAILED && failFloatingCubesRatio > 0) {
+		const result = sM.getResult();
+		const { stopPushDownRatio, failFloatingCubesRatio, failPushDownRatio } = system.getRatios();
+
+		if (result === 'FAILED' && failFloatingCubesRatio > 0) {
 			_c.copy(ERROR_COLOR);
 		}
 
-		if (stateResult === AnimationResult.COMPLETED || stateResult === AnimationResult.REPLAY) {
+		if (result === 'COMPLETED' || result === 'REPLAY') {
 			heroState.successColorRatio = Math.min(1, heroState.successColorRatio + 0.5 * dt);
 			_c.lerp(SUCCESS_COLOR, heroState.successColorRatio);
 		}
 
-		if (stateResult !== AnimationResult.REPLAY && stateResult !== AnimationResult.COMPLETED) {
+		if (result !== 'REPLAY' && result !== 'COMPLETED') {
 			_c.lerp(DEFAULT_COLOR, math.saturate(stopPushDownRatio + failPushDownRatio));
 		}
 
@@ -326,9 +324,9 @@ const Hero = () => {
 		SUCCESS_COLOR.convertSRGBToLinear();
 
 		for (let i = 0; i < TOTAL_BLOCKS; i++) {
-			const logicBlock = blocks.filter((block) => block.id === i)[0];
+			const logicBlock = system.getBlocks().filter((block) => block.id === i)[0];
 
-			const isActive = i < blocks.length + (lastSpawnedBlock ? 1 : 0);
+			const isActive = i < system.getBlocks().length + (system.getLastSpawnedBlock() ? 1 : 0);
 			const color = isActive ? _c : DEFAULT_COLOR;
 
 			if (isActive && logicBlock?.isErrorBlock) {
@@ -355,17 +353,19 @@ const Hero = () => {
 
 			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.set(DEFAULT_COLOR).convertSRGBToLinear();
 
-			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(_c.set(properties.successColor), previousSuccessBlocksAnimationRatio);
+			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(_c.set(properties.successColor), system.getRatios().previousSuccessBlocksAnimationRatio);
 			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.convertSRGBToLinear();
 		}
 	}
 
 	function _updateInfoTexture() {
-		tiles.forEach((rowMap) => {
+		system.board.getTiles().forEach((rowMap) => {
 			rowMap.forEach((tile) => {
 				const x = (tile.id % SIZE) + 1;
 				const y = Math.floor(tile.id / SIZE) + 1;
 				const index = (y * SIZE_WITH_PADDING + x) * 4;
+
+				const { stopPushDownRatio, stopSpawnRatio, failFloatingCubesRatio, floatingCubesRatio, successPushDownRatio, failPushDownRatio } = system.getRatios();
 
 				let endAnimationRatio = 0.5 * floatingCubesRatio * math.fit(successPushDownRatio, 0, 0.1, 1, 0);
 				endAnimationRatio += (failFloatingCubesRatio > 0 ? 1 : 0) * math.fit(failPushDownRatio, 0, 0.1, 1, 0);
@@ -386,15 +386,16 @@ const Hero = () => {
 	}
 
 	function _updateFreeBlocks() {
-		if (lastSpawnedBlock) {
-			const block = heroState._blockList[lastSpawnedBlock.id];
-			if (lastSpawnedBlock.currentTile) {
-				block.boardPos.set(lastSpawnedBlock.currentTile?.row, lastSpawnedBlock.currentTile?.col);
+		const lastSpawned = system.getLastSpawnedBlock();
+		if (lastSpawned) {
+			const block = heroState._blockList[lastSpawned.id];
+			if (lastSpawned.currentTile) {
+				block.boardPos.set(lastSpawned.currentTile?.row, lastSpawned.currentTile?.col);
 			}
-			block.showRatio = customEasing(math.saturate(lastSpawnedBlock.spawnAnimationRatioUnclamped));
+			block.showRatio = customEasing(math.saturate(lastSpawned.spawnAnimationRatioUnclamped));
 		}
 
-		blocks.forEach((logicBlock) => {
+		system.getBlocks().forEach((logicBlock) => {
 			const block = heroState._blockList[logicBlock.id];
 
 			if (block) {
@@ -438,14 +439,15 @@ const Hero = () => {
 	}
 
 	function _updateStopAnimation(block, i) {
-		if (stateResult === AnimationResult.STOP) {
+		const result = sM.getResult();
+		if (result === 'STOP') {
 			if (i >= TOTAL_TILES) {
 				const _i = i - TOTAL_TILES;
 				const col = (_i % SIZE) - HALF_SIZE;
 				const row = Math.floor(_i / SIZE) - HALF_SIZE;
-				const tile = board.getTile(row, col);
+				const tile = system.board.getTile(row, col);
 				if (!tile.isOccupied) {
-					const ratio = math.saturate(stopSpawnRatio - tile.randomDelay);
+					const ratio = math.saturate(system.getRatios().stopSpawnRatio - tile.randomDelay);
 					tile.activeRatio = ratio;
 					block.showRatio = customEasing(ratio);
 					block.boardPos.set(row, col);
@@ -472,7 +474,8 @@ const Hero = () => {
 			block.update(properties.deltaTime);
 			block.addsFallAnimation(Math.max(0, animationRatio - 0.8));
 		}
-		if (stateResult === AnimationResult.FAILED) {
+		if (sM.getResult() === 'FAILED') {
+			const { failFloatingCubesRatio, failShakeRatio, failSpawnRatio } = system.getRatios();
 			if (logicBlock) {
 				const tile = logicBlock.currentTile;
 
@@ -520,7 +523,7 @@ const Hero = () => {
 				const _i = i - TOTAL_TILES;
 				const col = (_i % SIZE) - HALF_SIZE;
 				const row = Math.floor(_i / SIZE) - HALF_SIZE;
-				const tile = board.getTile(row, col);
+				const tile = system.board.getTile(row, col);
 				const ratio = math.saturate(failSpawnRatio - tile.randomDelay);
 
 				if (!tile.isOccupied) {
@@ -533,7 +536,9 @@ const Hero = () => {
 	}
 
 	function _updateFloatAnimation(logicBlock, block) {
-		if (stateResult === AnimationResult.COMPLETED || stateResult === AnimationResult.REPLAY) {
+		const result = sM.getResult();
+		if (result === 'COMPLETED' || result === 'REPLAY') {
+			const { floatingCubesDisplacement, floatingCubesRatio } = system.getRatios();
 			if (logicBlock) {
 				const tile = logicBlock.currentTile;
 				const delay = 0.1 * tile.randomDelay;
@@ -556,7 +561,7 @@ const Hero = () => {
 			const block = heroState._blockList[i];
 			block.update(dt);
 
-			const logicBlock = blocks.filter((block) => block.id === i)[0];
+			const logicBlock = system.getBlocks().filter((block) => block.id === i)[0];
 
 			if (block.showRatio > 0) {
 				heroState._blockRenderList[renderCount++] = block;
@@ -570,9 +575,12 @@ const Hero = () => {
 		_updateInfoTexture();
 		_updateAttributes(renderCount);
 
+		const { stopPushDownRatio, successPushDownRatio, failPushDownRatio, towerRotationRatio, successColorTowerRatio, stopSpawnRatio, failSpawnRatio, successRatio } =
+			system.getRatios();
 		const pushDownRatio = Math.min(1, stopPushDownRatio + failPushDownRatio + successPushDownRatio);
 		const easedRestartAnimationRatio = ease.backOut(pushDownRatio, 3);
-		const easedFirstStartAnimationRatio = 1 - customEasing(firstStartAnimationRatio);
+		const easedFirstStartAnimationRatio = 1 - customEasing(system.getFirstStart());
+
 		heroContainer.position.y = -easedRestartAnimationRatio - 2 * easedFirstStartAnimationRatio;
 		heroContainer.rotation.y = 0.5 * Math.PI * easedFirstStartAnimationRatio;
 		heroContainer.rotation.y += 2 * Math.PI * ease.quartInOut(towerRotationRatio);
@@ -605,7 +613,7 @@ const Hero = () => {
 		update,
 		buffers,
 		textures,
+		heroContainer,
+		heroSharedUniforms,
 	};
 };
-const heroBlocks = Hero();
-export { heroBlocks, heroContainer, heroSharedUniforms };

@@ -2,6 +2,8 @@
 
 Source for the tower animation used in [_Tari Universe_](https://github.com/tari-project/universe).
 
+## 🚧 under construction
+
 ### Installation
 
 ```bash
@@ -10,29 +12,7 @@ Source for the tower animation used in [_Tari Universe_](https://github.com/tari
 
 ## Usage
 
-Initialise
-
-```tsx
-import { loadTowerAnimation } from '@tari-project/tari-tower';
-
-loadTowerAnimation();
-```
-
-Available methods:
-
-| name                     | args                                                                                             | description                                        |
-| ------------------------ | ------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
-| `loadTowerAnimation`     | **canvasId**: `string` <br/> **offset?**: `number`                                               | initialise all the animation logic + canvas        |
-| `removeTowerAnimation`   | `none`                                                                                           | stop the animation and remove canvas               |
-| `setAnimationState`      | **id**: `'start'\|'stop'\|'fail'\|'sucess'\|'sucess2'\|'sucess3'` <br/> **isReplay?:** `boolean` | set the animation state                            |
-| `setAnimationProperties` | properties:`{property:string; value:unknown}[]`                                                  | set properties (e.g colours in dark vs light mode) |
-
-Available values:
-
-| name                   | description                                                                 |
-| ---------------------- | --------------------------------------------------------------------------- |
-| `animationStatus`      | the state of the animation                                                  |
-| `animationStatusIndex` | the index of the animation state (useful as a trigger in dependencya array) |
+🚧 under construction
 
 ## Contributing
 
@@ -46,21 +26,21 @@ note: _must be built first to be able to reference the lib locally_
     npm run dev
 ```
 
--   make changes in the `lib` directory
--   export anything you want available in `/lib/index.ts`
--   update readme
+- make changes in the `lib` directory
+- export anything you want available in `/lib/index.ts`
+- update readme
 
 ### Distribution
 
--   make sure your tari labs registry PAT is set up
--   bump version in package.json
--   build changes:
+- make sure your tari labs registry PAT is set up
+- bump version in package.json
+- build changes:
 
 ```bash
     npm run build
 ```
 
--   publish changes:
+- publish changes:
 
 ```
     npm publish

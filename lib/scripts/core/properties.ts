@@ -8,7 +8,7 @@ const _resolution = new THREE.Vector2();
 const _viewportResolution = new THREE.Vector2();
 const maxFreeBlocksCount = TOTAL_TILES - 5;
 
-export const propertiesInitialState: PropertiesType = {
+export const properties: PropertiesType = {
 	canvasId: undefined,
 	time: 0,
 	deltaTime: 0,
@@ -61,6 +61,3 @@ export const propertiesInitialState: PropertiesType = {
 	particlesOpacity: 0.75,
 	particlesSize: 0.01,
 };
-const properties = { ...propertiesInitialState };
-
-export { properties };

@@ -1,34 +1,33 @@
-import * as THREE from 'three';
+import { ColorManagement, PCFShadowMap, WebGLRenderer } from 'three';
 import settings, { WEBGL_OPTS } from './core/settings.ts';
-import { properties } from './core/properties.ts';
-import { heroBlocks, heroContainer } from './visuals/hero/hero.ts';
-import { coinContainer, Coins } from './visuals/coins/coins.ts';
-import BlueNoise from './utils/blueNoise/blueNoise.ts';
-import { OrbitControls } from './controls/OrbitControls';
-import game from './logic/systemManager.ts';
-import { Background, bgContainer } from './visuals/bg/bg.ts';
+import { BlueNoise } from './utils/blueNoise/blueNoise.ts';
 import loader from './core/loader.ts';
+import { Background } from './visuals/bg/bg.ts';
+import { OrbitControls } from './controls/OrbitControls';
 import { OrthographicCamera } from 'three';
 import { canvasSignal } from './logic/signals.ts';
+import { Coins } from './visuals/coins/coins.ts';
+import { properties } from './core/properties.ts';
 import { logError } from './utils/logger.ts';
+import { Hero } from './visuals/hero/hero.ts';
+import { systemManager } from './modules.ts';
 
-THREE.ColorManagement.enabled = false;
-
-const TariTower = () => {
+ColorManagement.enabled = false;
+export const TariTower = () => {
 	const background = Background();
 	const blueNoise = BlueNoise();
+	const heroBlocks = Hero();
 	const coins = Coins();
 
+	const camera = new OrthographicCamera();
 	let orbitControls: OrbitControls;
-
-	const camera = new THREE.OrthographicCamera();
 	let orbitCamera: OrthographicCamera;
-	let renderer: THREE.WebGLRenderer;
+	let renderer: WebGLRenderer;
 
 	async function _handleRenderer() {
 		if (renderer) {
 			renderer.shadowMap.enabled = true;
-			renderer.shadowMap.type = THREE.PCFShadowMap;
+			renderer.shadowMap.type = PCFShadowMap;
 
 			if (properties.sharedUniforms) {
 				const bgColor1 = properties.sharedUniforms.u_bgColor1.value;
@@ -40,7 +39,6 @@ const TariTower = () => {
 			renderer.setClearColor(properties.bgColor1, 1);
 		}
 	}
-
 	function _handleResize(viewportWidth: number, viewportHeight: number) {
 		properties.viewportWidth = viewportWidth;
 		properties.viewportHeight = viewportHeight;
@@ -66,13 +64,11 @@ const TariTower = () => {
 		camera.setViewOffset(viewportWidth, viewportHeight, 0, 87.5, viewportWidth, viewportHeight);
 		camera.updateProjectionMatrix();
 	}
-
 	function onResize() {
 		_handleResize(window.innerWidth, window.innerHeight);
 	}
-
 	async function preload({ canvasEl, initCallback }: { canvasEl: HTMLCanvasElement; initCallback: () => Promise<void> }) {
-		renderer = new THREE.WebGLRenderer({ ...WEBGL_OPTS, canvas: canvasEl });
+		renderer = new WebGLRenderer({ ...WEBGL_OPTS, canvas: canvasEl });
 		canvasSignal.addOnce(() => {
 			destroy();
 		});
@@ -84,7 +80,6 @@ const TariTower = () => {
 		await loader.start(initCallback);
 		await initCallback();
 	}
-
 	async function _initScene() {
 		properties.scene.add(camera);
 		camera.position.fromArray(settings.DEFAULT_POSITION);
@@ -103,7 +98,7 @@ const TariTower = () => {
 
 		try {
 			// first the logic
-			await game.init();
+			await systemManager.init();
 		} catch (error) {
 			logError('init tower : ', error);
 		}
@@ -114,14 +109,13 @@ const TariTower = () => {
 			coins.init();
 			background.init();
 
-			properties.scene.add(coinContainer);
-			properties.scene.add(bgContainer);
-			properties.scene.add(heroContainer);
+			properties.scene.add(coins.coinContainer);
+			properties.scene.add(background.bgContainer);
+			properties.scene.add(heroBlocks.heroContainer);
 		} catch (error) {
 			logError('visuals init : ', error);
 		}
 	}
-
 	function render(delta: number) {
 		const canvas = document.getElementById(renderer?.domElement?.id) as HTMLCanvasElement | null;
 		if (!canvas) {
@@ -164,15 +158,14 @@ const TariTower = () => {
 		orbitCamera?.matrix.decompose(camera.position, camera.quaternion, camera.scale);
 		camera.matrix.compose(camera.position, camera.quaternion, camera.scale);
 
+		systemManager.update(dt);
 		blueNoise.update(dt);
-		game.update(dt);
-		heroBlocks.update(dt);
 		coins.update(dt);
 		background.update(dt);
+		heroBlocks.update(dt);
 
 		renderer?.render(properties.scene, camera);
 	}
-
 	function _disposeAll() {
 		coins.buffers.forEach((b) => b?.dispose());
 		coins.textures.forEach((t) => t?.dispose());
@@ -186,7 +179,7 @@ const TariTower = () => {
 		if (!canvas || !canvas?.id) return;
 		properties.showVisual = false;
 
-		game.resetPostDestroy();
+		systemManager.resetPostDestroy();
 		const canvasEl = document.getElementById(canvas.id);
 		canvasEl?.remove();
 		// Clean up Three.js resources
@@ -200,7 +193,6 @@ const TariTower = () => {
 		blueNoise,
 		onResize,
 		render,
+		heroBlocks,
 	};
 };
-
-export default TariTower;

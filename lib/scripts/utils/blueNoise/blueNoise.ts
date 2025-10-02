@@ -9,12 +9,12 @@ export interface BN_Uniforms {
 	u_blueNoiseTexelSize: Uniform<Vector2 | null>;
 	u_blueNoiseCoordOffset: Uniform<Vector2>;
 }
-const bn_sharedUniforms: BN_Uniforms = {
+export const bn_sharedUniforms: BN_Uniforms = {
 	u_blueNoiseTexture: { value: null },
 	u_blueNoiseTexelSize: { value: null },
 	u_blueNoiseCoordOffset: { value: new Vector2() },
 };
-const BlueNoise = () => {
+export const BlueNoise = () => {
 	const TEXTURE_SIZE = 128;
 	const textures: Texture[] = [];
 	async function preInit() {
@@ -40,10 +40,6 @@ const BlueNoise = () => {
 		update,
 		preInit,
 		TEXTURE_SIZE,
-		bn_sharedUniforms,
 		textures,
 	};
 };
-
-export default BlueNoise;
-export { bn_sharedUniforms };

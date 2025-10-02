@@ -2,19 +2,19 @@ import * as THREE from 'three';
 
 import loader from '../../core/loader';
 import { properties } from '../../core/properties';
-import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
-import { heroSharedUniforms } from '../hero/hero';
 
 import vert from './coins.vert?raw';
 import frag from './coins.frag?raw';
 import fragDepth from './coinsDepth.frag?raw';
-import { floatingCoinsRatio, vortexCoinsRatio } from '../../logic/successAnimationManager';
 import { BufferGeometry, InstancedBufferGeometry, Mesh, ShaderMaterial, Texture } from 'three';
-const coinContainer = new THREE.Object3D();
-coinContainer.name = 'coins_container';
+import { systemManager, tower } from '../../modules.ts';
+import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise.ts';
 
-let loadComplete = false;
-const Coins = () => {
+export const Coins = () => {
+	let loadComplete = false;
+	const coinContainer = new THREE.Object3D();
+	coinContainer.name = 'coins_container';
+
 	const buffers: BufferGeometry[] = [];
 	const textures: Texture[] = [];
 
@@ -111,7 +111,7 @@ const Coins = () => {
 	function _setupMaterial() {
 		coinMaterial = new THREE.ShaderMaterial({
 			uniforms: {
-				...heroSharedUniforms,
+				...tower.heroBlocks.heroSharedUniforms,
 				...properties.sharedUniforms,
 				...coinsSharedUniforms,
 				...bn_sharedUniforms,
@@ -141,6 +141,7 @@ const Coins = () => {
 	}
 
 	function update(dt: number) {
+		const { vortexCoinsRatio, floatingCoinsRatio } = systemManager.getRatios();
 		const isFloatingAnimationActive = vortexCoinsRatio === 0;
 
 		animationRatio = isFloatingAnimationActive ? floatingCoinsRatio : vortexCoinsRatio;
@@ -165,7 +166,6 @@ const Coins = () => {
 		update,
 		buffers,
 		textures,
+		coinContainer,
 	};
 };
-
-export { Coins, coinContainer };
