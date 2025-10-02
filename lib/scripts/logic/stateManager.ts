@@ -66,17 +66,24 @@ export const StateManager = () => {
 	 * @returns true if the state transition is valid and should proceed
 	 */
 	function _canUpdateStatus(newStatus: Status, result?: Result | null): boolean {
-		// Prevent state changes if visualization is disabled
 		if (!properties.showVisual) return false;
-
 		let canUpdateStatus = false;
-
 		const hasResult = !!result;
 		const isReplay = result === 'REPLAY';
 
 		// Handle special replay case - allows jumping to FREE state from NOT_STARTED
 		if (isReplay && _statusIndex === 0) {
 			_statusIndex = 2; // Jump to FREE state
+		}
+
+		// Handle special reset case - allows resetting from the RESTART state
+		if (newStatus === 'NOT_STARTED' && result === 'NONE' && _statusIndex === 5) {
+			_statusIndex = 6; // Move to the end to allow reset
+		}
+
+		// Handle special quick restart (due to quick mining changes in TU)
+		if (newStatus === 'STARTED' && _statusIndex === 5) {
+			_statusIndex = 0; // Move to the start
 		}
 
 		const shouldLog = (hasResult && result !== 'NONE') || (newStatus === 'STARTED' && status !== 'FREE');
@@ -169,6 +176,7 @@ export const StateManager = () => {
 				}
 			: { status, callback: () => _canUpdateStatus(status) };
 		const canAddToQueue = Boolean(!statuses.includes(status) || (result && !results.includes(result)));
+
 		if (canAddToQueue) {
 			statusUpdateQueue.push(queueItem);
 		}
@@ -192,6 +200,7 @@ export const StateManager = () => {
 	}
 
 	function setStart() {
+		statusUpdateQueue = [];
 		_queueStatusUpdate({ status: 'STARTED' });
 	}
 

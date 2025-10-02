@@ -2,8 +2,8 @@ import { WebGLRendererParameters } from 'three';
 export const WEBGL_OPTS: WebGLRendererParameters = { antialias: true, powerPreference: 'low-power', precision: 'lowp', failIfMajorPerformanceCaveat: true };
 
 const AUTO_RESTART = true;
-const AUTO_START = true;
-const SHOW_BLOCK = true;
+const AUTO_START = false;
+const SHOW_BLOCK = false;
 const DEFAULT_LOOKAT_POSITION = [0, 0, 0];
 const DEFAULT_POSITION = [-20, 18, 20];
 const DPR = Math.min(2, window.devicePixelRatio || 1);
