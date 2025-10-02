@@ -10,12 +10,10 @@ import { Coins } from './visuals/coins/coins.ts';
 import { properties } from './core/properties.ts';
 import { logError } from './utils/logger.ts';
 import { Hero } from './visuals/hero/hero.ts';
-import { SystemManager } from './logic/systemManager.ts';
+import { systemManager } from './modules.ts';
 
 ColorManagement.enabled = false;
 export const TariTower = () => {
-	const systemManager = SystemManager();
-
 	const background = Background();
 	const blueNoise = BlueNoise();
 	const heroBlocks = Hero();
@@ -204,6 +202,5 @@ export const TariTower = () => {
 		onResize,
 		render,
 		heroBlocks,
-		systemManager,
 	};
 };

@@ -1,7 +1,5 @@
 import { properties } from '../core/properties';
 import { Board, TOTAL_TILES } from './board';
-import { successAnimationManager } from './successAnimationManager';
-import { stopAnimationManager } from './stopAnimationManager';
 import {
 	canvasSignal,
 	completeAnimationEndedSignal,
@@ -16,11 +14,18 @@ import Block from './Block';
 import { SystemManagerState } from '../../types/systemManager';
 import math from '../utils/math';
 import { logInfo } from '../utils/logger.ts';
-import { failAnimation, stateManager as sM, tower } from '../modules.ts';
+import { stateManager as sM, tower } from '../modules.ts';
 import { PREVENT_CYCLE_STATES, RESET_CYCLE_RESULTS } from '../core/states.ts';
+import { ErrorAnimationManager } from './errorAnimationManager.ts';
+import { StopAnimationManager } from './stopAnimationManager.ts';
+import { SuccessAnimationManager } from './successAnimationManager.ts';
 
 export const SystemManager = () => {
 	const board = Board();
+	const stopAnimation = StopAnimationManager();
+	const winAnimation = SuccessAnimationManager();
+	const failAnimation = ErrorAnimationManager();
+
 	let firstStartAnimationRatio = 0;
 	let blocks: SystemManagerState['blocks'] = [];
 	let lastSpawnedBlock: SystemManagerState['lastSpawnedBlock'] = null;
@@ -214,8 +219,8 @@ export const SystemManager = () => {
 	function update(dt: number) {
 		_updateAnimationRatios(dt);
 
-		successAnimationManager.update(dt);
-		stopAnimationManager.update(dt);
+		winAnimation.update(dt);
+		stopAnimation.update(dt);
 		failAnimation.update(dt);
 
 		const state = sM.getFlags();
@@ -250,8 +255,8 @@ export const SystemManager = () => {
 
 	async function init() {
 		sM.init();
-		successAnimationManager.init();
-		stopAnimationManager.init();
+		winAnimation.init();
+		stopAnimation.init();
 		failAnimation.init();
 		board.init();
 
@@ -281,8 +286,18 @@ export const SystemManager = () => {
 	function getBlocks() {
 		return blocks;
 	}
-	function getWinRatio() {
-		return previousSuccessBlocksAnimationRatio;
+
+	function getRatios() {
+		const win = winAnimation.getRatios();
+		const stop = stopAnimation.getRatios();
+		const fail = failAnimation.getRatios();
+
+		return {
+			...win,
+			...stop,
+			...fail,
+			previousSuccessBlocksAnimationRatio,
+		};
 	}
 
 	return {
@@ -292,8 +307,11 @@ export const SystemManager = () => {
 		resetPostDestroy,
 		getBlocks,
 		getLastSpawnedBlock,
-		getWinRatio,
+		getRatios,
 		getFirstStart,
 		board,
+		stopAnimation,
+		winAnimation,
+		failAnimation,
 	};
 };

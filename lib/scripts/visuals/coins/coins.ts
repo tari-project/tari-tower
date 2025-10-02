@@ -7,9 +7,8 @@ import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise';
 import vert from './coins.vert?raw';
 import frag from './coins.frag?raw';
 import fragDepth from './coinsDepth.frag?raw';
-import { floatingCoinsRatio, vortexCoinsRatio } from '../../logic/successAnimationManager';
 import { BufferGeometry, InstancedBufferGeometry, Mesh, ShaderMaterial, Texture } from 'three';
-import { tower } from '../../modules.ts';
+import { systemManager, tower } from '../../modules.ts';
 
 export const Coins = () => {
 	let loadComplete = false;
@@ -142,6 +141,7 @@ export const Coins = () => {
 	}
 
 	function update(dt: number) {
+		const { vortexCoinsRatio, floatingCoinsRatio } = systemManager.getRatios();
 		const isFloatingAnimationActive = vortexCoinsRatio === 0;
 
 		animationRatio = isFloatingAnimationActive ? floatingCoinsRatio : vortexCoinsRatio;

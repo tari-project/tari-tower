@@ -3,18 +3,18 @@ import math from '../utils/math';
 import { completeAnimationEndedSignal, winAnimationSignal } from './signals';
 import { SuccessLevel } from '../../types/stateManager';
 
-let currentAnimationStyle: SuccessLevel | null;
-let successRatio = 0;
-const successAnimationDuration = 6.5; // seconds
-let towerRotationRatio = 0;
-let floatingCoinsRatio = 0;
-let floatingCubesRatio = 0;
-let vortexCoinsRatio = 0;
-let successPushDownRatio = 0;
-let successColorTowerRatio = 0;
-let floatingCubesDisplacement = 1;
+export const SuccessAnimationManager = () => {
+	let currentAnimationStyle: SuccessLevel | null;
+	let successRatio = 0;
+	const successAnimationDuration = 6.5; // seconds
+	let towerRotationRatio = 0;
+	let floatingCoinsRatio = 0;
+	let floatingCubesRatio = 0;
+	let vortexCoinsRatio = 0;
+	let successPushDownRatio = 0;
+	let successColorTowerRatio = 0;
+	let floatingCubesDisplacement = 1;
 
-const SuccessAnimationManager = () => {
 	function init() {
 		winAnimationSignal.add((completeAnimationLevel) => {
 			if (completeAnimationLevel) {
@@ -91,23 +91,22 @@ const SuccessAnimationManager = () => {
 			resetRatios();
 		}
 	}
-
+	function getRatios() {
+		return {
+			successRatio,
+			towerRotationRatio,
+			floatingCoinsRatio,
+			floatingCubesRatio,
+			vortexCoinsRatio,
+			successPushDownRatio,
+			successColorTowerRatio,
+			floatingCubesDisplacement,
+		};
+	}
 	return {
 		init,
 		update,
 		resetRatios,
+		getRatios,
 	};
-};
-
-const successAnimationManager = SuccessAnimationManager();
-export {
-	successAnimationManager,
-	successRatio,
-	towerRotationRatio,
-	floatingCoinsRatio,
-	floatingCubesRatio,
-	vortexCoinsRatio,
-	successPushDownRatio,
-	successColorTowerRatio,
-	floatingCubesDisplacement,
 };

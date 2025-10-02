@@ -1,10 +1,9 @@
 import { TariTower } from './tower.ts';
 import { StateManager } from './logic/stateManager.ts';
+import { SystemManager } from './logic/systemManager.ts';
 
-import { ErrorAnimationManager } from './logic/errorAnimationManager.ts';
-
+const systemManager = SystemManager();
+const stateManager = StateManager();
 const tower = TariTower();
-const stateManagerInstance = StateManager();
-const failAnimation = ErrorAnimationManager();
 
-export { tower, stateManagerInstance as stateManager, failAnimation };
+export { tower, systemManager, stateManager };

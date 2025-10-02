@@ -1,13 +1,13 @@
 import math from '../utils/math';
 import { stateSignal, stopAnimationEndedSignal } from './signals';
 
-const stopAnimationDuration = 2.25; // seconds
-let isActive = false;
-let stopRatio = 0;
-let stopSpawnRatio = 0;
-let stopPushDownRatio = 0;
+export const StopAnimationManager = () => {
+	const stopAnimationDuration = 2.25; // seconds
+	let isActive = false;
+	let stopRatio = 0;
+	let stopSpawnRatio = 0;
+	let stopPushDownRatio = 0;
 
-const StopAnimationManager = () => {
 	function init() {
 		stateSignal.add((status, result) => {
 			if (status === 'RESULT' && result === 'STOP') {
@@ -35,12 +35,18 @@ const StopAnimationManager = () => {
 			resetRatios();
 		}
 	}
+	function getRatios() {
+		return {
+			stopRatio,
+			stopSpawnRatio,
+			stopPushDownRatio,
+		};
+	}
 
 	return {
 		init,
 		update,
 		resetRatios,
+		getRatios,
 	};
 };
-const stopAnimationManager = StopAnimationManager();
-export { stopAnimationManager, stopSpawnRatio, stopPushDownRatio };

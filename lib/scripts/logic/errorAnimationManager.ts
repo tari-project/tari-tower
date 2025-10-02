@@ -40,13 +40,20 @@ export const ErrorAnimationManager = () => {
 		}
 	}
 
+	function getRatios() {
+		return {
+			failRatio,
+			failShakeRatio,
+			failFloatingCubesRatio,
+			failSpawnRatio,
+			failPushDownRatio,
+		};
+	}
+
 	return {
 		init,
 		resetRatios,
 		update,
-		failShakeRatio,
-		failFloatingCubesRatio,
-		failSpawnRatio,
-		failPushDownRatio,
+		getRatios,
 	};
 };
