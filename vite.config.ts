@@ -19,7 +19,6 @@ export default defineConfig({
 		dts({ include: ['lib'], exclude: ['src'], rollupTypes: true, tsconfigPath: resolve(__dirname, 'tsconfig.app.json') }),
 	],
 	build: {
-		emptyOutDir: true,
 		lib: {
 			entry: resolve(__dirname, 'lib/index.ts'),
 			name: '@tari-project/tari-tower',

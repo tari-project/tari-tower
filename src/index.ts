@@ -43,15 +43,15 @@ if (import.meta.env.MODE === 'development') {
 	}).on('change', (_) => {
 		PARAMS.status = getCurrentAnimationState();
 	});
-	p.addBinding(PARAMS, 'flags', {
-		readonly: true,
-		multiline: true,
-		rows: 12,
-		interval: 500,
-	}).on('change', (_) => {
-		const flags = getCurrentFlags();
-		PARAMS.flags = JSON.stringify(flags, null, 2);
-	});
+	// p.addBinding(PARAMS, 'flags', {
+	// 	readonly: true,
+	// 	multiline: true,
+	// 	rows: 12,
+	// 	interval: 500,
+	// }).on('change', (_) => {
+	// 	const flags = getCurrentFlags();
+	// 	PARAMS.flags = JSON.stringify(flags, null, 2);
+	// });
 
 	p.addBinding(PARAMS, 'speed', { min: 0.5, max: 10, step: 0.5 }).on('change', (e) => {
 		setAnimationProperties([{ property: 'animationSpeed', value: e.value }]);
@@ -60,8 +60,8 @@ if (import.meta.env.MODE === 'development') {
 		setAnimationProperties([{ property: 'minSpawnedBlocksForTheErrorBlock', value: e.value }]);
 	});
 
-	const gen = p.addFolder({ title: 'General' });
 	const s = p.addFolder({ title: 'States' });
+	const gen = p.addFolder({ title: 'General' });
 
 	gen.addButton({ title: 'remove' }).on('click', () => removeTowerAnimation({ canvasId }));
 	gen.addButton({ title: 'load' }).on('click', () => loadTowerAnimation({ canvasId, offset: 0 }));

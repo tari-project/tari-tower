@@ -6,9 +6,9 @@ export const HALF_SIZE = Math.floor(SIZE / 2);
 export const TOTAL_TILES = SIZE * SIZE;
 export const TOTAL_TILES_WITH_PADDING = SIZE_WITH_PADDING * SIZE_WITH_PADDING;
 
-let mainTile: Tile | null = null;
-let tiles: Tile[][] = [];
 export const Board = () => {
+	let mainTile: Tile | null = null;
+	let tiles: Tile[][] = [];
 	function init() {
 		tiles = Array.from({ length: SIZE }, (_, i) =>
 			Array.from({ length: SIZE }, (_, j) => {
@@ -60,6 +60,14 @@ export const Board = () => {
 		tiles.flat().forEach((tile) => tile.update(dt));
 	}
 
+	function getMainTile() {
+		return mainTile;
+	}
+
+	function getTiles() {
+		return tiles;
+	}
+
 	return {
 		init,
 		getTile,
@@ -67,7 +75,7 @@ export const Board = () => {
 		reset,
 		preUpdate,
 		update,
+		getMainTile,
+		getTiles,
 	};
 };
-
-export { mainTile, tiles };

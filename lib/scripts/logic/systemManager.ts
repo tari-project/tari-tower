@@ -1,5 +1,5 @@
 import { properties } from '../core/properties';
-import { Board, mainTile, TOTAL_TILES } from './board';
+import { Board, TOTAL_TILES } from './board';
 import { successAnimationManager } from './successAnimationManager';
 import { stopAnimationManager } from './stopAnimationManager';
 import {
@@ -53,7 +53,7 @@ export const SystemManager = () => {
 
 	function _shouldPreventSpawn() {
 		const state = sM.getFlags();
-		return state.isFailResult || state.isStopped || blocks.length >= TOTAL_TILES || (mainTile?.isOccupied && !state.isSuccessResult && !state.isReplayResult);
+		return state.isFailResult || state.isStopped || blocks.length >= TOTAL_TILES || (board.getMainTile()?.isOccupied && !state.isSuccessResult && !state.isReplayResult);
 	}
 
 	function _spawnMultipleBlocks() {
@@ -92,7 +92,7 @@ export const SystemManager = () => {
 			properties.errorBlock = null;
 		}
 		if (block) {
-			block.currentTile = mainTile;
+			block.currentTile = board.getMainTile();
 
 			block.init();
 			block.updateTile();
@@ -272,11 +272,17 @@ export const SystemManager = () => {
 		});
 	}
 
-	function _getLastSpawnedBlock() {
+	function getLastSpawnedBlock() {
 		return lastSpawnedBlock;
 	}
 	function getFirstStart() {
 		return firstStartAnimationRatio;
+	}
+	function getBlocks() {
+		return blocks;
+	}
+	function getWinRatio() {
+		return previousSuccessBlocksAnimationRatio;
 	}
 
 	return {
@@ -284,10 +290,10 @@ export const SystemManager = () => {
 		update,
 		reset,
 		resetPostDestroy,
-		blocks,
-		board,
-		lastSpawnedBlock: _getLastSpawnedBlock(),
-		previousSuccessBlocksAnimationRatio,
+		getBlocks,
+		getLastSpawnedBlock,
+		getWinRatio,
 		getFirstStart,
+		board,
 	};
 };
