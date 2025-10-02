@@ -5,7 +5,7 @@ import vert from './bg.vert?raw';
 import frag from './bg.frag?raw';
 import particlesVert from './particles.vert?raw';
 import particlesFrag from './particles.frag?raw';
-import { tower } from '../../modules.ts';
+import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise.ts';
 
 export const Background = () => {
 	const container = new THREE.Object3D();
@@ -17,7 +17,7 @@ export const Background = () => {
 			u_resolution: properties.sharedUniforms?.u_resolution,
 			u_bgColor1: properties.sharedUniforms?.u_bgColor1,
 			u_bgColor2: properties.sharedUniforms?.u_bgColor2,
-			...tower.blueNoise.getSharedUniforms(),
+			...bn_sharedUniforms,
 		} as unknown as ShaderMaterial['uniforms'];
 		mesh.material = new THREE.ShaderMaterial({
 			uniforms,

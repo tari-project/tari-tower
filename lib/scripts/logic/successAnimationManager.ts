@@ -73,7 +73,6 @@ export const SuccessAnimationManager = () => {
 	function update(dt: number) {
 		successRatio += ((currentAnimationStyle ? 1 : 0) * dt) / successAnimationDuration;
 		successRatio = math.clamp(successRatio, 0, 1);
-
 		switch (currentAnimationStyle) {
 			case 'ONE':
 				_updateRatios1();

@@ -136,9 +136,9 @@ export const StateManager = () => {
 			restartAnimation: () => setRestartAnimation(),
 			restart: () => setRestart(),
 			showVisual: () => showVisual(),
-			success: () => setWin(id as WinLevel, isReplay),
-			success2: () => setWin(id as WinLevel, isReplay),
-			success3: () => setWin(id as WinLevel, isReplay),
+			ONE: () => setWin(id as WinLevel, isReplay),
+			TWO: () => setWin(id as WinLevel, isReplay),
+			THREE: () => setWin(id as WinLevel, isReplay),
 		};
 		actions[id]?.();
 	}

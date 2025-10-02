@@ -8,6 +8,7 @@ import frag from './coins.frag?raw';
 import fragDepth from './coinsDepth.frag?raw';
 import { BufferGeometry, InstancedBufferGeometry, Mesh, ShaderMaterial, Texture } from 'three';
 import { systemManager, tower } from '../../modules.ts';
+import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise.ts';
 
 export const Coins = () => {
 	let loadComplete = false;
@@ -113,7 +114,7 @@ export const Coins = () => {
 				...tower.heroBlocks.heroSharedUniforms,
 				...properties.sharedUniforms,
 				...coinsSharedUniforms,
-				...tower.blueNoise.getSharedUniforms(),
+				...bn_sharedUniforms,
 				...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
 				u_matcapTexture: { value: matcapTexture },
 			},

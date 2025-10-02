@@ -25,13 +25,16 @@ export default defineConfig({
 			formats: ['es'],
 		},
 		rollupOptions: {
-			external: ['three', 'min-signal', '@eslint/js', '@tweakpane/core', 'prettier', 'eslint', 'eslint-config-prettier', 'tweakpane', 'typescript', /node_modules/, '/src'],
+			external: ['three', 'min-signal', '@eslint/js', '@tweakpane/core', 'prettier', 'eslint', 'eslint-config-prettier', 'tweakpane', 'typescript'],
 			input: resolve(__dirname, 'lib/index.ts'),
 			output: {
+				compact: true,
+				validate: true,
 				entryFileNames: '[name].js',
 				assetFileNames: 'assets/[name][extname]',
 				generatedCode: {
 					objectShorthand: true,
+					constBindings: true,
 				},
 				globals: {
 					'three': 'THREE',

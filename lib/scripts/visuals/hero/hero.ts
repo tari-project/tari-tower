@@ -17,7 +17,8 @@ import { lightCameraHelperSignal, lightCameraUpdateSignal } from '../../logic/si
 
 import { HeroSharedUniforms, HeroType } from '../../../types/hero';
 import { log } from '../../utils/logger.ts';
-import { stateManager as sM, systemManager as system, tower } from '../../modules.ts';
+import { stateManager as sM, systemManager as system } from '../../modules.ts';
+import { bn_sharedUniforms } from '../../utils/blueNoise/blueNoise.ts';
 
 export const Hero = () => {
 	const TOTAL_BLOCKS = 2 * TOTAL_TILES;
@@ -119,7 +120,7 @@ export const Hero = () => {
 			...properties.sharedUniforms,
 			...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
 			...heroSharedUniforms,
-			...tower.blueNoise.getSharedUniforms(),
+			...bn_sharedUniforms,
 			u_color: { value: new THREE.Color(properties.neutralColor) },
 			u_blocksColor: { value: new THREE.Color() },
 			u_yDisplacement: { value: 0 },
@@ -176,7 +177,7 @@ export const Hero = () => {
 				...THREE.UniformsUtils.merge([THREE.UniformsLib.lights]),
 				...properties.sharedUniforms,
 				...heroSharedUniforms,
-				...tower.blueNoise.getSharedUniforms(),
+				...bn_sharedUniforms,
 			},
 			vertexShader: vert,
 			fragmentShader: frag,

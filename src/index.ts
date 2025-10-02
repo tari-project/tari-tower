@@ -69,9 +69,9 @@ if (import.meta.env.MODE === 'development') {
 	s.addButton({ title: 'start' }).on('click', () => setAnimationState('start'));
 	s.addButton({ title: 'stop' }).on('click', () => setAnimationState('stop'));
 	s.addButton({ title: 'fail' }).on('click', () => setAnimationState('fail'));
-	s.addButton({ title: 'success' }).on('click', () => setAnimationState('success'));
-	s.addButton({ title: 'success2' }).on('click', () => setAnimationState('success2'));
-	s.addButton({ title: 'success3' }).on('click', () => setAnimationState('success3', true));
+	s.addButton({ title: 'success' }).on('click', () => setAnimationState('ONE'));
+	s.addButton({ title: 'success2' }).on('click', () => setAnimationState('TWO'));
+	s.addButton({ title: 'success3' }).on('click', () => setAnimationState('THREE', true));
 
 	p.refresh();
 
