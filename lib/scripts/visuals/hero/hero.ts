@@ -299,7 +299,7 @@ export const Hero = () => {
 		MAIN_COLOR.set(properties.mainColor);
 		SUCCESS_COLOR.set(properties.successColor);
 		ERROR_COLOR.set(properties.failColor);
-		DEFAULT_COLOR.set(properties.neutralColor).convertSRGBToLinear();
+		DEFAULT_COLOR.set(properties.neutralColor);
 
 		_c.copy(MAIN_COLOR);
 
@@ -322,6 +322,7 @@ export const Hero = () => {
 		_c.convertSRGBToLinear();
 		DEFAULT_COLOR.convertSRGBToLinear();
 		SUCCESS_COLOR.convertSRGBToLinear();
+		ERROR_COLOR.convertSRGBToLinear();
 
 		for (let i = 0; i < TOTAL_BLOCKS; i++) {
 			const logicBlock = system.getBlocks().filter((block) => block.id === i)[0];
@@ -347,14 +348,13 @@ export const Hero = () => {
 		}
 
 		if (heroState._baseMesh) {
-			heroState._baseMesh.material.uniforms.u_color.value.set(DEFAULT_COLOR).convertSRGBToLinear();
+			heroState._baseMesh.material.uniforms.u_color.value.copy(DEFAULT_COLOR);
 			heroState._baseMesh.material.uniforms.u_blocksColor.value.copy(_c);
 			heroState._baseMesh.material.uniforms.u_successColor.value.copy(SUCCESS_COLOR);
 
-			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.set(DEFAULT_COLOR).convertSRGBToLinear();
-
-			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.lerp(_c.set(properties.successColor), system.getRatios().previousSuccessBlocksAnimationRatio);
-			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value.convertSRGBToLinear();
+			heroState._baseMesh.material.uniforms.u_prevSuccessColor.value
+				.copy(DEFAULT_COLOR)
+				.lerp(SUCCESS_COLOR, system.getRatios().previousSuccessBlocksAnimationRatio);
 		}
 	}
 

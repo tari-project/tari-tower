@@ -105,6 +105,7 @@ export const Coins = () => {
 			});
 
 			coinGeometry = geometry;
+			buffers.push(geometry);
 		}
 	}
 
@@ -153,10 +154,6 @@ export const Coins = () => {
 		if (coinMesh) {
 			coinMesh.rotation.y = (isFloating ? 0 : 4) * animationRatio;
 			coinMesh.visible = animationRatio > 0 && animationRatio < 1;
-		}
-		if (animationRatio <= 0) {
-			buffers.forEach((b) => b?.dispose());
-			textures.forEach((t) => t?.dispose());
 		}
 	}
 

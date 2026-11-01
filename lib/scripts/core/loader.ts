@@ -78,6 +78,7 @@ const Loader = () => {
 					attempts++;
 					if (attempts >= maxAttempts) {
 						logError(`Failed to load buffer: ${assetName} after ${maxAttempts} attempts`, error);
+						_onLoad();
 					} else {
 						logError(`Failed to load buffer: ${assetName}, attempt ${attempts}/${maxAttempts}, retrying...`, error);
 						await new Promise((resolve) => setTimeout(resolve, 100));
@@ -108,31 +109,43 @@ const Loader = () => {
 	async function loadTexture(assetName, cb) {
 		const url = assets[assetName];
 
-		list.push(() => {
-			new TextureLoader().load(
-				url,
-				(texture) => {
-					texture.name = assetName;
-					texture.minFilter = LinearMipMapLinearFilter;
-					texture.magFilter = LinearFilter;
-					texture.generateMipmaps = true;
-					texture.anisotropy = 1;
-					texture.flipY = true;
-					cb?.(texture);
-				},
-				undefined,
-				(error) => logError(`Failed to load texture: ${assetName}`, error),
-			);
-		});
+		list.push(
+			() =>
+				new Promise<void>((resolve) => {
+					new TextureLoader().load(
+						url,
+						(texture) => {
+							texture.name = assetName;
+							texture.minFilter = LinearMipMapLinearFilter;
+							texture.magFilter = LinearFilter;
+							texture.generateMipmaps = true;
+							texture.anisotropy = 1;
+							texture.flipY = true;
+							cb?.(texture);
+							_onLoad();
+							resolve();
+						},
+						undefined,
+						(error) => {
+							logError(`Failed to load texture: ${assetName}`, error);
+							_onLoad();
+							resolve();
+						},
+					);
+				}),
+		);
 	}
 
 	async function start(cb) {
-		if (list.length === 0) return;
-		for (const loadFunction of list) {
-			await loadFunction();
+		if (list.length === 0) {
+			cb?.();
+			return;
 		}
 		loadedCount = 0;
 		onLoadCallback = cb;
+		for (const loadFunction of [...list]) {
+			await loadFunction();
+		}
 	}
 
 	function _onLoad() {

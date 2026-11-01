@@ -31,8 +31,8 @@ const Ease = () => {
 };
 
 function cubicBezier(x, x1, y1, x2, y2) {
-	if (x === 0) return 0;
-	if (x === 1) return 1;
+	if (x <= 0) return 0;
+	if (x >= 1) return 1;
 
 	// Helper function to calculate a point on a cubic Bezier curve
 	function bezier(t, p0, p1, p2, p3) {
@@ -49,7 +49,7 @@ function cubicBezier(x, x1, y1, x2, y2) {
 		let t1 = 1;
 		let t = x;
 
-		while (t0 < t1) {
+		for (let i = 0; i < 32 && t1 - t0 > epsilon; i++) {
 			const xEstimate = bezier(t, 0, x1, x2, 1);
 			if (Math.abs(xEstimate - x) < epsilon) {
 				return t;
