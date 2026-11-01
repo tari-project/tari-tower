@@ -5,9 +5,14 @@ import { stateManager, tower } from './modules.ts';
 
 let time = 0;
 let lastRender = 0;
+let animationFrameId: number | null = null;
 const targetFPS = 40;
 const frameInterval = 1 / targetFPS;
 let resetCompleted = false;
+
+function onTowerRemoved() {
+	resetCompleted = true;
+}
 
 /**
  * Main animation loop that controls rendering at a fixed frame rate
@@ -22,7 +27,7 @@ function animate() {
 		time = newTime;
 	}
 
-	requestAnimationFrame(animate);
+	animationFrameId = requestAnimationFrame(animate);
 }
 async function initCallback() {
 	logInfo('[loadTowerAnimation] Initializing...');
@@ -31,8 +36,12 @@ async function initCallback() {
 		logInfo('[loadTowerAnimation] Tari Tower initialized successfully.');
 		time = performance.now() / 1000;
 		lastRender = time;
+		window.removeEventListener('resize', tower.onResize);
 		window.addEventListener('resize', tower.onResize);
 		tower.onResize();
+		if (animationFrameId !== null) {
+			cancelAnimationFrame(animationFrameId);
+		}
 		animate();
 	} catch (error) {
 		logError('[loadTowerAnimation] initCallback:', error);
@@ -41,9 +50,8 @@ async function initCallback() {
 export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: string; offset?: number }) {
 	let loaded = false;
 	resetCompleted = false;
-	towerRemovedSignal.add(() => {
-		resetCompleted = true;
-	});
+	towerRemovedSignal.remove(onTowerRemoved);
+	towerRemovedSignal.add(onTowerRemoved);
 	if (document.getElementById(canvasId)) return;
 
 	properties.offsetX = offset;
@@ -69,6 +77,7 @@ export async function loadTowerAnimation({ canvasId, offset = 0 }: { canvasId: s
 export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 	let removed = false;
 	if (!document.getElementById(canvasId)) return;
+	resetCompleted = false;
 	const status = stateManager.getStatus();
 	logInfo(`[removeTowerAnimation] initiated | current status: ${status}`);
 	if (status === 'NOT_STARTED') {
@@ -90,6 +99,12 @@ export async function removeTowerAnimation({ canvasId }: { canvasId: string }) {
 			clearTimeout(timeout);
 		}
 	}
+	if (animationFrameId !== null) {
+		cancelAnimationFrame(animationFrameId);
+		animationFrameId = null;
+	}
+	window.removeEventListener('resize', tower.onResize);
+	towerRemovedSignal.remove(onTowerRemoved);
 	if (resetCompleted) {
 		logInfo('[removeTowerAnimation] Tower animation removed successfully.');
 		removed = true;

@@ -187,6 +187,7 @@ export const StateManager = () => {
 			status = 'NOT_STARTED';
 			result = 'NONE';
 			_statusIndex = 0;
+			_updateFlags();
 
 			setRemove(false);
 

@@ -141,7 +141,29 @@ export const SystemManager = () => {
 		});
 	}
 
+	function _onCompleteAnimationEnded() {
+		sM.setRestart();
+		_startNewCycle();
+	}
+
+	function _onStopAnimationEnded() {
+		sM.setRestart();
+		reset();
+	}
+
+	function _onErrorAnimationEnded() {
+		sM.setRestart();
+		_startNewCycle();
+	}
+
+	function _removeAnimationListeners() {
+		completeAnimationEndedSignal.remove(_onCompleteAnimationEnded);
+		stopAnimationEndedSignal.remove(_onStopAnimationEnded);
+		errorAnimationEndedSignal.remove(_onErrorAnimationEnded);
+	}
+
 	function resetPostDestroy() {
+		_removeAnimationListeners();
 		blocks.forEach((block) => block.reset());
 		tower.heroBlocks.reset();
 		board.reset();
@@ -165,6 +187,7 @@ export const SystemManager = () => {
 		previousSuccessBlocksAnimationRatio = wasSuccess ? 1 : 0;
 		wasSuccess = false;
 		if (isDestroy) {
+			_removeAnimationListeners();
 			canvasSignal.dispatch();
 			firstStartAnimationRatio = 0;
 		}
@@ -177,18 +200,6 @@ export const SystemManager = () => {
 			sM.setStart();
 		}
 
-		completeAnimationEndedSignal.remove(() => {
-			sM.setRestart();
-			_startNewCycle();
-		});
-		stopAnimationEndedSignal.remove(() => {
-			sM.setRestart();
-			reset();
-		});
-		errorAnimationEndedSignal.remove(() => {
-			sM.setRestart();
-			_startNewCycle();
-		});
 		towerRemovedSignal.dispatch();
 	}
 
@@ -260,18 +271,10 @@ export const SystemManager = () => {
 		failAnimation.init();
 		board.init();
 
-		completeAnimationEndedSignal.add(() => {
-			sM.setRestart();
-			_startNewCycle();
-		});
-		stopAnimationEndedSignal.add(() => {
-			sM.setRestart();
-			reset();
-		});
-		errorAnimationEndedSignal.add(() => {
-			sM.setRestart();
-			_startNewCycle();
-		});
+		_removeAnimationListeners();
+		completeAnimationEndedSignal.add(_onCompleteAnimationEnded);
+		stopAnimationEndedSignal.add(_onStopAnimationEnded);
+		errorAnimationEndedSignal.add(_onErrorAnimationEnded);
 		gameEndedSignal.addOnce(() => {
 			reset(true);
 		});
